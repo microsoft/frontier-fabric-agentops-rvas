@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+*.whl
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Azure
+.azure/
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+
+# Build artifacts
+*.log
+*.tmp
+*.bak
+
+# Secrets
+*.pem
+*.key
+*.cert

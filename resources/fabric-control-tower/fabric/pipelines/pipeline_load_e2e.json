@@ -1,0 +1,146 @@
+{
+  "name": "Load E2E Pipeline",
+  "properties": {
+    "description": "End-to-end medallion architecture load pipeline. Orchestrates Bronze ingestion, Silver transformation, Gold aggregation, and Cosmos mirroring across the observability lakehouse.",
+    "activities": [
+      {
+        "name": "Bronze Ingestion",
+        "type": "TridentNotebook",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 60
+        },
+        "typeProperties": {
+          "notebookId": "01_bronze_ingestion",
+          "parameters": {
+            "FromMonth": {
+              "value": {
+                "value": "@pipeline().parameters.FromMonth",
+                "type": "Expression"
+              },
+              "type": "int"
+            },
+            "ToMonth": {
+              "value": {
+                "value": "@pipeline().parameters.ToMonth",
+                "type": "Expression"
+              },
+              "type": "int"
+            }
+          }
+        }
+      },
+      {
+        "name": "Silver Transformation",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "Bronze Ingestion",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 60
+        },
+        "typeProperties": {
+          "notebookId": "02_silver_transformation"
+        }
+      },
+      {
+        "name": "Gold Aggregation",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "Silver Transformation",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 60
+        },
+        "typeProperties": {
+          "notebookId": "03_gold_aggregation"
+        }
+      },
+      {
+        "name": "Cosmos Mirroring Transform",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "Bronze Ingestion",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 2,
+          "retryIntervalInSeconds": 60
+        },
+        "typeProperties": {
+          "notebookId": "04_cosmos_mirroring_transform"
+        }
+      },
+      {
+        "name": "Send Failure Notification",
+        "type": "WebActivity",
+        "dependsOn": [
+          {
+            "activity": "Bronze Ingestion",
+            "dependencyConditions": ["Failed"]
+          },
+          {
+            "activity": "Silver Transformation",
+            "dependencyConditions": ["Failed"]
+          },
+          {
+            "activity": "Gold Aggregation",
+            "dependencyConditions": ["Failed"]
+          },
+          {
+            "activity": "Cosmos Mirroring Transform",
+            "dependencyConditions": ["Failed"]
+          }
+        ],
+        "policy": {
+          "timeout": "0.00:05:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "url": {
+            "value": "@pipeline().parameters.WebhookUrl",
+            "type": "Expression"
+          },
+          "method": "POST",
+          "headers": {
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "value": "@json(concat('{\"pipeline\":\"', pipeline().Pipeline, '\",\"runId\":\"', pipeline().RunId, '\",\"status\":\"Failed\",\"timestamp\":\"', utcNow(), '\",\"message\":\"Load E2E Pipeline failed. Check activity run details for root cause.\"}'))",
+            "type": "Expression"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "FromMonth": {
+        "type": "int",
+        "defaultValue": -3
+      },
+      "ToMonth": {
+        "type": "int",
+        "defaultValue": 0
+      },
+      "WebhookUrl": {
+        "type": "string",
+        "defaultValue": "https://your-logic-app-or-webhook-endpoint.azurewebsites.net/api/pipeline-alerts"
+      }
+    }
+  }
+}

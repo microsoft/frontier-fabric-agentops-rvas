@@ -1,0 +1,59 @@
+{
+  "name": "Daily Refresh Pipeline",
+  "properties": {
+    "description": "Daily scheduled refresh of observability data. Executes the full E2E medallion load pipeline with a rolling one-month window.",
+    "activities": [
+      {
+        "name": "Run E2E Load",
+        "type": "ExecutePipeline",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.04:00:00"
+        },
+        "typeProperties": {
+          "pipeline": {
+            "referenceName": "Load E2E Pipeline",
+            "type": "PipelineReference"
+          },
+          "waitOnCompletion": true,
+          "parameters": {
+            "FromMonth": -1,
+            "ToMonth": 0
+          }
+        }
+      }
+    ],
+    "parameters": {}
+  },
+  "triggers": [
+    {
+      "name": "DailyRefreshTrigger",
+      "type": "ScheduleTrigger",
+      "properties": {
+        "description": "Triggers the daily refresh pipeline at 06:00 UTC every day",
+        "runtimeState": "Started",
+        "pipelines": [
+          {
+            "pipelineReference": {
+              "referenceName": "Daily Refresh Pipeline",
+              "type": "PipelineReference"
+            },
+            "parameters": {}
+          }
+        ],
+        "typeProperties": {
+          "recurrence": {
+            "frequency": "Day",
+            "interval": 1,
+            "startTime": "2024-01-01T06:00:00Z",
+            "timeZone": "UTC",
+            "schedule": {
+              "hours": [6],
+              "minutes": [0]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+name: Deploy Fabric Analytics
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - "src/**"
+      - "fabric/**"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+        default: dev
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+jobs:
+  deploy:
+    name: Deploy Fabric Analytics
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'dev' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install Azure Developer CLI
+        uses: Azure/setup-azd@v2
+
+      - name: Provision Azure Infrastructure
+        run: azd provision --no-prompt
+        env:
+          AZURE_ENV_NAME: ${{ inputs.environment || 'dev' }}
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: src/setup/requirements.txt
+
+      - name: Install Python dependencies
+        run: pip install -r src/setup/requirements.txt
+
+      - name: Configure Fabric Workspace
+        run: |
+          python src/setup/setup_fabric_workspace.py \
+            --workspace-name "${{ vars.WORKSPACE_NAME }}" \
+            --storage-account-url "${{ secrets.STORAGE_ACCOUNT_URL }}" \
+            --capacity-id "${{ secrets.FABRIC_CAPACITY_ID }}"
+        continue-on-error: false
+
+      - name: Configure Cosmos DB Mirroring
+        run: |
+          python src/setup/setup_cosmos_mirroring.py \
+            --workspace-id "${{ secrets.FABRIC_WORKSPACE_ID }}" \
+            --cosmos-account "${{ secrets.COSMOS_ACCOUNT }}" \
+            --database "${{ secrets.COSMOS_DATABASE }}"
+        continue-on-error: true

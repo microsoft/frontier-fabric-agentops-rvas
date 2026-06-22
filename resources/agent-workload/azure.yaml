@@ -1,0 +1,22 @@
+name: agentops-agent-workload
+metadata:
+  template: agentops-agent-workload@1.0.0
+services:
+  frontend:
+    project: ./src/frontend
+    language: ts
+    host: containerapp
+    docker:
+      path: Dockerfile
+  backend:
+    project: ./src/backend
+    language: py
+    host: containerapp
+    docker:
+      path: Dockerfile
+  agent:
+    project: ./src/agent
+    language: py
+    host: containerapp
+    docker:
+      path: Dockerfile

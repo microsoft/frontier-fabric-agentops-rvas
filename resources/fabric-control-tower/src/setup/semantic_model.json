@@ -1,0 +1,796 @@
+{
+  "name": "Observability Analytics",
+  "compatibilityLevel": 1604,
+  "model": {
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "tables": [
+      {
+        "name": "CostSummary",
+        "lineageTag": "cost-summary-table",
+        "columns": [
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "formatString": "General Date",
+            "lineageTag": "cost-summary-date",
+            "summarizeBy": "none",
+            "isKey": false,
+            "type": "data"
+          },
+          {
+            "name": "service_name",
+            "dataType": "string",
+            "sourceColumn": "service_name",
+            "lineageTag": "cost-summary-service-name",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "capacity_name",
+            "dataType": "string",
+            "sourceColumn": "capacity_name",
+            "lineageTag": "cost-summary-capacity-name",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "region",
+            "dataType": "string",
+            "sourceColumn": "region",
+            "lineageTag": "cost-summary-region",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "daily_cost",
+            "dataType": "decimal",
+            "sourceColumn": "daily_cost",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00",
+            "lineageTag": "cost-summary-daily-cost",
+            "summarizeBy": "sum",
+            "type": "data"
+          },
+          {
+            "name": "monthly_cost",
+            "dataType": "decimal",
+            "sourceColumn": "monthly_cost",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00",
+            "lineageTag": "cost-summary-monthly-cost",
+            "summarizeBy": "sum",
+            "type": "data"
+          },
+          {
+            "name": "ytd_cost",
+            "dataType": "decimal",
+            "sourceColumn": "ytd_cost",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00",
+            "lineageTag": "cost-summary-ytd-cost",
+            "summarizeBy": "sum",
+            "type": "data"
+          },
+          {
+            "name": "cost_change_pct",
+            "dataType": "double",
+            "sourceColumn": "cost_change_pct",
+            "formatString": "0.00%",
+            "lineageTag": "cost-summary-cost-change-pct",
+            "summarizeBy": "average",
+            "type": "data"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CostSummary-partition",
+            "mode": "directLake",
+            "source": {
+              "type": "entity",
+              "entityName": "gold_cost_summary",
+              "schemaName": "dbo",
+              "expressionSource": "DatabaseQuery"
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "TotalCost",
+            "expression": "SUMX(CostSummary, CostSummary[daily_cost])",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00",
+            "lineageTag": "measure-total-cost"
+          },
+          {
+            "name": "AvgDailyCost",
+            "expression": "AVERAGEX(VALUES(Calendar[Date]), [TotalCost])",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00",
+            "lineageTag": "measure-avg-daily-cost"
+          },
+          {
+            "name": "CostYTD",
+            "expression": "TOTALYTD([TotalCost], Calendar[Date])",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00",
+            "lineageTag": "measure-cost-ytd"
+          },
+          {
+            "name": "CostMoMChange",
+            "expression": "VAR CurrentMonth = [TotalCost] VAR PreviousMonth = CALCULATE([TotalCost], DATEADD(Calendar[Date], -1, MONTH)) RETURN DIVIDE(CurrentMonth - PreviousMonth, PreviousMonth, 0)",
+            "formatString": "0.00%",
+            "lineageTag": "measure-cost-mom-change"
+          },
+          {
+            "name": "CostRolling7Day",
+            "expression": "CALCULATE([TotalCost], DATESINPERIOD(Calendar[Date], MAX(Calendar[Date]), -7, DAY))",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00",
+            "lineageTag": "measure-cost-rolling-7day"
+          }
+        ]
+      },
+      {
+        "name": "CapacityUsage",
+        "lineageTag": "capacity-usage-table",
+        "columns": [
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "formatString": "General Date",
+            "lineageTag": "capacity-usage-date",
+            "summarizeBy": "none",
+            "isKey": false,
+            "type": "data"
+          },
+          {
+            "name": "workspace_name",
+            "dataType": "string",
+            "sourceColumn": "workspace_name",
+            "lineageTag": "capacity-usage-workspace-name",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "capacity_name",
+            "dataType": "string",
+            "sourceColumn": "capacity_name",
+            "lineageTag": "capacity-usage-capacity-name",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "avg_utilization",
+            "dataType": "double",
+            "sourceColumn": "avg_utilization",
+            "formatString": "0.00%",
+            "lineageTag": "capacity-usage-avg-utilization",
+            "summarizeBy": "average",
+            "type": "data"
+          },
+          {
+            "name": "max_utilization",
+            "dataType": "double",
+            "sourceColumn": "max_utilization",
+            "formatString": "0.00%",
+            "lineageTag": "capacity-usage-max-utilization",
+            "summarizeBy": "max",
+            "type": "data"
+          },
+          {
+            "name": "p95_utilization",
+            "dataType": "double",
+            "sourceColumn": "p95_utilization",
+            "formatString": "0.00%",
+            "lineageTag": "capacity-usage-p95-utilization",
+            "summarizeBy": "average",
+            "type": "data"
+          },
+          {
+            "name": "cu_seconds_consumed",
+            "dataType": "int64",
+            "sourceColumn": "cu_seconds_consumed",
+            "formatString": "#,0",
+            "lineageTag": "capacity-usage-cu-seconds",
+            "summarizeBy": "sum",
+            "type": "data"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "CapacityUsage-partition",
+            "mode": "directLake",
+            "source": {
+              "type": "entity",
+              "entityName": "gold_capacity_usage",
+              "schemaName": "dbo",
+              "expressionSource": "DatabaseQuery"
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "CapacityUtilization",
+            "expression": "AVERAGE(CapacityUsage[avg_utilization])",
+            "formatString": "0.00%",
+            "lineageTag": "measure-capacity-utilization"
+          }
+        ]
+      },
+      {
+        "name": "OperationalMetrics",
+        "lineageTag": "operational-metrics-table",
+        "columns": [
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "formatString": "General Date",
+            "lineageTag": "operational-metrics-date",
+            "summarizeBy": "none",
+            "isKey": false,
+            "type": "data"
+          },
+          {
+            "name": "service_name",
+            "dataType": "string",
+            "sourceColumn": "service_name",
+            "lineageTag": "operational-metrics-service-name",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "error_count",
+            "dataType": "int64",
+            "sourceColumn": "error_count",
+            "formatString": "#,0",
+            "lineageTag": "operational-metrics-error-count",
+            "summarizeBy": "sum",
+            "type": "data"
+          },
+          {
+            "name": "total_requests",
+            "dataType": "int64",
+            "sourceColumn": "total_requests",
+            "formatString": "#,0",
+            "lineageTag": "operational-metrics-total-requests",
+            "summarizeBy": "sum",
+            "type": "data"
+          },
+          {
+            "name": "error_rate",
+            "dataType": "double",
+            "sourceColumn": "error_rate",
+            "formatString": "0.00%",
+            "lineageTag": "operational-metrics-error-rate",
+            "summarizeBy": "average",
+            "type": "data"
+          },
+          {
+            "name": "p50_latency_ms",
+            "dataType": "double",
+            "sourceColumn": "p50_latency_ms",
+            "formatString": "#,0.00",
+            "lineageTag": "operational-metrics-p50-latency",
+            "summarizeBy": "average",
+            "type": "data"
+          },
+          {
+            "name": "p95_latency_ms",
+            "dataType": "double",
+            "sourceColumn": "p95_latency_ms",
+            "formatString": "#,0.00",
+            "lineageTag": "operational-metrics-p95-latency",
+            "summarizeBy": "average",
+            "type": "data"
+          },
+          {
+            "name": "p99_latency_ms",
+            "dataType": "double",
+            "sourceColumn": "p99_latency_ms",
+            "formatString": "#,0.00",
+            "lineageTag": "operational-metrics-p99-latency",
+            "summarizeBy": "average",
+            "type": "data"
+          },
+          {
+            "name": "availability_pct",
+            "dataType": "double",
+            "sourceColumn": "availability_pct",
+            "formatString": "0.00%",
+            "lineageTag": "operational-metrics-availability-pct",
+            "summarizeBy": "average",
+            "type": "data"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "OperationalMetrics-partition",
+            "mode": "directLake",
+            "source": {
+              "type": "entity",
+              "entityName": "gold_operational_metrics",
+              "schemaName": "dbo",
+              "expressionSource": "DatabaseQuery"
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "ErrorRate",
+            "expression": "DIVIDE(SUM(OperationalMetrics[error_count]), SUM(OperationalMetrics[total_requests]), 0)",
+            "formatString": "0.00%",
+            "lineageTag": "measure-error-rate"
+          },
+          {
+            "name": "AvgResponseTime",
+            "expression": "AVERAGE(AgentAnalytics[avg_response_time_ms])",
+            "formatString": "#,0.00",
+            "lineageTag": "measure-avg-response-time"
+          }
+        ]
+      },
+      {
+        "name": "ResourceInventory",
+        "lineageTag": "resource-inventory-table",
+        "columns": [
+          {
+            "name": "resource_id",
+            "dataType": "string",
+            "sourceColumn": "resource_id",
+            "lineageTag": "resource-inventory-resource-id",
+            "summarizeBy": "none",
+            "isKey": true,
+            "type": "data"
+          },
+          {
+            "name": "resource_name",
+            "dataType": "string",
+            "sourceColumn": "resource_name",
+            "lineageTag": "resource-inventory-resource-name",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "resource_type",
+            "dataType": "string",
+            "sourceColumn": "resource_type",
+            "lineageTag": "resource-inventory-resource-type",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "resource_group",
+            "dataType": "string",
+            "sourceColumn": "resource_group",
+            "lineageTag": "resource-inventory-resource-group",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "region",
+            "dataType": "string",
+            "sourceColumn": "region",
+            "lineageTag": "resource-inventory-region",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "tags",
+            "dataType": "string",
+            "sourceColumn": "tags",
+            "lineageTag": "resource-inventory-tags",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "total_cost",
+            "dataType": "decimal",
+            "sourceColumn": "total_cost",
+            "formatString": "$#,0.00;($#,0.00);$#,0.00",
+            "lineageTag": "resource-inventory-total-cost",
+            "summarizeBy": "sum",
+            "type": "data"
+          },
+          {
+            "name": "is_compliant",
+            "dataType": "boolean",
+            "sourceColumn": "is_compliant",
+            "lineageTag": "resource-inventory-is-compliant",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "effective_start_date",
+            "dataType": "dateTime",
+            "sourceColumn": "effective_start_date",
+            "formatString": "General Date",
+            "lineageTag": "resource-inventory-effective-start-date",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "effective_end_date",
+            "dataType": "dateTime",
+            "sourceColumn": "effective_end_date",
+            "formatString": "General Date",
+            "lineageTag": "resource-inventory-effective-end-date",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "is_current",
+            "dataType": "boolean",
+            "sourceColumn": "is_current",
+            "lineageTag": "resource-inventory-is-current",
+            "summarizeBy": "none",
+            "type": "data"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "ResourceInventory-partition",
+            "mode": "directLake",
+            "source": {
+              "type": "entity",
+              "entityName": "gold_resource_inventory",
+              "schemaName": "dbo",
+              "expressionSource": "DatabaseQuery"
+            }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "ResourceHierarchy",
+            "lineageTag": "hierarchy-resource",
+            "levels": [
+              {
+                "name": "ResourceType",
+                "ordinal": 0,
+                "column": "resource_type",
+                "lineageTag": "hierarchy-resource-type-level"
+              },
+              {
+                "name": "ResourceName",
+                "ordinal": 1,
+                "column": "resource_name",
+                "lineageTag": "hierarchy-resource-name-level"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "AgentAnalytics",
+        "lineageTag": "agent-analytics-table",
+        "columns": [
+          {
+            "name": "date",
+            "dataType": "dateTime",
+            "sourceColumn": "date",
+            "formatString": "General Date",
+            "lineageTag": "agent-analytics-date",
+            "summarizeBy": "none",
+            "isKey": false,
+            "type": "data"
+          },
+          {
+            "name": "agent_id",
+            "dataType": "string",
+            "sourceColumn": "agent_id",
+            "lineageTag": "agent-analytics-agent-id",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "agent_name",
+            "dataType": "string",
+            "sourceColumn": "agent_name",
+            "lineageTag": "agent-analytics-agent-name",
+            "summarizeBy": "none",
+            "type": "data"
+          },
+          {
+            "name": "total_conversations",
+            "dataType": "int64",
+            "sourceColumn": "total_conversations",
+            "formatString": "#,0",
+            "lineageTag": "agent-analytics-total-conversations",
+            "summarizeBy": "sum",
+            "type": "data"
+          },
+          {
+            "name": "avg_response_time_ms",
+            "dataType": "double",
+            "sourceColumn": "avg_response_time_ms",
+            "formatString": "#,0.00",
+            "lineageTag": "agent-analytics-avg-response-time",
+            "summarizeBy": "average",
+            "type": "data"
+          },
+          {
+            "name": "avg_satisfaction_score",
+            "dataType": "double",
+            "sourceColumn": "avg_satisfaction_score",
+            "formatString": "0.00",
+            "lineageTag": "agent-analytics-avg-satisfaction",
+            "summarizeBy": "average",
+            "type": "data"
+          },
+          {
+            "name": "total_tokens_used",
+            "dataType": "int64",
+            "sourceColumn": "total_tokens_used",
+            "formatString": "#,0",
+            "lineageTag": "agent-analytics-total-tokens",
+            "summarizeBy": "sum",
+            "type": "data"
+          },
+          {
+            "name": "total_prompt_tokens",
+            "dataType": "int64",
+            "sourceColumn": "total_prompt_tokens",
+            "formatString": "#,0",
+            "lineageTag": "agent-analytics-prompt-tokens",
+            "summarizeBy": "sum",
+            "type": "data"
+          },
+          {
+            "name": "total_completion_tokens",
+            "dataType": "int64",
+            "sourceColumn": "total_completion_tokens",
+            "formatString": "#,0",
+            "lineageTag": "agent-analytics-completion-tokens",
+            "summarizeBy": "sum",
+            "type": "data"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "AgentAnalytics-partition",
+            "mode": "directLake",
+            "source": {
+              "type": "entity",
+              "entityName": "gold_agent_analytics",
+              "schemaName": "dbo",
+              "expressionSource": "DatabaseQuery"
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "AvgSatisfactionScore",
+            "expression": "AVERAGE(AgentAnalytics[avg_satisfaction_score])",
+            "formatString": "0.00",
+            "lineageTag": "measure-avg-satisfaction-score"
+          },
+          {
+            "name": "TotalConversations",
+            "expression": "SUM(AgentAnalytics[total_conversations])",
+            "formatString": "#,0",
+            "lineageTag": "measure-total-conversations"
+          }
+        ]
+      },
+      {
+        "name": "Calendar",
+        "lineageTag": "calendar-table",
+        "columns": [
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "sourceColumn": "Date",
+            "formatString": "General Date",
+            "lineageTag": "calendar-date",
+            "summarizeBy": "none",
+            "isKey": true,
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "formatString": "0",
+            "lineageTag": "calendar-year",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Quarter",
+            "dataType": "int64",
+            "sourceColumn": "Quarter",
+            "formatString": "0",
+            "lineageTag": "calendar-quarter",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Month",
+            "dataType": "int64",
+            "sourceColumn": "Month",
+            "formatString": "0",
+            "lineageTag": "calendar-month",
+            "summarizeBy": "none",
+            "sortByColumn": "Month",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "MonthName",
+            "dataType": "string",
+            "sourceColumn": "MonthName",
+            "lineageTag": "calendar-month-name",
+            "summarizeBy": "none",
+            "sortByColumn": "Month",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Day",
+            "dataType": "int64",
+            "sourceColumn": "Day",
+            "formatString": "0",
+            "lineageTag": "calendar-day",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "WeekOfYear",
+            "dataType": "int64",
+            "sourceColumn": "WeekOfYear",
+            "formatString": "0",
+            "lineageTag": "calendar-week-of-year",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "IsWeekend",
+            "dataType": "boolean",
+            "sourceColumn": "IsWeekend",
+            "lineageTag": "calendar-is-weekend",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Calendar-partition",
+            "mode": "import",
+            "source": {
+              "type": "calculated",
+              "expression": "VAR MinDate = MIN(MIN(CostSummary[date]), MIN(MIN(CapacityUsage[date]), MIN(MIN(OperationalMetrics[date]), AgentAnalytics[date]))) VAR MaxDate = MAX(MAX(CostSummary[date]), MAX(MAX(CapacityUsage[date]), MAX(MAX(OperationalMetrics[date]), AgentAnalytics[date]))) RETURN ADDCOLUMNS( CALENDAR(MinDate, MaxDate), \"Year\", YEAR([Date]), \"Quarter\", QUARTER([Date]), \"Month\", MONTH([Date]), \"MonthName\", FORMAT([Date], \"MMMM\"), \"Day\", DAY([Date]), \"WeekOfYear\", WEEKNUM([Date]), \"IsWeekend\", WEEKDAY([Date], 2) >= 6 )"
+            }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "DateHierarchy",
+            "lineageTag": "hierarchy-date",
+            "levels": [
+              {
+                "name": "Year",
+                "ordinal": 0,
+                "column": "Year",
+                "lineageTag": "hierarchy-date-year-level"
+              },
+              {
+                "name": "Quarter",
+                "ordinal": 1,
+                "column": "Quarter",
+                "lineageTag": "hierarchy-date-quarter-level"
+              },
+              {
+                "name": "Month",
+                "ordinal": 2,
+                "column": "Month",
+                "lineageTag": "hierarchy-date-month-level"
+              },
+              {
+                "name": "Day",
+                "ordinal": 3,
+                "column": "Day",
+                "lineageTag": "hierarchy-date-day-level"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "CostSummary_Date_to_Calendar_Date",
+        "fromTable": "CostSummary",
+        "fromColumn": "date",
+        "toTable": "Calendar",
+        "toColumn": "Date",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "singleDirection",
+        "isActive": true
+      },
+      {
+        "name": "CapacityUsage_Date_to_Calendar_Date",
+        "fromTable": "CapacityUsage",
+        "fromColumn": "date",
+        "toTable": "Calendar",
+        "toColumn": "Date",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "singleDirection",
+        "isActive": true
+      },
+      {
+        "name": "OperationalMetrics_Date_to_Calendar_Date",
+        "fromTable": "OperationalMetrics",
+        "fromColumn": "date",
+        "toTable": "Calendar",
+        "toColumn": "Date",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "singleDirection",
+        "isActive": true
+      },
+      {
+        "name": "AgentAnalytics_Date_to_Calendar_Date",
+        "fromTable": "AgentAnalytics",
+        "fromColumn": "date",
+        "toTable": "Calendar",
+        "toColumn": "Date",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "crossFilteringBehavior": "singleDirection",
+        "isActive": true
+      },
+      {
+        "name": "CostSummary_ServiceName_to_ResourceInventory_ResourceType",
+        "fromTable": "CostSummary",
+        "fromColumn": "service_name",
+        "toTable": "ResourceInventory",
+        "toColumn": "resource_type",
+        "fromCardinality": "many",
+        "toCardinality": "many",
+        "crossFilteringBehavior": "bothDirections",
+        "isActive": true
+      }
+    ],
+    "roles": [
+      {
+        "name": "Reader",
+        "modelPermission": "read",
+        "members": [],
+        "tablePermissions": []
+      },
+      {
+        "name": "RegionFiltered",
+        "modelPermission": "read",
+        "members": [],
+        "tablePermissions": [
+          {
+            "name": "CostSummary",
+            "filterExpression": "CostSummary[region] = USERNAME()"
+          },
+          {
+            "name": "CapacityUsage",
+            "filterExpression": "TRUE()"
+          },
+          {
+            "name": "OperationalMetrics",
+            "filterExpression": "TRUE()"
+          },
+          {
+            "name": "ResourceInventory",
+            "filterExpression": "ResourceInventory[region] = USERNAME()"
+          },
+          {
+            "name": "AgentAnalytics",
+            "filterExpression": "TRUE()"
+          },
+          {
+            "name": "Calendar",
+            "filterExpression": "TRUE()"
+          }
+        ]
+      }
+    ],
+    "expressions": [
+      {
+        "name": "DatabaseQuery",
+        "kind": "m",
+        "expression": "let Source = Sql.Database(\"your-fabric-sql-endpoint\", \"your-lakehouse-name\") in Source"
+      }
+    ]
+  }
+}
