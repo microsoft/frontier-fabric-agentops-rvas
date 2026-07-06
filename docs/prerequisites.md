@@ -127,8 +127,8 @@ This RVAS is intentionally low-cost, but **clean up when you're done**.
 ## 8. Get the code
 
 ```bash
-git clone https://github.com/microsoft/frontier-fabric-agentops-hackathon.git
-cd frontier-fabric-agentops-hackathon
+git clone https://github.com/microsoft/frontier-fabric-agentops-rvas.git
+cd frontier-fabric-agentops-rvas
 ```
 
 ---

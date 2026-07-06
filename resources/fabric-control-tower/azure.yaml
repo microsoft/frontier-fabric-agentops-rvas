@@ -1,6 +1,6 @@
 name: agentops-fabric-control-tower
 metadata:
-  template: frontier-fabric-agentops-hackathon/fabric-control-tower
+  template: frontier-fabric-agentops-rvas/fabric-control-tower
 infra:
   provider: bicep
   path: ./infra

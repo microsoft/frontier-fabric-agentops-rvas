@@ -137,7 +137,7 @@ See the [**Challenge Index**](challenges/README.md) for the full arc, dependenci
 ## Repository Structure
 
 ```
-frontier-fabric-agentops-hackathon/
+frontier-fabric-agentops-rvas/
 ├── README.md                     ← you are here
 ├── docs/
 │   ├── architecture.md           # Reference architecture & data flows
