@@ -10,7 +10,7 @@
 > to connect it to Microsoft Fabric without copying piles of data around. This is where OneLake becomes
 > the customer's unifying data estate.
 
-In this challenge you build the **Fabric foundation** for the rest of the hackathon: a Lakehouse that
+In this challenge you build the **Fabric foundation** for the rest of the RVAS: a Lakehouse that
 sees the Challenge 2 landing-zone files through **OneLake shortcuts**, and a mirrored Cosmos DB source
 that brings Challenge 1 agent conversations into OneLake Delta tables for near-real-time analytics.
 

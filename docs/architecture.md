@@ -1,6 +1,6 @@
 # Reference Architecture — AgentOps Control Tower (Fabric Edition)
 
-This document describes the end-to-end architecture your team will build during the hackathon. Use
+This document describes the end-to-end architecture your team will build during the RVAS. Use
 it as your north star: every challenge stands up one slice of this picture.
 
 > The `resources/` directory contains a working reference implementation of everything described

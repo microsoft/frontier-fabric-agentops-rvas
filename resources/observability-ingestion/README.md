@@ -1,6 +1,6 @@
 # Observability Ingestion — Reference Component
 
-> **Part of the [Frontier Fabric AgentOps Hackathon](../../README.md).** This component is the
+> **Part of the [Frontier Fabric AgentOps RVAS](../../README.md).** This component is the
 > **telemetry landing zone** you build in **[Challenge 2](../../challenges/challenge-02-landing-zone.md)** —
 > Azure infrastructure and export scripts that land cost, metrics, logs, diagnostics, and resource
 > metadata into ADLS Gen2 so Fabric can shortcut to it in later challenges.

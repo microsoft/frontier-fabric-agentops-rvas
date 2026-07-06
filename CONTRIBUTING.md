@@ -1,6 +1,6 @@
-# Contributing to the Frontier Fabric AgentOps Hackathon
+# Contributing to the Frontier Fabric AgentOps RVAS
 
-Thanks for your interest in improving this hackathon! This repo is an open teaching asset — the more
+Thanks for your interest in improving this RVAS! This repo is an open teaching asset — the more
 real-world the challenges, hints, and coach guides are, the better the experience for the next
 customer team that runs it. Contributions of all sizes are welcome, from fixing a typo to authoring a
 brand-new challenge.

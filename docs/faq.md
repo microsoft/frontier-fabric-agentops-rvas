@@ -1,13 +1,13 @@
 # Frequently Asked Questions
 
-General, architecture, and logistics questions for the **AgentOps Control Tower** hackathon. Coaches
+General, architecture, and logistics questions for the **AgentOps Control Tower** RVAS. Coaches
 should also review the per-challenge guides in [`coach/`](../coach/README.md).
 
 ---
 
 ## Logistics
 
-**How long is the hackathon?**
+**How long is the RVAS?**
 Plan for **1.5–2 days**. Challenges 0–5 are the core path; Challenge 6 is a stretch for teams that
 move fast. Each challenge is scoped to roughly 1.5–2.5 hours including discussion.
 
@@ -86,7 +86,7 @@ The Silver/Gold layers join FOCUS cost data with **resource tags** and the **age
 
 **How much data can this handle?**
 It scales with Fabric capacity. F2/F4 handles tens of millions of rows comfortably for the
-hackathon. For enterprise volumes (billions of cost records), use F64+, partition Delta tables by
+RVAS. For enterprise volumes (billions of cost records), use F64+, partition Delta tables by
 month, and Z-order on frequently filtered columns (subscription, date).
 
 **What's the end-to-end latency?**
@@ -114,7 +114,7 @@ Yes. ADLS Gen2 and OneLake encrypt at rest (Microsoft-managed keys by default; c
 available). Cosmos DB is encrypted at rest. All traffic uses TLS 1.2+.
 
 **What will this cost us?**
-Low for a hackathon: Fabric is free on trial; the agent workload runs a few dollars/day with
+Low for an RVAS: Fabric is free on trial; the agent workload runs a few dollars/day with
 `gpt-4o-mini`, serverless Cosmos DB, and scale-to-low Container Apps (APIM Developer tier is the main
 fixed cost); the landing zone is inexpensive. **Tear everything down** with `azd down --purge` and
 end the Fabric trial / delete the workspace when finished.

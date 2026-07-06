@@ -74,7 +74,7 @@ Reference path:
    - `dim_resource[Team] = "FinanceOps"`
    - `LEFT(dim_agent[AgentNamespace], 16) = "contoso.finance"`
 4. Test with **View as** for both roles.
-5. Assign users or groups if the tenant/workspace permits; for hackathon validation, View as is enough.
+5. Assign users or groups if the tenant/workspace permits; for RVAS validation, View as is enough.
 
 Coach prompt: "Show me the exact same report page as Role A and Role B, and tell me why the totals
 changed."

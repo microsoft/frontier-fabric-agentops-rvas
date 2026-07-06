@@ -1,12 +1,12 @@
-# Frontier Fabric AgentOps Hackathon
+# Frontier Fabric AgentOps RVAS
 
 ### Build an **AgentOps Control Tower** on Microsoft Fabric
 
-> A hands-on, challenge-based hackathon where your team builds a Fabric-based control tower that
+> A hands-on, challenge-based RVAS (Real Value Acceleration Solutions) where your team builds a Fabric-based control tower that
 > **ingests and correlates telemetry from Azure services and Foundry-built agents** — enabling
 > end-to-end monitoring, analytics, and dashboards for **reliability, cost, and performance**.
 
-![Hackathon](https://img.shields.io/badge/format-hackathon-blueviolet)
+![RVAS](https://img.shields.io/badge/format-RVAS-blueviolet)
 ![Microsoft Fabric](https://img.shields.io/badge/Microsoft-Fabric-117865)
 ![Azure AI Foundry](https://img.shields.io/badge/Azure%20AI-Foundry-0078D4)
 ![Level](https://img.shields.io/badge/level-200--400-orange)
@@ -31,7 +31,7 @@ The telemetry exists, but it is scattered across Application Insights, Azure Mon
 Management, Resource Graph, and Cosmos DB. The customer has chosen **Microsoft Fabric** to unify it
 all into a single **AgentOps Control Tower**.
 
-**That is your job.** Over the course of this hackathon your team will stand up the end-to-end
+**That is your job.** Over the course of this RVAS your team will stand up the end-to-end
 platform: light up a live agent workload, land its telemetry in a lake, connect it to Fabric with
 zero-copy OneLake shortcuts and Cosmos DB Mirroring, refine it through a medallion architecture, and
 deliver the Control Tower dashboards that finally give the business a single pane of glass.
@@ -91,7 +91,7 @@ all on first-party Microsoft technology.
 
 ---
 
-## Hackathon Format
+## RVAS Format
 
 | | |
 |---|---|
@@ -165,7 +165,7 @@ Control Tower itself. Coaches hold the keys to the reference solution for each c
 
 ## Outcomes
 
-After this hackathon, your team will be able to:
+After this RVAS, your team will be able to:
 
 - Deploy and instrument **Azure AI Foundry agents** that emit production-grade telemetry.
 - Build a unified **observability landing zone** spanning telemetry, cost, and metadata.
@@ -178,7 +178,7 @@ After this hackathon, your team will be able to:
 
 ## Contributing
 
-This hackathon is maintained as an open asset. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to
+This RVAS is maintained as an open asset. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to
 propose improvements, report issues, or add challenges. Bug reports and feature requests are welcome
 via GitHub Issues.
 

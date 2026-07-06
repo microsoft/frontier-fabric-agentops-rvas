@@ -41,7 +41,7 @@ graph LR
 
 ## Scoring
 
-This is a learning hackathon, not a competition — but if your event wants friendly scoring, here's a
+This is a learning RVAS, not a competition — but if your event wants friendly scoring, here's a
 simple rubric (coaches can adapt). Points are awarded per challenge at the success checkpoint.
 
 | Challenge | Base points | Bonus opportunities |

@@ -97,7 +97,7 @@ movement patterns without prompting.
 | Fabric **Mirroring tenant setting** disabled | Fabric admin must enable Mirroring and service principal / managed identity access in tenant settings |
 | Cosmos continuous backup / analytical store not enabled → mirrored tables empty | Enable the required Cosmos DB Mirroring prerequisites for the source account/database, then restart Mirroring |
 | Wrong **capacity ID** | Use the Fabric capacity GUID from Challenge 0, not the display name; confirm the workspace is assigned to that capacity |
-| Cross-tenant identity issues | Keep Azure subscription, Cosmos DB, storage, and Fabric workspace in the same tenant for the hackathon path |
+| Cross-tenant identity issues | Keep Azure subscription, Cosmos DB, storage, and Fabric workspace in the same tenant for the RVAS path |
 | Fabric API returns **202 Accepted** and item ID is missing | Creation is asynchronous; wait in Fabric until the item appears, then rerun the idempotent script |
 | `metadata` vs `resource-metadata` naming confusion | The script creates shortcut `metadata`; the README's notebook section may call the domain `resource-metadata`. Verify the actual Challenge 2 container name and keep the path consistent before Challenge 4 |
 | Mirrored table names differ from the guide | Check Cosmos DB containers from Challenge 1. Current setup script uses `conversations` and `interactions`; select `messages`/`feedback` only if those containers exist |

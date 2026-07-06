@@ -75,7 +75,7 @@ Ask the team to:
 | **Foundry access not enabled** on the subscription | This can take time — escalate immediately; have a backup subscription that already has Foundry |
 | Region has the model but **not Fabric** (or vice versa) | Standardize on East US 2 / West US 3 / Sweden Central |
 | Fabric **tenant setting** disabled (can't create workspaces / Mirroring) | Get the Fabric admin to enable it (see prerequisites) — this is a tenant-admin action, plan ahead |
-| Trial **F64 option not offered** | F4 is fine for the hackathon; or use a paid F2+; eligibility for F64 varies |
+| Trial **F64 option not offered** | F4 is fine for the RVAS; or use a paid F2+; eligibility for F64 varies |
 | Corporate **egress restrictions** block PyPI/npm/MCR or `*.fabric.microsoft.com` | Use Azure Cloud Shell for CLI; raise a firewall exception |
 
 ## Talking points (mini-briefing)

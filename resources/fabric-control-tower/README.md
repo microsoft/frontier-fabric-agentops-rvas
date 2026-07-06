@@ -1,6 +1,6 @@
 # Fabric Control Tower — Reference Component
 
-> **Part of the [Frontier Fabric AgentOps Hackathon](../../README.md).** This is the **control
+> **Part of the [Frontier Fabric AgentOps RVAS](../../README.md).** This is the **control
 > tower** itself — the Fabric workspace you stand up across
 > **[Challenge 3](../../challenges/challenge-03-onelake-foundation.md)** (OneLake foundation),
 > **[Challenge 4](../../challenges/challenge-04-medallion-pipeline.md)** (medallion pipeline), and

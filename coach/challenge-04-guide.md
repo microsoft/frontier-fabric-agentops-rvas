@@ -13,7 +13,7 @@
 
 ## Coaching objectives
 
-This is the data-engineering core of the hackathon. Keep teams focused on **correlation**, not just
+This is the data-engineering core of the RVAS. Keep teams focused on **correlation**, not just
 "notebooks ran." The Control Tower becomes valuable when cost, telemetry, resource metadata, and agent
 activity can be joined into one operational story.
 

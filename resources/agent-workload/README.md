@@ -1,6 +1,6 @@
 # Agent Workload — Reference Component
 
-> **Part of the [Frontier Fabric AgentOps Hackathon](../../README.md).** This is the telemetry
+> **Part of the [Frontier Fabric AgentOps RVAS](../../README.md).** This is the telemetry
 > **source** you deploy in **[Challenge 1](../../challenges/challenge-01-agent-telemetry.md)** — a
 > full-stack Azure AI Foundry agent that emits the traces, custom token/cost metrics, and
 > conversation data the Control Tower later correlates.
@@ -109,7 +109,7 @@ After deployment completes, `azd` prints the service URLs:
 |---|---|
 | **Technology** | Next.js 14 (React, TypeScript) |
 | **Port** | 3000 |
-| **Purpose** | Modern chat interface for user interactions with the AI agent. Renders streaming responses, manages conversation state, and provides a clean UX for the hackathon. |
+| **Purpose** | Modern chat interface for user interactions with the AI agent. Renders streaming responses, manages conversation state, and provides a clean UX for the RVAS. |
 
 ### Backend — `src/backend`
 
@@ -428,7 +428,7 @@ The agent service emits custom metrics for model usage:
 
 #### Live Metrics
 
-Monitor real-time request rates, failure rates, and dependency durations during the hackathon.
+Monitor real-time request rates, failure rates, and dependency durations during the RVAS.
 
 **View live metrics:** Azure Portal → Application Insights → Live metrics.
 

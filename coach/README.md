@@ -1,6 +1,6 @@
 # Coach Handbook
 
-Everything an instructor needs to run the **AgentOps Control Tower** hackathon. Read this first, then
+Everything an instructor needs to run the **AgentOps Control Tower** RVAS. Read this first, then
 review the per-challenge coach guides.
 
 > 🧑‍🏫 **Coaching philosophy:** facilitate, don't solve. Let teams struggle productively. Ask

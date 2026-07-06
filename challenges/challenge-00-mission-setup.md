@@ -18,7 +18,7 @@ later.
 
 By the end of this challenge you will have:
 
-- Confirmed Azure subscription access and the roles needed for the rest of the hackathon.
+- Confirmed Azure subscription access and the roles needed for the rest of the RVAS.
 - Verified Azure AI Foundry model quota in a region that also supports Fabric.
 - A working **Microsoft Fabric capacity** (trial or paid) and a **team workspace** on it.
 - Local tooling installed and verified for every team member.

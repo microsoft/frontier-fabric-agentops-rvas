@@ -113,7 +113,7 @@ filtered to their subscription, resource group, team, or agent namespace.
 - Test the report with **View as** for both roles.
 - Show that the same page returns different slices for different roles.
 
-A simple ownership table is enough for the hackathon. Production can map Entra groups to roles later.
+A simple ownership table is enough for the RVAS. Production can map Entra groups to roles later.
 
 ### D. Automation — give the tower a daily operating rhythm
 
@@ -154,7 +154,7 @@ threshold so the alert can fire during the demo, then explain the production thr
 <details>
 <summary>What counts as a simulated breach?</summary>
 
-For the hackathon, it is acceptable to simulate by lowering the threshold, filtering to a noisy agent,
+For the RVAS, it is acceptable to simulate by lowering the threshold, filtering to a noisy agent,
 or inserting a clearly marked test row into a development Gold table. Do not corrupt production-like
 history; keep the test obvious and reversible.
 </details>

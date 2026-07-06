@@ -1,6 +1,6 @@
 # Resources — Reference Implementation Toolbox
 
-This directory is your **toolbox** for the hackathon. It contains a complete, working reference
+This directory is your **toolbox** for the RVAS. It contains a complete, working reference
 implementation of the AgentOps Control Tower — infrastructure-as-code, application code, Fabric setup
 automation, PySpark notebooks, pipelines, and a semantic model.
 
@@ -35,7 +35,7 @@ Challenge 6  ──▶  fabric-control-tower/  +  Power BI / Data Activator  (op
   environment. Read each component's README before deploying.
 - **Deploy in order where there are dependencies:** the agent workload and landing zone are
   independent of each other, but the Fabric Control Tower consumes both.
-- **Cost & cleanup:** everything is sized for a low-cost hackathon. Tear down with `azd down --purge`
+- **Cost & cleanup:** everything is sized for a low-cost RVAS. Tear down with `azd down --purge`
   in each workload directory when you're finished (see [prerequisites](../docs/prerequisites.md)).
 - **Same tenant:** keep the Azure subscription and Fabric capacity in the **same Entra tenant** to
   avoid managed-identity and Mirroring friction.

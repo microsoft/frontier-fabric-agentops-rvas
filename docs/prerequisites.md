@@ -1,6 +1,6 @@
 # Prerequisites & Environment Setup
 
-Work through this checklist **with your coach before Day 1**. The hackathon runs on the **customer's
+Work through this checklist **with your coach before Day 1**. The RVAS runs on the **customer's
 own environment** — your Azure subscription(s) plus a Microsoft Fabric capacity. Getting access and
 quota sorted up front is the single biggest factor in a smooth event.
 
@@ -32,7 +32,7 @@ The agent needs a chat model. Confirm **before** the event:
 - Access to **Azure AI Foundry** (Azure OpenAI) in your tenant. If your subscription has never used
   it, request access / confirm it is enabled.
 - **Model quota** for `gpt-4o` **or** `gpt-4o-mini` (the agent defaults to `gpt-4o`; `gpt-4o-mini`
-  is cheaper and recommended for the hackathon) in your chosen region.
+  is cheaper and recommended for the RVAS) in your chosen region.
 - A **region** that offers both the model and Microsoft Fabric. Good defaults: **East US 2**,
   **West US 3**, **Sweden Central**. Verify model availability for your region in the Foundry portal.
 
@@ -43,7 +43,7 @@ The agent needs a chat model. Confirm **before** the event:
 
 The Control Tower runs on **Microsoft Fabric**. You have two options:
 
-### Option A — Fabric free trial (recommended for the hackathon)
+### Option A — Fabric free trial (recommended for the RVAS)
 
 - Provides **free access for 60 days** with a trial capacity (provisioned as an **F64** or **F4**;
   eligibility for F64 may vary by tenant). It includes a Power BI individual trial.
@@ -54,7 +54,7 @@ The Control Tower runs on **Microsoft Fabric**. You have two options:
 
 ### Option B — Paid Fabric capacity
 
-- Any **F2 or higher** capacity works. F2 handles the hackathon data volumes comfortably; the
+- Any **F2 or higher** capacity works. F2 handles the RVAS data volumes comfortably; the
   reference Q&A notes F64+ for production scale.
 - Create it in the Azure portal (`Microsoft.Fabric/capacities`) and **pause it** outside working
   hours to control cost.
@@ -70,7 +70,7 @@ A **Fabric / Power BI tenant administrator** must ensure:
   are permitted (used by the setup script and Cosmos DB Mirroring).
 
 > ⚠️ On **trial capacity**, Private Link is disabled and a few enterprise features aren't supported —
-> none of which block this hackathon. Mirroring, shortcuts, Spark, Direct Lake, and Data Activator
+> none of which block this RVAS. Mirroring, shortcuts, Spark, Direct Lake, and Data Activator
 > all work.
 
 ## 4. Power BI
@@ -115,12 +115,12 @@ git --version
 
 ## 7. Cost expectations & hygiene
 
-This hackathon is intentionally low-cost, but **clean up when you're done**.
+This RVAS is intentionally low-cost, but **clean up when you're done**.
 
 - **Fabric** — free on trial; pause paid capacity outside hours. OneLake storage is a few cents/GB.
 - **Agent workload** — serverless Cosmos DB, Container Apps scale-to-low, and `gpt-4o-mini` keep
   spend to a few dollars/day. APIM **Developer** tier (used here) is the main fixed cost.
-- **Landing zone** — ADLS Gen2 + Log Analytics are inexpensive at hackathon volumes.
+- **Landing zone** — ADLS Gen2 + Log Analytics are inexpensive at RVAS volumes.
 - **Tear down** with `azd down --purge` in each workload directory when the event ends (Challenge 0
   cleanup notes), and delete the Fabric workspace / end the trial.
 
