@@ -3,7 +3,7 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Agents Runtime - Observability Platform",
+  title: "Agents Runtime - AgentOps Control Tower",
   description: "Azure AI Agents Runtime Demo with full observability",
 };
 
