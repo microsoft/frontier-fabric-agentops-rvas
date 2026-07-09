@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coach Guide — Challenge 2: Build the Telemetry Landing Zone · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Coach Guide — Challenge 2: Build the Telemetry Landing Zone">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#snapshot">Snapshot</a></li>
+          <li><a class="h2" href="#coaching-objectives">Coaching objectives</a></li>
+          <li><a class="h2" href="#the-reference-path">The reference path</a></li>
+          <li><a class="h2" href="#checkpoint-verification">Checkpoint verification</a></li>
+          <li><a class="h2" href="#common-pitfalls-fixes">Common pitfalls &amp; fixes</a></li>
+          <li><a class="h2" href="#talking-points-mini-briefing">Talking points (mini-briefing)</a></li>
+          <li><a class="h2" href="#if-they-finish-early">If they finish early</a></li>
+          <li><a class="h2" href="#reference-assets">Reference assets</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../coach/README.html">Coach</a> <span class="sep">/</span> <span>Coach Guide — Challenge 2: Build the Telemetry Landing Zone</span></div><div class="meta-row"><span class="chip cat-coach">Coach</span></div>
+        <article class="article prose">
+<h1 id="coach-guide-—-challenge-2-build-the-telemetry-landing-zone">Coach Guide — Challenge 2: Build the Telemetry Landing Zone</h1>
+<blockquote>
+<p>Attendee challenge: <a href="../challenges/challenge-02-landing-zone.html"><code>challenges/challenge-02-landing-zone.md</code></a></p>
+</blockquote>
+<h2 id="snapshot">Snapshot<a class="anchor" href="#snapshot" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Est. time</strong></td>
+<td>1.5–2 h</td>
+</tr>
+<tr>
+<td><strong>Difficulty</strong></td>
+<td>⭐⭐ (200)</td>
+</tr>
+<tr>
+<td><strong>They build</strong></td>
+<td>ADLS Gen2 landing zone for cost, metrics, logs, metadata, and diagnostics</td>
+</tr>
+<tr>
+<td><strong>Key services</strong></td>
+<td>ADLS Gen2, Azure Cost Management, Resource Graph, Log Analytics data export, Diagnostic Settings</td>
+</tr>
+</tbody></table></div>
+<h2 id="coaching-objectives">Coaching objectives<a class="anchor" href="#coaching-objectives" aria-hidden="true">#</a></h2>
+<p>This challenge turns scattered Azure signals into a single <strong>landing zone</strong> that Fabric can read with
+OneLake shortcuts. Keep teams focused on the outcome: five domains landing in storage with enough
+proof that Challenge 3 can shortcut to them.</p>
+<p><strong>What good looks like:</strong> the team shows the five containers, validates FOCUS and Resource Graph
+Parquet, confirms the Log Analytics export rule, applies diagnostic settings to supported resources,
+and records the storage account name, resource ID, and DFS endpoint.</p>
+<h2 id="the-reference-path">The reference path<a class="anchor" href="#the-reference-path" aria-hidden="true">#</a></h2>
+<p>Deploy the ingestion asset:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd resources/observability-ingestion
+azd auth login
+azd up        # env name, region (same as Challenge 0), subscription</code></pre>
+<p><code>azd up</code> provisions ADLS Gen2 storage, five containers, Log Analytics workspace + data export rule,
+Cost Management FOCUS export, Key Vault, and a user-assigned managed identity. Capture outputs:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">azd env get-values</code></pre>
+<p>Install script dependencies:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd resources/observability-ingestion/src/scripts
+pip install -r requirements.txt</code></pre>
+<p>Preview diagnostic settings:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">python setup_diagnostic_settings.py \
+  --subscription-id &lt;SUBSCRIPTION_ID&gt; \
+  --workspace-id &lt;WORKSPACE_RESOURCE_ID&gt; \
+  --storage-account-id &lt;STORAGE_ACCOUNT_RESOURCE_ID&gt; \
+  --dry-run</code></pre>
+<p>Apply diagnostic settings:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">python setup_diagnostic_settings.py \
+  --subscription-id &lt;SUBSCRIPTION_ID&gt; \
+  --workspace-id &lt;WORKSPACE_RESOURCE_ID&gt; \
+  --storage-account-id &lt;STORAGE_ACCOUNT_RESOURCE_ID&gt;</code></pre>
+<p>Run Resource Graph export:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">python resource_graph_export.py \
+  --subscription-id &lt;SUBSCRIPTION_ID&gt; \
+  --storage-account &lt;STORAGE_ACCOUNT_NAME&gt; \
+  --container metadata</code></pre>
+<p>Trigger the Cost Management export. The current Azure CLI <code>costmanagement export</code> group may not expose
+a <code>run</code> command, so use the ARM action directly:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">EXPORT_NAME=export-&lt;env-name&gt;-focus-daily
+SCOPE=&quot;/subscriptions/&lt;SUBSCRIPTION_ID&gt;&quot;
+
+az rest --method post \
+  --url &quot;https://management.azure.com${SCOPE}/providers/Microsoft.CostManagement/exports/${EXPORT_NAME}/run?api-version=2023-11-01&quot;</code></pre>
+<p>Check export execution history:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">az costmanagement export show \
+  --name &quot;$EXPORT_NAME&quot; \
+  --scope &quot;$SCOPE&quot;</code></pre>
+<p>Validate the landing zone:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">python validate_exports.py \
+  --storage-account &lt;STORAGE_ACCOUNT_NAME&gt;</code></pre>
+<h2 id="checkpoint-verification">Checkpoint verification<a class="anchor" href="#checkpoint-verification" aria-hidden="true">#</a></h2>
+<p>Ask the team to show:</p>
+<ol>
+<li><strong>Storage account</strong> with hierarchical namespace enabled and containers:
+<code>costs</code>, <code>metrics</code>, <code>logs</code>, <code>metadata</code>, <code>diagnostics</code>.</li>
+<li><strong>FOCUS cost Parquet</strong> under <code>costs/focus/...</code> after trigger/wait.</li>
+<li><strong>Resource Graph Parquet</strong> under <code>metadata/resource-graph/year=*/month=*/day=*/</code>.</li>
+<li><strong>Log Analytics data export</strong> enabled for <code>AppRequests</code>, <code>AppDependencies</code>, <code>AppTraces</code>,
+<code>AppExceptions</code>, and <code>AppMetrics</code>.</li>
+<li><strong>Diagnostic settings</strong> created on supported resources; unsupported types skipped gracefully.</li>
+<li><code>validate_exports.py</code> output with file counts, sizes, latest timestamps, and sample schemas.</li>
+<li>Recorded Fabric coordinates:<ul>
+<li>storage account name</li>
+<li>storage account resource ID</li>
+<li><code>https://&lt;storage-account&gt;.dfs.core.windows.net</code></li>
+</ul>
+</li>
+</ol>
+<p>✅ Pass when the storage landing zone is validated and the team can explain how Challenge 3 will
+shortcut to it.</p>
+<h2 id="common-pitfalls-fixes">Common pitfalls &amp; fixes<a class="anchor" href="#common-pitfalls-fixes" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Pitfall</th>
+<th>Fix</th>
+</tr>
+</thead><tbody><tr>
+<td>Missing <strong>Cost Management Reader</strong></td>
+<td>Grant at the billing/subscription scope; Contributor on the resource group is not enough for cost exports</td>
+</tr>
+<tr>
+<td><code>costs</code> container empty</td>
+<td>Cost export is daily; trigger it manually with the ARM <code>run</code> action and wait for execution to complete</td>
+</tr>
+<tr>
+<td>Cost export name unknown</td>
+<td>It is <code>export-&lt;environmentName&gt;-focus-daily</code> from <code>infra/main.bicep</code>; confirm with <code>az costmanagement export list --scope /subscriptions/&lt;id&gt;</code></td>
+</tr>
+<tr>
+<td>Expecting Log Analytics export to backfill</td>
+<td>Data export is continuous from enablement forward; generate Challenge 1 traffic after enabling it</td>
+</tr>
+<tr>
+<td>Assuming data export requires a dedicated cluster</td>
+<td>It does not for this reference path; verify the rule is enabled and treat it as continuous export</td>
+</tr>
+<tr>
+<td>Diagnostic settings fail on some resources</td>
+<td>Normal. The script skips known unsupported types and logs warnings for resources without categories</td>
+</tr>
+<tr>
+<td>Storage access denied from scripts</td>
+<td>Ensure the caller/identity has Storage Blob Data Contributor on the storage account or resource group</td>
+</tr>
+<tr>
+<td>No metrics/log files yet</td>
+<td>Confirm the data export rule is enabled, traffic exists in the workspace, and allow time for export latency</td>
+</tr>
+</tbody></table></div>
+<h2 id="talking-points-mini-briefing">Talking points (mini-briefing)<a class="anchor" href="#talking-points-mini-briefing" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>FOCUS = FinOps lingua franca.</strong> It standardizes cost fields so spend can be joined to tags,
+resources, services, and agent namespaces.</li>
+<li><strong>One landing zone beats five silos.</strong> Cost, logs, metrics, metadata, and diagnostics become
+queryable together instead of trapped in separate portals.</li>
+<li><strong>Date partitions are Spark fuel.</strong> The storage layout is already shaped for Fabric notebooks and
+medallion processing.</li>
+<li><strong>Continuous vs batch matters.</strong> Log Analytics and diagnostics stream continuously; cost and
+Resource Graph are scheduled/triggered snapshots.</li>
+<li><strong>This is Challenge 3&#39;s shortcut target.</strong> The storage DFS endpoint is the bridge into OneLake with
+no data copy.</li>
+</ul>
+<h2 id="if-they-finish-early">If they finish early<a class="anchor" href="#if-they-finish-early" aria-hidden="true">#</a></h2>
+<ul>
+<li>Add tags (<code>team</code>, <code>agent</code>, <code>environment</code>, <code>costCenter</code>) to Challenge 1 resources, rerun Resource
+Graph export, and prove tags appear in Parquet.</li>
+<li>Generate more agent traffic and watch the <code>metrics</code> / <code>logs</code> containers grow.</li>
+<li>Compare <code>ResourceId</code> in FOCUS with <code>id</code> in Resource Graph and sketch the future <code>dim_resource</code> join.</li>
+<li>Review <a href="../docs/architecture.html"><code>docs/architecture.md</code></a> Gold tables and map which raw container
+feeds each one.</li>
+</ul>
+<h2 id="reference-assets">Reference assets<a class="anchor" href="#reference-assets" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="../resources/observability-ingestion/README.html"><code>resources/observability-ingestion/README.md</code></a> — deployment, data layout, script usage</li>
+<li><a href="../code.html?path=resources%2Fobservability-ingestion%2Finfra%2Fmain.bicep"><code>resources/observability-ingestion/infra/main.bicep</code></a> — outputs and resource naming</li>
+<li><a href="../code.html?path=resources%2Fobservability-ingestion%2Finfra%2Fmodules%2Fstorage.bicep"><code>resources/observability-ingestion/infra/modules/storage.bicep</code></a> — five containers and ADLS Gen2 settings</li>
+<li><a href="../code.html?path=resources%2Fobservability-ingestion%2Finfra%2Fmodules%2Fmonitoring.bicep"><code>resources/observability-ingestion/infra/modules/monitoring.bicep</code></a> — Log Analytics data export tables</li>
+<li><a href="../code.html?path=resources%2Fobservability-ingestion%2Finfra%2Fmodules%2Fcost-export.bicep"><code>resources/observability-ingestion/infra/modules/cost-export.bicep</code></a> — FOCUS Parquet export</li>
+<li><a href="../resources/observability-ingestion/README.html"><code>resources/observability-ingestion/src/scripts/</code></a> — Resource Graph, diagnostic settings, validation</li>
+<li><a href="../docs/architecture.html"><code>docs/architecture.md</code></a> — Ingest stage and Gold data products</li>
+</ul>
+
+        </article>
+        
+        
+        <nav class="pager" aria-label="Challenge navigation">
+          <a class="prev" href="challenge-01-guide.html"><div class="dir">← Previous</div><div class="ttl">Coach Guide — Challenge 1: Light Up the Agents</div></a>
+          <a class="next" href="challenge-03-guide.html"><div class="dir">Next →</div><div class="ttl">Coach Guide — Challenge 3: Connect Fabric to the Enterprise</div></a>
+        </nav>
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/coach/challenge-02-guide.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

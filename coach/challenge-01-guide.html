@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coach Guide — Challenge 1: Light Up the Agents · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Coach Guide — Challenge 1: Light Up the Agents">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#snapshot">Snapshot</a></li>
+          <li><a class="h2" href="#coaching-objectives">Coaching objectives</a></li>
+          <li><a class="h2" href="#the-reference-path">The reference path</a></li>
+          <li><a class="h2" href="#checkpoint-verification">Checkpoint verification</a></li>
+          <li><a class="h2" href="#common-pitfalls-fixes">Common pitfalls &amp; fixes</a></li>
+          <li><a class="h2" href="#talking-points-mini-briefing">Talking points (mini-briefing)</a></li>
+          <li><a class="h2" href="#if-they-finish-early">If they finish early</a></li>
+          <li><a class="h2" href="#reference-assets">Reference assets</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../coach/README.html">Coach</a> <span class="sep">/</span> <span>Coach Guide — Challenge 1: Light Up the Agents</span></div><div class="meta-row"><span class="chip cat-coach">Coach</span></div>
+        <article class="article prose">
+<h1 id="coach-guide-—-challenge-1-light-up-the-agents">Coach Guide — Challenge 1: Light Up the Agents</h1>
+<blockquote>
+<p>Attendee challenge: <a href="../challenges/challenge-01-agent-telemetry.html"><code>challenges/challenge-01-agent-telemetry.md</code></a></p>
+</blockquote>
+<h2 id="snapshot">Snapshot<a class="anchor" href="#snapshot" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Est. time</strong></td>
+<td>1.5–2 h</td>
+</tr>
+<tr>
+<td><strong>Difficulty</strong></td>
+<td>⭐⭐ (200)</td>
+</tr>
+<tr>
+<td><strong>They build</strong></td>
+<td>A live Foundry agent workload emitting traces, metrics, and conversation data</td>
+</tr>
+<tr>
+<td><strong>Key services</strong></td>
+<td>Container Apps, API Management, Cosmos DB, Azure AI Foundry, Application Insights</td>
+</tr>
+</tbody></table></div>
+<h2 id="coaching-objectives">Coaching objectives<a class="anchor" href="#coaching-objectives" aria-hidden="true">#</a></h2>
+<p>The point is <strong>not</strong> &quot;deploy an app&quot; — it&#39;s understanding <strong>what telemetry the Control Tower will
+later consume and why</strong>. Make sure teams can trace a single user message across every hop and can
+name the custom token/cost metric. That mental model pays off in Challenges 4 and 5.</p>
+<p><strong>What good looks like:</strong> the team shows an end-to-end transaction (gateway → backend → agent → model</p>
+<ul>
+<li>Cosmos), points at a token metric, and finds their conversations in Cosmos DB.</li>
+</ul>
+<h2 id="the-reference-path">The reference path<a class="anchor" href="#the-reference-path" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd resources/agent-workload
+azd auth login
+azd up        # env name, region (same as Challenge 0), subscription</code></pre>
+<ul>
+<li>Encourage <code>gpt-4o-mini</code> to conserve quota (check the model/deployment parameter in
+<code>infra/main.parameters.json</code> / <code>azd</code> env before deploying).</li>
+<li><code>azd up</code> provisions Container Apps env + 3 apps, APIM, Cosmos DB (serverless), Azure AI Services +
+model deployment, Log Analytics + Application Insights, and managed identities with role
+assignments. Expect <strong>10–20 min</strong>.</li>
+<li>Outputs include the <strong>frontend/backend/agent URLs</strong>.</li>
+</ul>
+<p>Generate traffic:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash"># Through the UI (preferred for the narrative), or burst the API:
+AGENT=https://&lt;agent-url&gt;
+for i in $(seq 1 20); do
+  curl -s -X POST &quot;$AGENT/api/agent/invoke&quot; -H &#39;Content-Type: application/json&#39; \
+    -d &#39;{&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;One fact about distributed tracing.&quot;}]}&#39; &gt;/dev/null
+done</code></pre>
+<p>Show telemetry in <strong>Application Insights</strong> (this workload&#39;s resource):</p>
+<ul>
+<li><strong>Transaction search</strong> → recent <code>POST /api/...</code> → <strong>end-to-end transaction details</strong> → waterfall
+across services + Cosmos DB + Azure OpenAI.</li>
+<li><strong>Application map</strong> → services + dependencies, with latency/volume on hover.</li>
+<li><strong>Metrics / Logs</strong> → custom token metrics:<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-kql">customMetrics
+| where name startswith &quot;agent.&quot;
+| summarize sum(value) by name, bin(timestamp, 5m)
+| render timechart</code></pre>
+</li>
+</ul>
+<p>Show <strong>Cosmos DB → Data Explorer</strong> → <code>agentsdb</code> → <code>conversations</code> / <code>interactions</code>; note the
+partition key (<code>conversation_id</code>). This is the data mirrored in Challenge 3.</p>
+<h2 id="checkpoint-verification">Checkpoint verification<a class="anchor" href="#checkpoint-verification" aria-hidden="true">#</a></h2>
+<p>Have the team walk you through <strong>one</strong> message:</p>
+<ol>
+<li>The request in <strong>Transaction search</strong> with the full waterfall.</li>
+<li>The <strong>Application Map</strong> dependencies.</li>
+<li>A <strong>custom token/cost metric</strong> plotted or queried.</li>
+<li>The matching <strong>conversation</strong> document in Cosmos DB.</li>
+</ol>
+<p>✅ Pass when all four are shown and they&#39;ve recorded the App Insights + Cosmos resource names.</p>
+<h2 id="common-pitfalls-fixes">Common pitfalls &amp; fixes<a class="anchor" href="#common-pitfalls-fixes" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Pitfall</th>
+<th>Fix</th>
+</tr>
+</thead><tbody><tr>
+<td><code>azd up</code> fails creating <strong>role assignments</strong></td>
+<td>Deployer lacks User Access Administrator/Owner — grant it, or pre-create assignments (link from Challenge 0)</td>
+</tr>
+<tr>
+<td>Agent returns <strong>500 / auth error</strong> to the model</td>
+<td>Managed identity <code>Cognitive Services OpenAI User</code> role still propagating — wait 5–10 min, retry; verify <code>AZURE_OPENAI_ENDPOINT</code>/deployment env</td>
+</tr>
+<tr>
+<td><strong>Quota exceeded</strong> on the model</td>
+<td>Switch deployment to <code>gpt-4o-mini</code> or lower TPM; confirm region quota</td>
+</tr>
+<tr>
+<td><strong>No telemetry</strong> in App Insights</td>
+<td><code>APPLICATIONINSIGHTS_CONNECTION_STRING</code> not set on the app, or no traffic yet — redeploy/restart and generate requests</td>
+</tr>
+<tr>
+<td>Cosmos <strong>403</strong> from backend</td>
+<td>Cosmos DB data-plane role assignment missing/propagating; check managed identity client id env</td>
+</tr>
+<tr>
+<td>Can&#39;t find custom metrics</td>
+<td>They live under a <strong>custom metric namespace</strong>; query <code>customMetrics</code> in Logs to confirm names (<code>agent.tokens.*</code>, <code>agent.duration_ms</code>)</td>
+</tr>
+</tbody></table></div>
+<h2 id="talking-points-mini-briefing">Talking points (mini-briefing)<a class="anchor" href="#talking-points-mini-briefing" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Every hop is observable.</strong> Distributed tracing connects frontend → APIM → backend → agent →
+model so you can attribute latency and errors precisely.</li>
+<li><strong>Managed identity everywhere</strong> — no secrets; auth is Entra + RBAC. This is also how Fabric will
+reach the data later.</li>
+<li><strong>Tokens = money.</strong> The custom token metric is the seed of cost-per-request and FinOps chargeback
+in Challenges 4–6. Connect today&#39;s metric to that future payoff.</li>
+<li><strong>Serverless Cosmos DB</strong> is the conversation system-of-record — and the Mirroring source in
+Challenge 3.</li>
+</ul>
+<h2 id="if-they-finish-early">If they finish early<a class="anchor" href="#if-they-finish-early" aria-hidden="true">#</a></h2>
+<ul>
+<li>Script sustained load and watch <strong>Container Apps autoscale</strong> (Scale and replicas).</li>
+<li>Explore <strong>APIM Analytics</strong> (rate limiting, PTU-aware load balancing) as future Control Tower input.</li>
+<li>Read the <a href="../resources/observability-sdk/README.html"><code>observability-sdk</code></a> and map its event schema
+(AgentStart/Step/ExternalCall/End/Error) to what they see in App Insights.</li>
+</ul>
+<h2 id="reference-assets">Reference assets<a class="anchor" href="#reference-assets" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="../resources/agent-workload/README.html"><code>resources/agent-workload/README.md</code></a> — full service/API/monitoring detail</li>
+<li><a href="../resources/agent-workload/README.html"><code>resources/agent-workload/infra/</code></a> — Bicep modules</li>
+<li><a href="../resources/observability-sdk/README.html"><code>resources/observability-sdk/</code></a> — telemetry contract</li>
+</ul>
+
+        </article>
+        
+        
+        <nav class="pager" aria-label="Challenge navigation">
+          <a class="prev" href="challenge-00-guide.html"><div class="dir">← Previous</div><div class="ttl">Coach Guide — Challenge 0: Mission Briefing &amp; Environment Setup</div></a>
+          <a class="next" href="challenge-02-guide.html"><div class="dir">Next →</div><div class="ttl">Coach Guide — Challenge 2: Build the Telemetry Landing Zone</div></a>
+        </nav>
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/coach/challenge-01-guide.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

@@ -13,6 +13,11 @@
 ![Duration](https://img.shields.io/badge/duration-1.5--2%20days-informational)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
+> **🌐 Explore it online:** browse every challenge, coach guide, doc, and reference file — without
+> leaving the browser — at **<https://microsoft.github.io/frontier-fabric-agentops-rvas/>**. Running
+> this for a customer? Use the **[delivery composer](https://microsoft.github.io/frontier-fabric-agentops-rvas/builder.html)**
+> to pick the challenges that fit their environment and export a tailored delivery brief.
+
 ---
 
 ## The Mission

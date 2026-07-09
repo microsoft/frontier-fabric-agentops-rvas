@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frequently Asked Questions · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="General, architecture, and logistics questions for the AgentOps Control Tower RVAS. Coaches
+should also review the per-challenge guides in coach/(../coach/README.md).">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#logistics">Logistics</a></li>
+          <li><a class="h2" href="#environment-access">Environment &amp; access</a></li>
+          <li><a class="h2" href="#architecture-design">Architecture &amp; design</a></li>
+          <li><a class="h2" href="#performance-scale">Performance &amp; scale</a></li>
+          <li><a class="h2" href="#security-cost">Security &amp; cost</a></li>
+          <li><a class="h2" href="#troubleshooting-quick-hits">Troubleshooting quick hits</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <span>Docs</span> <span class="sep">/</span> <span>Frequently Asked Questions</span></div><div class="meta-row"><span class="chip cat-docs">Docs</span></div>
+        <article class="article prose">
+<h1 id="frequently-asked-questions">Frequently Asked Questions</h1>
+<p>General, architecture, and logistics questions for the <strong>AgentOps Control Tower</strong> RVAS. Coaches
+should also review the per-challenge guides in <a href="../coach/README.html"><code>coach/</code></a>.</p>
+<hr>
+<h2 id="logistics">Logistics<a class="anchor" href="#logistics" aria-hidden="true">#</a></h2>
+<p><strong>How long is the RVAS?</strong>
+Plan for <strong>1.5–2 days</strong>. Challenges 0–5 are the core path; Challenge 6 is a stretch for teams that
+move fast. Each challenge is scoped to roughly 1.5–2.5 hours including discussion.</p>
+<p><strong>Do we build everything from scratch?</strong>
+No. The <a href="../resources/README.html"><code>resources/</code></a> directory is a complete reference implementation — Bicep,
+application code, Fabric setup scripts, PySpark notebooks, pipelines, and a semantic model. The
+intent is that you <strong>deploy the Azure foundation</strong> (Challenges 1–2) quickly and spend your real
+energy on the <strong>Fabric Control Tower</strong> (Challenges 3–6). Coaches decide how much of the reference to
+reveal based on your team&#39;s level.</p>
+<p><strong>Can teams share one Fabric capacity?</strong>
+Yes. One <strong>trial capacity</strong> (or paid F-SKU) can back many workspaces. The capacity admin assigns
+each team&#39;s workspace to the shared capacity. Give each team <strong>its own workspace</strong> for isolation.</p>
+<p><strong>What if our network blocks egress?</strong>
+Flag it before Day 1. You need outbound HTTPS to Azure, <code>*.fabric.microsoft.com</code>, and package
+registries (PyPI, npm, MCR/Docker Hub). Azure Cloud Shell is a good fallback for CLI work.</p>
+<hr>
+<h2 id="environment-access">Environment &amp; access<a class="anchor" href="#environment-access" aria-hidden="true">#</a></h2>
+<p><strong>Do we need multiple Azure subscriptions?</strong>
+One is enough. Multiple is fully supported and realistic — e.g., workload in one subscription, cost
+exports scoped at the billing account. Record your subscription IDs in Challenge 0.</p>
+<p><strong>Which region should we use?</strong>
+One that offers <strong>both</strong> your chosen model (<code>gpt-4o</code> / <code>gpt-4o-mini</code>) <strong>and</strong> Microsoft Fabric. East
+US 2, West US 3, and Sweden Central are safe defaults. Keep all resources in one region to avoid
+egress charges with OneLake shortcuts.</p>
+<p><strong>What happens when the Fabric trial expires?</strong>
+After 60 days, trial-capacity access is revoked and assigned workspaces are reassigned. Content stays
+in <strong>OneLake for 7 days</strong> and can be reactivated by assigning the workspace to a paid F or Power BI
+Premium capacity. For a 2-day event this is a non-issue — just don&#39;t let a long gap pass before
+revisiting.</p>
+<p><strong>Do we need Power BI Desktop?</strong>
+No — you can author the semantic model and reports in the Fabric/Power BI service. Desktop (Windows)
+is convenient for offline model edits but optional.</p>
+<hr>
+<h2 id="architecture-design">Architecture &amp; design<a class="anchor" href="#architecture-design" aria-hidden="true">#</a></h2>
+<p><strong>Why a medallion (Bronze/Silver/Gold) architecture instead of one transformation?</strong>
+Separation of concerns. <strong>Bronze</strong> preserves raw data for reprocessing and audit. <strong>Silver</strong>
+standardizes across sources so consumers get a consistent interface. <strong>Gold</strong> pre-computes
+aggregations so dashboards are fast. If a transformation bug appears, reprocess from Bronze without
+re-ingesting from source.</p>
+<p><strong>Why Fabric instead of Synapse or Databricks?</strong>
+Fabric unifies data engineering, warehousing, and BI on a shared <strong>OneLake</strong>. For this scenario the
+tight integration between Lakehouse, notebooks, pipelines, Direct Lake, and Data Activator removes
+data movement and simplifies the architecture. Synapse and Databricks are great alternatives for the
+medallion layer — the pattern is portable.</p>
+<p><strong>Why OneLake shortcuts and Mirroring instead of copying data in?</strong>
+<strong>Shortcuts</strong> let Fabric read ADLS Gen2 telemetry in place — zero duplication, zero intra-region
+egress. <strong>Mirroring</strong> replicates Cosmos DB conversations into OneLake Delta tables near-real-time
+with no ETL to build or operate. Together they minimize cost, latency, and maintenance.</p>
+<p><strong>What makes this a &quot;Control Tower&quot; and not just a dashboard?</strong>
+It <strong>correlates</strong> signals that normally live in silos — cost (Cost Management), reliability (Azure
+Monitor), and agent behavior (App Insights + Cosmos DB) — into shared Gold data products, and then
+<strong>acts</strong> on them with real-time alerts. One pane of glass plus automated response.</p>
+<p><strong>How does cost attribution / chargeback work?</strong>
+The Silver/Gold layers join FOCUS cost data with <strong>resource tags</strong> and the <strong>agent namespace</strong>
+(<code>&lt;org&gt;.&lt;domain&gt;.&lt;agent&gt;.&lt;version&gt;</code>). That lets you attribute blended cost (model tokens + Cosmos RUs</p>
+<ul>
+<li>compute + APIM) to a team, use case, or client. Challenge 6 builds this out with RLS.</li>
+</ul>
+<hr>
+<h2 id="performance-scale">Performance &amp; scale<a class="anchor" href="#performance-scale" aria-hidden="true">#</a></h2>
+<p><strong>How much data can this handle?</strong>
+It scales with Fabric capacity. F2/F4 handles tens of millions of rows comfortably for the
+RVAS. For enterprise volumes (billions of cost records), use F64+, partition Delta tables by
+month, and Z-order on frequently filtered columns (subscription, date).</p>
+<p><strong>What&#39;s the end-to-end latency?</strong>
+ADLS Gen2 data follows the pipeline schedule (the reference daily pipeline runs ~06:00 UTC). Cosmos
+DB mirrored data is typically available within a minute of the write. Direct Lake reflects the
+latest Delta state after each pipeline run — no scheduled dataset refresh needed.</p>
+<p><strong>How long does the end-to-end pipeline take?</strong>
+For a typical 3-month window (a few million cost rows, hundreds of thousands of metric points, tens
+of thousands of logs), the full Bronze→Gold pipeline runs in ~10–15 min on F2; the daily incremental
+finishes in 2–3 min.</p>
+<hr>
+<h2 id="security-cost">Security &amp; cost<a class="anchor" href="#security-cost" aria-hidden="true">#</a></h2>
+<p><strong>How is authentication handled?</strong>
+Managed identities and Entra ID throughout — the agent services use managed identity to reach Azure
+OpenAI and Cosmos DB; Fabric uses workspace identity / managed identity to reach ADLS Gen2; Mirroring
+authenticates via Entra ID. Optional CI/CD uses GitHub OIDC federated credentials (no stored
+secrets).</p>
+<p><strong>Is the data encrypted?</strong>
+Yes. ADLS Gen2 and OneLake encrypt at rest (Microsoft-managed keys by default; customer-managed keys
+available). Cosmos DB is encrypted at rest. All traffic uses TLS 1.2+.</p>
+<p><strong>What will this cost us?</strong>
+Low for an RVAS: Fabric is free on trial; the agent workload runs a few dollars/day with
+<code>gpt-4o-mini</code>, serverless Cosmos DB, and scale-to-low Container Apps (APIM Developer tier is the main
+fixed cost); the landing zone is inexpensive. <strong>Tear everything down</strong> with <code>azd down --purge</code> and
+end the Fabric trial / delete the workspace when finished.</p>
+<p><strong>Can we pause Fabric to save money?</strong>
+Yes (paid capacities). Pause outside working hours; schedule pipelines within the active window.
+OneLake data persists while paused. Trial capacity needs no pausing — it&#39;s free.</p>
+<hr>
+<h2 id="troubleshooting-quick-hits">Troubleshooting quick hits<a class="anchor" href="#troubleshooting-quick-hits" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Symptom</th>
+<th>First thing to check</th>
+</tr>
+</thead><tbody><tr>
+<td><code>azd up</code> fails on role assignment</td>
+<td>You lack <strong>User Access Administrator</strong>/Owner; ask an admin or pre-create the identity</td>
+</tr>
+<tr>
+<td>Agent returns 500 / auth error</td>
+<td>Managed identity role on Azure OpenAI (<code>Cognitive Services OpenAI User</code>) and Cosmos DB data role not yet propagated — wait a few minutes</td>
+</tr>
+<tr>
+<td>No telemetry in App Insights</td>
+<td><code>APPLICATIONINSIGHTS_CONNECTION_STRING</code> not set on the container app; generate some traffic first</td>
+</tr>
+<tr>
+<td>Shortcut creation fails in Fabric</td>
+<td>Workspace identity lacks <strong>Storage Blob Data Reader</strong> on the storage account; Mirroring/SP tenant setting disabled</td>
+</tr>
+<tr>
+<td>Mirrored Cosmos tables empty</td>
+<td>Continuous backup / analytical store not enabled on the Cosmos account; check Mirroring status timestamp</td>
+</tr>
+<tr>
+<td>Power BI report is blank</td>
+<td>Gold tables not populated (run the pipeline) or semantic model not refreshed/bound to the Lakehouse</td>
+</tr>
+<tr>
+<td>Cost container empty</td>
+<td>Cost Management export not run yet (it&#39;s daily); trigger it manually or wait</td>
+</tr>
+</tbody></table></div>
+<p>More detail lives in each challenge&#39;s <strong>coach guide</strong>.</p>
+
+        </article>
+        
+        
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/docs/faq.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

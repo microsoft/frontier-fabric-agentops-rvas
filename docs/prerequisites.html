@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prerequisites &amp; Environment Setup · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Work through this checklist with your coach before Day 1. The RVAS runs on the customer&#39;s
+own environment — your Azure subscription(s) plus a Microsoft Fabric capacity. Getting acc">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#1-azure-subscription-permissions">1. Azure subscription &amp; permissions</a></li>
+          <li><a class="h2" href="#2-azure-ai-foundry-azure-openai-quota">2. Azure AI Foundry / Azure OpenAI quota</a></li>
+          <li><a class="h2" href="#3-microsoft-fabric-capacity">3. Microsoft Fabric capacity</a></li>
+          <li><a class="h3" href="#option-a-—-fabric-free-trial-recommended-for-the-rvas">Option A — Fabric free trial (recommended for the RVAS)</a></li>
+          <li><a class="h3" href="#option-b-—-paid-fabric-capacity">Option B — Paid Fabric capacity</a></li>
+          <li><a class="h3" href="#tenant-settings-admin-one-time">Tenant settings (admin, one-time)</a></li>
+          <li><a class="h2" href="#4-power-bi">4. Power BI</a></li>
+          <li><a class="h2" href="#5-identity-networking">5. Identity &amp; networking</a></li>
+          <li><a class="h2" href="#6-local-tooling">6. Local tooling</a></li>
+          <li><a class="h2" href="#7-cost-expectations-hygiene">7. Cost expectations &amp; hygiene</a></li>
+          <li><a class="h2" href="#8-get-the-code">8. Get the code</a></li>
+          <li><a class="h2" href="#✅-pre-flight-checklist">✅ Pre-flight checklist</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <span>Docs</span> <span class="sep">/</span> <span>Prerequisites &amp; Environment Setup</span></div><div class="meta-row"><span class="chip cat-docs">Docs</span></div>
+        <article class="article prose">
+<h1 id="prerequisites-environment-setup">Prerequisites &amp; Environment Setup</h1>
+<p>Work through this checklist <strong>with your coach before Day 1</strong>. The RVAS runs on the <strong>customer&#39;s
+own environment</strong> — your Azure subscription(s) plus a Microsoft Fabric capacity. Getting access and
+quota sorted up front is the single biggest factor in a smooth event.</p>
+<blockquote>
+<p>⏱️ <strong>Lead time:</strong> Azure AI Foundry model quota and Fabric tenant enablement can take from minutes
+to a few business days depending on your tenant&#39;s governance. <strong>Start at least 3–5 business days
+early.</strong></p>
+</blockquote>
+<hr>
+<h2 id="1-azure-subscription-permissions">1. Azure subscription &amp; permissions<a class="anchor" href="#1-azure-subscription-permissions" aria-hidden="true">#</a></h2>
+<p>You need at least one Azure subscription where your team can create resources.</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Requirement</th>
+<th>Why</th>
+<th>How to check</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Contributor</strong> (or Owner) on a subscription or resource group</td>
+<td>Deploy the agent workload and landing zone</td>
+<td><code>az role assignment list --assignee &lt;you&gt; -o table</code></td>
+</tr>
+<tr>
+<td><strong>User Access Administrator</strong> or <strong>Owner</strong> (recommended)</td>
+<td>Create role assignments for managed identities</td>
+<td>Needed by the Bicep in Challenges 1 &amp; 2</td>
+</tr>
+<tr>
+<td><strong>Cost Management Reader</strong> at the billing scope</td>
+<td>Configure FOCUS cost exports (Challenge 2)</td>
+<td>Ask your billing admin</td>
+</tr>
+<tr>
+<td>Ability to <strong>register resource providers</strong></td>
+<td>First-time use of Container Apps, APIM, etc.</td>
+<td><code>az provider register --namespace Microsoft.App</code></td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p>🏢 <strong>Multiple subscriptions?</strong> That&#39;s fine and realistic. A common pattern: the <strong>agent workload</strong>
+and <strong>landing zone</strong> live in one subscription, while <strong>cost exports</strong> are scoped at the billing
+account / management group. Note your subscription IDs in Challenge 0.</p>
+</blockquote>
+<h2 id="2-azure-ai-foundry-azure-openai-quota">2. Azure AI Foundry / Azure OpenAI quota<a class="anchor" href="#2-azure-ai-foundry-azure-openai-quota" aria-hidden="true">#</a></h2>
+<p>The agent needs a chat model. Confirm <strong>before</strong> the event:</p>
+<ul>
+<li>Access to <strong>Azure AI Foundry</strong> (Azure OpenAI) in your tenant. If your subscription has never used
+it, request access / confirm it is enabled.</li>
+<li><strong>Model quota</strong> for <code>gpt-4o</code> <strong>or</strong> <code>gpt-4o-mini</code> (the agent defaults to <code>gpt-4o</code>; <code>gpt-4o-mini</code>
+is cheaper and recommended for the RVAS) in your chosen region.</li>
+<li>A <strong>region</strong> that offers both the model and Microsoft Fabric. Good defaults: <strong>East US 2</strong>,
+<strong>West US 3</strong>, <strong>Sweden Central</strong>. Verify model availability for your region in the Foundry portal.</li>
+</ul>
+<blockquote>
+<p>🔎 Check quota in the <strong>Azure AI Foundry portal → Quotas</strong>, or with the <code>azure-quotas</code> tooling.
+30K–50K TPM of <code>gpt-4o-mini</code> is plenty for a team.</p>
+</blockquote>
+<h2 id="3-microsoft-fabric-capacity">3. Microsoft Fabric capacity<a class="anchor" href="#3-microsoft-fabric-capacity" aria-hidden="true">#</a></h2>
+<p>The Control Tower runs on <strong>Microsoft Fabric</strong>. You have two options:</p>
+<h3 id="option-a-—-fabric-free-trial-recommended-for-the-rvas">Option A — Fabric free trial (recommended for the RVAS)<a class="anchor" href="#option-a-—-fabric-free-trial-recommended-for-the-rvas" aria-hidden="true">#</a></h3>
+<ul>
+<li>Provides <strong>free access for 60 days</strong> with a trial capacity (provisioned as an <strong>F64</strong> or <strong>F4</strong>;
+eligibility for F64 may vary by tenant). It includes a Power BI individual trial.</li>
+<li>The person who starts the trial becomes the <strong>Capacity administrator</strong> and can <strong>share</strong> it by
+assigning workspaces — one trial capacity can back every team&#39;s workspace.</li>
+<li>Start it from <strong><a href="https://app.fabric.microsoft.com" target="_blank" rel="noopener">app.fabric.microsoft.com</a></strong> → <strong>Account
+manager → Start trial</strong>. See <a href="https://learn.microsoft.com/fabric/fundamentals/fabric-trial" target="_blank" rel="noopener">Try Microsoft Fabric for free</a>.</li>
+</ul>
+<h3 id="option-b-—-paid-fabric-capacity">Option B — Paid Fabric capacity<a class="anchor" href="#option-b-—-paid-fabric-capacity" aria-hidden="true">#</a></h3>
+<ul>
+<li>Any <strong>F2 or higher</strong> capacity works. F2 handles the RVAS data volumes comfortably; the
+reference Q&amp;A notes F64+ for production scale.</li>
+<li>Create it in the Azure portal (<code>Microsoft.Fabric/capacities</code>) and <strong>pause it</strong> outside working
+hours to control cost.</li>
+</ul>
+<h3 id="tenant-settings-admin-one-time">Tenant settings (admin, one-time)<a class="anchor" href="#tenant-settings-admin-one-time" aria-hidden="true">#</a></h3>
+<p>A <strong>Fabric / Power BI tenant administrator</strong> must ensure:</p>
+<ul>
+<li><strong>Microsoft Fabric is enabled</strong> for the tenant (or for the relevant security group). See
+<a href="https://learn.microsoft.com/fabric/admin/fabric-switch" target="_blank" rel="noopener">Enable Microsoft Fabric</a>.</li>
+<li>Users can <strong>create workspaces</strong>.</li>
+<li>For Challenge 3, the <strong>Mirroring</strong> and <strong>service principal / managed identity</strong> workspace settings
+are permitted (used by the setup script and Cosmos DB Mirroring).</li>
+</ul>
+<blockquote>
+<p>⚠️ On <strong>trial capacity</strong>, Private Link is disabled and a few enterprise features aren&#39;t supported —
+none of which block this RVAS. Mirroring, shortcuts, Spark, Direct Lake, and Data Activator
+all work.</p>
+</blockquote>
+<h2 id="4-power-bi">4. Power BI<a class="anchor" href="#4-power-bi" aria-hidden="true">#</a></h2>
+<ul>
+<li>Each report author/consumer needs a <strong>Power BI Pro</strong> license, <strong>Premium Per User</strong>, or the
+<strong>Power BI individual trial</strong> that accompanies the Fabric trial.</li>
+<li><strong>Power BI Desktop</strong> (Windows) is optional but handy for editing the semantic model offline.
+Authoring in the Fabric/Power BI service is sufficient for all challenges.</li>
+</ul>
+<h2 id="5-identity-networking">5. Identity &amp; networking<a class="anchor" href="#5-identity-networking" aria-hidden="true">#</a></h2>
+<ul>
+<li>A <strong>Microsoft Entra ID</strong> account in the same tenant as the Azure subscription and Fabric capacity.
+Using the <strong>same tenant</strong> end-to-end avoids cross-tenant friction with managed identity and
+Mirroring.</li>
+<li>Outbound HTTPS to Azure, Fabric (<code>*.fabric.microsoft.com</code>), and package registries (PyPI, npm,
+Docker Hub / MCR). If the customer network restricts egress, flag it to your coach early.</li>
+</ul>
+<h2 id="6-local-tooling">6. Local tooling<a class="anchor" href="#6-local-tooling" aria-hidden="true">#</a></h2>
+<p>Install on each team member&#39;s machine (or use a shared <strong>Azure Cloud Shell</strong> / dev box):</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Tool</th>
+<th>Version</th>
+<th>Install</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Azure CLI</strong> (<code>az</code>)</td>
+<td>2.60+</td>
+<td><a href="https://learn.microsoft.com/cli/azure/install-azure-cli" target="_blank" rel="noopener">https://learn.microsoft.com/cli/azure/install-azure-cli</a></td>
+</tr>
+<tr>
+<td><strong>Azure Developer CLI</strong> (<code>azd</code>)</td>
+<td>1.10+</td>
+<td><code>curl -fsSL https://aka.ms/install-azd.sh | bash</code></td>
+</tr>
+<tr>
+<td><strong>Python</strong></td>
+<td>3.11+</td>
+<td><a href="https://www.python.org/" target="_blank" rel="noopener">https://www.python.org/</a> (use a venv)</td>
+</tr>
+<tr>
+<td><strong>Node.js</strong></td>
+<td>20+</td>
+<td><a href="https://nodejs.org/" target="_blank" rel="noopener">https://nodejs.org/</a> (frontend, local dev only)</td>
+</tr>
+<tr>
+<td><strong>Docker</strong></td>
+<td>latest</td>
+<td><a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">https://www.docker.com/products/docker-desktop/</a> (build agent images)</td>
+</tr>
+<tr>
+<td><strong>Git</strong></td>
+<td>latest</td>
+<td><a href="https://git-scm.com/" target="_blank" rel="noopener">https://git-scm.com/</a></td>
+</tr>
+<tr>
+<td><strong>Power BI Desktop</strong> <em>(optional)</em></td>
+<td>latest</td>
+<td><a href="https://aka.ms/pbidesktop" target="_blank" rel="noopener">https://aka.ms/pbidesktop</a> (Windows only)</td>
+</tr>
+</tbody></table></div>
+<p>Verify:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">az version
+azd version
+python --version
+node --version
+docker --version
+git --version</code></pre>
+<h2 id="7-cost-expectations-hygiene">7. Cost expectations &amp; hygiene<a class="anchor" href="#7-cost-expectations-hygiene" aria-hidden="true">#</a></h2>
+<p>This RVAS is intentionally low-cost, but <strong>clean up when you&#39;re done</strong>.</p>
+<ul>
+<li><strong>Fabric</strong> — free on trial; pause paid capacity outside hours. OneLake storage is a few cents/GB.</li>
+<li><strong>Agent workload</strong> — serverless Cosmos DB, Container Apps scale-to-low, and <code>gpt-4o-mini</code> keep
+spend to a few dollars/day. APIM <strong>Developer</strong> tier (used here) is the main fixed cost.</li>
+<li><strong>Landing zone</strong> — ADLS Gen2 + Log Analytics are inexpensive at RVAS volumes.</li>
+<li><strong>Tear down</strong> with <code>azd down --purge</code> in each workload directory when the event ends (Challenge 0
+cleanup notes), and delete the Fabric workspace / end the trial.</li>
+</ul>
+<h2 id="8-get-the-code">8. Get the code<a class="anchor" href="#8-get-the-code" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">git clone https://github.com/microsoft/frontier-fabric-agentops-rvas.git
+cd frontier-fabric-agentops-rvas</code></pre>
+<hr>
+<h2 id="✅-pre-flight-checklist">✅ Pre-flight checklist<a class="anchor" href="#✅-pre-flight-checklist" aria-hidden="true">#</a></h2>
+<p>Bring this to the kickoff. You&#39;re ready when every box is ticked:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Each member can <code>az login</code> to the target subscription</li>
+<li><input disabled="" type="checkbox"> Roles confirmed: Contributor (+ User Access Administrator), Cost Management Reader</li>
+<li><input disabled="" type="checkbox"> Resource providers registered: <code>Microsoft.App</code>, <code>Microsoft.DocumentDB</code>, <code>Microsoft.ApiManagement</code>, <code>Microsoft.CognitiveServices</code>, <code>Microsoft.OperationalInsights</code>, <code>Microsoft.Storage</code></li>
+<li><input disabled="" type="checkbox"> Azure OpenAI / Foundry access confirmed with quota for <code>gpt-4o</code> or <code>gpt-4o-mini</code> in your region</li>
+<li><input disabled="" type="checkbox"> Region chosen that supports both the model <strong>and</strong> Fabric (e.g., East US 2)</li>
+<li><input disabled="" type="checkbox"> Fabric trial started (or paid F2+ capacity created) and you know your <strong>capacity ID / name</strong></li>
+<li><input disabled="" type="checkbox"> Fabric tenant settings allow workspace creation + Mirroring</li>
+<li><input disabled="" type="checkbox"> Everyone has a Power BI license (Pro / PPU / trial)</li>
+<li><input disabled="" type="checkbox"> Local tooling installed and verified (<code>az</code>, <code>azd</code>, <code>python</code>, <code>docker</code>, <code>git</code>)</li>
+<li><input disabled="" type="checkbox"> Repo cloned</li>
+</ul>
+<p>Stuck on any item? That&#39;s exactly what <strong><a href="../challenges/challenge-00-mission-setup.html">Challenge 0</a></strong>
+and your coach are for.</p>
+
+        </article>
+        
+        
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/docs/prerequisites.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

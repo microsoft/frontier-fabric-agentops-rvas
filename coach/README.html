@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coach Handbook · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Everything an instructor needs to run the AgentOps Control Tower RVAS. Read this first, then
+review the per-challenge coach guides.">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#who-this-is-for">Who this is for</a></li>
+          <li><a class="h2" href="#what-teams-build">What teams build</a></li>
+          <li><a class="h2" href="#sample-agenda-2-days">Sample agenda (2 days)</a></li>
+          <li><a class="h2" href="#how-to-run-each-challenge">How to run each challenge</a></li>
+          <li><a class="h2" href="#reveal-policy-for-resources">Reveal policy for resources/</a></li>
+          <li><a class="h2" href="#per-challenge-guides">Per-challenge guides</a></li>
+          <li><a class="h2" href="#logistics">Logistics</a></li>
+          <li><a class="h2" href="#scoring-optional">Scoring (optional)</a></li>
+          <li><a class="h2" href="#facilitation-tips">Facilitation tips</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../coach/README.html">Coach</a> <span class="sep">/</span> <span>Coach Handbook</span></div><div class="meta-row"><span class="chip cat-coach">Coach</span></div>
+        <article class="article prose">
+<h1 id="coach-handbook">Coach Handbook</h1>
+<p>Everything an instructor needs to run the <strong>AgentOps Control Tower</strong> RVAS. Read this first, then
+review the per-challenge coach guides.</p>
+<blockquote>
+<p>🧑‍🏫 <strong>Coaching philosophy:</strong> facilitate, don&#39;t solve. Let teams struggle productively. Ask
+leading questions, point to the right doc, and reveal the reference solution only when a team is
+genuinely stuck or running out of time. The <code>resources/</code> directory is the full answer key — you
+decide how much to expose and when.</p>
+</blockquote>
+<hr>
+<h2 id="who-this-is-for">Who this is for<a class="anchor" href="#who-this-is-for" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Audience:</strong> platform/cloud engineers, data engineers, FinOps practitioners, and AI engineers at
+the customer. Level 200–400.</li>
+<li><strong>Team size:</strong> 3–5 people. Aim for a mix of skills per team so each challenge has an owner.</li>
+<li><strong>Coach ratio:</strong> 1 coach per 1–3 teams works well.</li>
+</ul>
+<h2 id="what-teams-build">What teams build<a class="anchor" href="#what-teams-build" aria-hidden="true">#</a></h2>
+<p>A Fabric-based control tower that ingests and correlates telemetry from Azure services and
+Foundry-built agents, delivering dashboards and alerts for <strong>reliability, cost, and performance</strong>.
+See <a href="../docs/architecture.html"><code>docs/architecture.md</code></a>. The reference implementation lives in
+<a href="../resources/README.html"><code>resources/</code></a>.</p>
+<h2 id="sample-agenda-2-days">Sample agenda (2 days)<a class="anchor" href="#sample-agenda-2-days" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Time</th>
+<th>Day 1</th>
+<th>Day 2</th>
+</tr>
+</thead><tbody><tr>
+<td>Morning</td>
+<td>Welcome + mission briefing (30 min) · <strong>Challenge 0</strong> · <strong>Challenge 1</strong></td>
+<td>Recap · <strong>Challenge 4</strong></td>
+</tr>
+<tr>
+<td>Afternoon</td>
+<td><strong>Challenge 2</strong> · start <strong>Challenge 3</strong></td>
+<td><strong>Challenge 5</strong> · <strong>Challenge 6</strong> (stretch) · Showcase + retro</td>
+</tr>
+</tbody></table></div>
+<p>Compressed to <strong>1.5 days?</strong> Pre-provision Challenge 0 prerequisites, run Challenges 1 &amp; 2 in parallel
+(split teams), and treat Challenge 6 as optional.</p>
+<blockquote>
+<p>⏱️ The biggest schedule risk is <strong>environment access</strong> (roles, quota, Fabric enablement). Drive the
+<a href="../docs/prerequisites.html">prerequisites</a> <strong>before</strong> Day 1. Have a backup subscription and a
+pre-started Fabric trial in your pocket.</p>
+</blockquote>
+<h2 id="how-to-run-each-challenge">How to run each challenge<a class="anchor" href="#how-to-run-each-challenge" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Frame it (5–10 min).</strong> Set the scene with the challenge&#39;s mission hook and objectives. Use the
+&quot;Talking points&quot; in each coach guide as mini-lecture material.</li>
+<li><strong>Let them work.</strong> Teams self-organize. Circulate, unblock, ask questions. Resist hand-holding.</li>
+<li><strong>Checkpoint (✅).</strong> Validate against the success criteria using the &quot;Checkpoint verification&quot; in
+the coach guide. Award points if you&#39;re scoring.</li>
+<li><strong>Debrief (5 min).</strong> Reinforce <em>why</em> it mattered before moving on.</li>
+</ol>
+<h2 id="reveal-policy-for-resources">Reveal policy for <code>resources/</code><a class="anchor" href="#reveal-policy-for-resources" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Team is…</th>
+<th>Do this</th>
+</tr>
+</thead><tbody><tr>
+<td>Cruising</td>
+<td>Keep the reference hidden; push them toward stretch goals and &quot;explain it to me&quot;</td>
+</tr>
+<tr>
+<td>Steady</td>
+<td>Point to the relevant <strong>resource README</strong>, not the solution commands</td>
+</tr>
+<tr>
+<td>Stuck (15+ min)</td>
+<td>Share the specific command/snippet from the coach guide</td>
+</tr>
+<tr>
+<td>Out of time</td>
+<td>Have them deploy the reference asset directly so they can continue the arc</td>
+</tr>
+</tbody></table></div>
+<p>The arc matters more than any single challenge — <strong>don&#39;t let a team fall off the path.</strong> It&#39;s fine to
+fast-forward a team through Challenges 1–2 (Azure foundation) so they reach the <strong>Fabric</strong> core
+(3–6), which is the point of the event.</p>
+<h2 id="per-challenge-guides">Per-challenge guides<a class="anchor" href="#per-challenge-guides" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>#</th>
+<th>Guide</th>
+<th>Focus</th>
+</tr>
+</thead><tbody><tr>
+<td>0</td>
+<td><a href="challenge-00-guide.html">challenge-00-guide.md</a></td>
+<td>Access, tooling, Fabric capacity</td>
+</tr>
+<tr>
+<td>1</td>
+<td><a href="challenge-01-guide.html">challenge-01-guide.md</a></td>
+<td>Deploy + verify agent telemetry</td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="challenge-02-guide.html">challenge-02-guide.md</a></td>
+<td>ADLS Gen2 landing zone</td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="challenge-03-guide.html">challenge-03-guide.md</a></td>
+<td>Lakehouse, shortcuts, Mirroring</td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="challenge-04-guide.html">challenge-04-guide.md</a></td>
+<td>Medallion pipeline</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="challenge-05-guide.html">challenge-05-guide.md</a></td>
+<td>Semantic model + dashboards</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="challenge-06-guide.html">challenge-06-guide.md</a></td>
+<td>Alerts, chargeback, RLS</td>
+</tr>
+</tbody></table></div>
+<h2 id="logistics">Logistics<a class="anchor" href="#logistics" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Shared Fabric capacity.</strong> One trial/paid capacity can back every team. As capacity admin, assign
+each team&#39;s workspace to it. Give each team <strong>its own workspace</strong>.</li>
+<li><strong>Naming.</strong> Agree a convention up front, e.g. <code>rg-agentops-&lt;team&gt;</code> and workspace <code>AgentOps-&lt;team&gt;</code>,
+so resources are easy to find and clean up.</li>
+<li><strong>Cost.</strong> Low by design (see <a href="../docs/faq.html">FAQ</a>). Use <code>gpt-4o-mini</code>. Pause paid capacity
+overnight.</li>
+<li><strong>Cleanup (end of event).</strong> In each workload dir: <code>azd down --purge</code>. Delete Fabric workspaces and,
+if you started a trial, let it expire (or end it). Remove cost exports.</li>
+</ul>
+<h2 id="scoring-optional">Scoring (optional)<a class="anchor" href="#scoring-optional" aria-hidden="true">#</a></h2>
+<p>The rubric lives in <a href="../challenges/README.html#scoring"><code>challenges/README.md</code></a>. For a closing
+<strong>showcase</strong>, have each team demo their Control Tower answering the three business questions
+(reliability, cost, performance). Judge on <strong>correlation and usefulness</strong>, not pixel polish.</p>
+<h2 id="facilitation-tips">Facilitation tips<a class="anchor" href="#facilitation-tips" aria-hidden="true">#</a></h2>
+<ul>
+<li>Keep the <strong>three business questions</strong> on a whiteboard all event. Every challenge ladders up to them.</li>
+<li>Celebrate the first end-to-end <strong>trace</strong> (Challenge 1) and the first <strong>Direct Lake</strong> visual
+(Challenge 5) — they&#39;re the &quot;aha&quot; moments.</li>
+<li>If energy dips in the data-engineering middle (Challenge 4), remind teams the payoff is the
+dashboard two hours away.</li>
+</ul>
+
+        </article>
+        
+        
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/coach/README.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code viewer · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="View reference-implementation source files from the Frontier Fabric AgentOps RVAS, syntax-highlighted, without leaving the site.">
+  <link rel="icon" type="image/png" href="assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <style>
+    .code-shell { max-width: 1200px; margin: 0 auto; padding: 30px 48px 60px; position: relative; z-index: 1; }
+    .file-head {
+      display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px 12px 0 0;
+      border-bottom: none; padding: 14px 20px;
+    }
+    .file-path { font-family: var(--ff-mono); font-size: 13.5px; color: var(--deep-navy); font-weight: 600; word-break: break-all; }
+    .file-path .dim { color: var(--text-3); font-weight: 400; }
+    .file-meta { font-family: var(--ff-mono); font-size: 11.5px; color: var(--text-2b); margin-top: 3px; }
+    .file-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .codebox { background: #0B1F3A; border: 1px solid #123059; border-radius: 0 0 12px 12px; overflow: hidden; box-shadow: var(--shadow-card); }
+    .codebox pre { margin: 0; overflow-x: auto; }
+    .codebox pre code {
+      display: block; font-family: var(--ff-mono); font-size: 13px; line-height: 1.62;
+      padding: 20px 22px; background: transparent !important; color: #E6EDF7;
+    }
+    /* notebook cells */
+    .nb-cell { border-bottom: 1px solid var(--border); }
+    .nb-cell:last-child { border-bottom: none; }
+    .nb-tag { font-family: var(--ff-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-2b); padding: 8px 20px 0; background: var(--surface); }
+    .nb-md { background: var(--surface); padding: 6px 24px 14px; }
+    .nb-md.prose { font-size: 15px; }
+    .nb-code { background: #0B1F3A; }
+    .nb-code pre code { padding: 14px 22px; }
+    .loading, .errbox { text-align: center; padding: 60px 20px; color: var(--text-2b); font-family: var(--ff-mono); }
+    .errbox a { color: var(--rvap-blue); }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="index.html" aria-label="RVAP · Home">
+        <img src="assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="resources/README.html">Resources</a>
+        <a class="nav-link solid" href="builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="code-shell">
+    <div class="breadcrumb" id="crumb"><a href="index.html">Home</a></div>
+    <div id="view">
+      <div class="loading">Loading file…</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Reference implementation · viewed in-place, syntax-highlighted.</div>
+      </div>
+      <a class="footer-cta" href="resources/README.html">↗ Back to resources</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script>
+    const REPO = 'https://github.com/microsoft/frontier-fabric-agentops-rvas';
+    const BLOB = REPO + '/blob/main/';
+
+    const EXT_LANG = {
+      py:'python', ts:'typescript', tsx:'typescript', js:'javascript', jsx:'javascript',
+      json:'json', ipynb:'json', yml:'yaml', yaml:'yaml', md:'markdown', sh:'bash', bash:'bash',
+      css:'css', html:'xml', xml:'xml', sql:'sql', toml:'ini', cfg:'ini', ini:'ini', txt:'plaintext',
+      dockerfile:'dockerfile', bicep:'plaintext', env:'bash'
+    };
+    const esc = (s) => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+    function langFor(pathStr) {
+      const base = pathStr.split('/').pop().toLowerCase();
+      if (base === 'dockerfile') return 'dockerfile';
+      const ext = base.includes('.') ? base.split('.').pop() : '';
+      return EXT_LANG[ext] || 'plaintext';
+    }
+
+    function safePath(p) {
+      if (!p) return null;
+      if (/^https?:|^\/\/|^\//.test(p) || p.includes('..') || p.includes('\0')) return null;
+      return p.replace(/^\.\//, '');
+    }
+
+    function crumbFor(p) {
+      const parts = p.split('/');
+      const crumb = document.getElementById('crumb');
+      let acc = [];
+      const bits = ['<a href="index.html">Home</a>'];
+      parts.forEach((seg, i) => {
+        acc.push(seg);
+        bits.push('<span class="sep">/</span>');
+        if (i === parts.length - 1) bits.push('<span>' + esc(seg) + '</span>');
+        else if (seg === 'resources' || (parts[0] === 'resources' && i === 1)) {
+          // link resource dirs to their README page
+          const readme = acc.join('/') + '/README.html';
+          bits.push('<a href="' + readme + '">' + esc(seg) + '</a>');
+        } else bits.push('<span>' + esc(seg) + '</span>');
+      });
+      crumb.innerHTML = bits.join(' ');
+    }
+
+    function renderPlain(text, lang) {
+      const code = document.createElement('code');
+      if (lang !== 'plaintext') code.className = 'language-' + lang;
+      code.textContent = text;
+      const pre = document.createElement('pre'); pre.appendChild(code);
+      const box = document.createElement('div'); box.className = 'codebox'; box.appendChild(pre);
+      try { window.hljs.highlightElement(code); } catch (e) {}
+      return box;
+    }
+
+    function renderNotebook(text) {
+      let nb; try { nb = JSON.parse(text); } catch (e) { return renderPlain(text, 'json'); }
+      if (!nb || !Array.isArray(nb.cells)) return renderPlain(text, 'json');
+      const box = document.createElement('div'); box.className = 'codebox'; box.style.background = 'transparent'; box.style.border = 'none'; box.style.boxShadow = 'none';
+      nb.cells.forEach(cell => {
+        const src = Array.isArray(cell.source) ? cell.source.join('') : (cell.source || '');
+        const cellEl = document.createElement('div'); cellEl.className = 'nb-cell';
+        if (cell.cell_type === 'markdown') {
+          const tag = document.createElement('div'); tag.className = 'nb-tag'; tag.textContent = 'Markdown';
+          const md = document.createElement('div'); md.className = 'nb-md prose';
+          md.innerHTML = window.marked ? window.marked.parse(src) : esc(src);
+          cellEl.appendChild(tag); cellEl.appendChild(md);
+        } else {
+          const tag = document.createElement('div'); tag.className = 'nb-tag'; tag.textContent = (cell.cell_type || 'code') + ' cell';
+          const wrap = document.createElement('div'); wrap.className = 'nb-code';
+          const code = document.createElement('code'); code.className = 'language-python'; code.textContent = src;
+          const pre = document.createElement('pre'); pre.appendChild(code); wrap.appendChild(pre);
+          try { window.hljs.highlightElement(code); } catch (e) {}
+          cellEl.appendChild(tag); cellEl.appendChild(wrap);
+        }
+        box.appendChild(cellEl);
+      });
+      const outer = document.createElement('div'); outer.className = 'codebox'; outer.appendChild(box);
+      return outer;
+    }
+
+    async function load() {
+      const params = new URLSearchParams(location.search);
+      const raw = params.get('path');
+      const p = safePath(raw);
+      const view = document.getElementById('view');
+      if (!p) {
+        view.innerHTML = '<div class="errbox">No file specified, or the path is invalid.<br><br><a href="resources/README.html">← Browse the resources</a></div>';
+        return;
+      }
+      crumbFor(p);
+      const lang = langFor(p);
+      const isNb = p.toLowerCase().endsWith('.ipynb');
+      try {
+        const res = await fetch('./' + p, { cache: 'no-cache' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const text = await res.text();
+        const lines = text.split('\n').length;
+        const bytes = new Blob([text]).size;
+        const kb = (bytes / 1024).toFixed(bytes < 10240 ? 1 : 0);
+        const dir = p.includes('/') ? p.slice(0, p.lastIndexOf('/') + 1) : '';
+        const name = p.split('/').pop();
+
+        const head = document.createElement('div'); head.className = 'file-head';
+        head.innerHTML =
+          '<div><div class="file-path"><span class="dim">' + esc(dir) + '</span>' + esc(name) + '</div>' +
+          '<div class="file-meta">' + (isNb ? 'Notebook · ' : lang + ' · ') + lines + ' lines · ' + kb + ' KB</div></div>' +
+          '<div class="file-actions">' +
+            '<button class="btn btn-ghost btn-sm" id="copyBtn">Copy</button>' +
+            '<a class="btn btn-ghost btn-sm" href="./' + encodeURI(p) + '" target="_blank" rel="noopener">Raw ↗</a>' +
+            '<a class="btn btn-primary btn-sm" href="' + BLOB + encodeURI(p) + '" target="_blank" rel="noopener">GitHub ↗</a>' +
+          '</div>';
+
+        view.innerHTML = '';
+        view.appendChild(head);
+        view.appendChild(isNb ? renderNotebook(text) : renderPlain(text, lang));
+        document.title = name + ' · Frontier Fabric AgentOps RVAS';
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(text).then(() => { copyBtn.textContent = 'Copied'; setTimeout(() => copyBtn.textContent = 'Copy', 1400); });
+        });
+      } catch (err) {
+        view.innerHTML = '<div class="errbox">Could not load <b>' + esc(p) + '</b> (' + esc(err.message) + ').<br><br>' +
+          '<a href="' + BLOB + encodeURI(p) + '" target="_blank" rel="noopener">Open it on GitHub ↗</a> · ' +
+          '<a href="resources/README.html">Back to resources</a></div>';
+      }
+    }
+    load();
+  </script>
+</body>
+</html>

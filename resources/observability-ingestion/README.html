@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Observability Ingestion — Reference Component · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Observability Ingestion — Reference Component">
+  <link rel="icon" type="image/png" href="../../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../../index.html" aria-label="RVAP · Home">
+        <img src="../../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#architecture-overview">Architecture Overview</a></li>
+          <li><a class="h3" href="#data-flows">Data Flows</a></li>
+          <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
+          <li><a class="h2" href="#deployment">Deployment</a></li>
+          <li><a class="h3" href="#with-azure-developer-cli">With Azure Developer CLI</a></li>
+          <li><a class="h3" href="#manual-bicep-deployment">Manual Bicep Deployment</a></li>
+          <li><a class="h2" href="#running-scripts">Running Scripts</a></li>
+          <li><a class="h3" href="#resource-graph-export">Resource Graph Export</a></li>
+          <li><a class="h3" href="#setup-diagnostic-settings">Setup Diagnostic Settings</a></li>
+          <li><a class="h3" href="#validate-exports">Validate Exports</a></li>
+          <li><a class="h2" href="#data-format-reference">Data Format Reference</a></li>
+          <li><a class="h3" href="#focus-cost-format">FOCUS Cost Format</a></li>
+          <li><a class="h3" href="#resource-graph-parquet-schema">Resource Graph Parquet Schema</a></li>
+          <li><a class="h2" href="#storage-layout">Storage Layout</a></li>
+          <li><a class="h2" href="#integration-with-the-fabric-control-tower">Integration with the Fabric Control Tower</a></li>
+          <li><a class="h2" href="#infrastructure-resources">Infrastructure Resources</a></li>
+          <li><a class="h2" href="#cicd">CI/CD</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../../index.html">Home</a> <span class="sep">/</span> <a href="../../resources/README.html">Resources</a> <span class="sep">/</span> <span>Observability Ingestion — Reference Component</span></div><div class="meta-row"><span class="chip cat-resources">Resources</span></div>
+        <article class="article prose">
+<h1 id="observability-ingestion-—-reference-component">Observability Ingestion — Reference Component</h1>
+<blockquote>
+<p><strong>Part of the <a href="../../README.html">Frontier Fabric AgentOps RVAS</a>.</strong> This component is the
+<strong>telemetry landing zone</strong> you build in <strong><a href="../../challenges/challenge-02-landing-zone.html">Challenge 2</a></strong> —
+Azure infrastructure and export scripts that land cost, metrics, logs, diagnostics, and resource
+metadata into ADLS Gen2 so Fabric can shortcut to it in later challenges.</p>
+</blockquote>
+<p>Azure infrastructure and scripts that ingest observability data from the Azure Control Plane, Azure Monitor, and Cost Management into an ADLS Gen2 landing zone.</p>
+<h2 id="architecture-overview">Architecture Overview<a class="anchor" href="#architecture-overview" aria-hidden="true">#</a></h2>
+<p>This component provisions the <strong>landing zone</strong> of the AgentOps Control Tower:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>┌──────────────────────────────────────────────────────────────────────┐
+│                       Azure Control Plane                           │
+│                                                                     │
+│  ┌─────────────────┐  ┌──────────────────┐  ┌───────────────────┐  │
+│  │ Cost Management  │  │ Resource Graph   │  │ Diagnostic        │  │
+│  │ (FOCUS Export)   │  │ (Metadata/Tags)  │  │ Settings          │  │
+│  └────────┬────────┘  └────────┬─────────┘  └────────┬──────────┘  │
+│           │                    │                      │             │
+│  ┌────────┴────────────────────┴──────────────────────┴──────────┐  │
+│  │                   ADLS Gen2 Storage Account                   │  │
+│  │  ┌───────┐ ┌────────┐ ┌──────┐ ┌──────────┐ ┌─────────────┐ │  │
+│  │  │ costs │ │metrics │ │ logs │ │ metadata │ │ diagnostics │ │  │
+│  │  └───────┘ └────────┘ └──────┘ └──────────┘ └─────────────┘ │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                                                     │
+│  ┌─────────────────────┐                                           │
+│  │ Log Analytics        │──── Data Export Rules ──────────┐        │
+│  │ Workspace            │                                 │        │
+│  └──────────┬───────────┘                                 ▼        │
+│             │                                     Storage Account  │
+│             ▼                                                      │
+│    Application Insights                                            │
+│    (AppRequests, AppTraces,                                        │
+│     AppDependencies, etc.)                                         │
+└──────────────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="data-flows">Data Flows<a class="anchor" href="#data-flows" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table><thead><tr>
+<th>Source</th>
+<th>Container</th>
+<th>Format</th>
+<th>Schedule</th>
+</tr>
+</thead><tbody><tr>
+<td>Azure Cost Management</td>
+<td><code>costs</code></td>
+<td>FOCUS Parquet (Snappy)</td>
+<td>Daily</td>
+</tr>
+<tr>
+<td>Azure Resource Graph</td>
+<td><code>metadata</code></td>
+<td>Parquet (Snappy)</td>
+<td>Daily (cron)</td>
+</tr>
+<tr>
+<td>Log Analytics Data Export</td>
+<td><code>metrics</code>, <code>logs</code></td>
+<td>JSON</td>
+<td>Continuous</td>
+</tr>
+<tr>
+<td>Diagnostic Settings</td>
+<td><code>diagnostics</code></td>
+<td>JSON</td>
+<td>Continuous</td>
+</tr>
+</tbody></table></div>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="https://learn.microsoft.com/cli/azure/install-azure-cli" target="_blank" rel="noopener">Azure CLI</a> v2.60+</li>
+<li><a href="https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd" target="_blank" rel="noopener">Azure Developer CLI (azd)</a> v1.9+</li>
+<li>An Azure subscription with <strong>Contributor</strong> and <strong>Cost Management Reader</strong> permissions</li>
+<li>Python 3.11+</li>
+</ul>
+<h2 id="deployment">Deployment<a class="anchor" href="#deployment" aria-hidden="true">#</a></h2>
+<h3 id="with-azure-developer-cli">With Azure Developer CLI<a class="anchor" href="#with-azure-developer-cli" aria-hidden="true">#</a></h3>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash"># Authenticate
+azd auth login
+
+# Provision infrastructure
+azd up</code></pre>
+<p>You will be prompted for:</p>
+<ul>
+<li><strong>Environment name</strong> — a short identifier (e.g., <code>dev</code>, <code>demo</code>)</li>
+<li><strong>Azure location</strong> — region for all resources (e.g., <code>eastus2</code>)</li>
+<li><strong>Azure subscription</strong> — the target subscription</li>
+</ul>
+<h3 id="manual-bicep-deployment">Manual Bicep Deployment<a class="anchor" href="#manual-bicep-deployment" aria-hidden="true">#</a></h3>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">az deployment group create \
+  --resource-group rg-observability-demo \
+  --template-file infra/main.bicep \
+  --parameters infra/main.parameters.json \
+  --parameters environmentName=demo location=eastus2</code></pre>
+<h2 id="running-scripts">Running Scripts<a class="anchor" href="#running-scripts" aria-hidden="true">#</a></h2>
+<h3 id="resource-graph-export">Resource Graph Export<a class="anchor" href="#resource-graph-export" aria-hidden="true">#</a></h3>
+<p>Queries Azure Resource Graph for resource metadata and exports to ADLS Gen2:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd src/scripts
+pip install -r requirements.txt
+
+python resource_graph_export.py \
+  --subscription-id &lt;SUBSCRIPTION_ID&gt; \
+  --storage-account &lt;STORAGE_ACCOUNT_NAME&gt; \
+  --container metadata</code></pre>
+<h3 id="setup-diagnostic-settings">Setup Diagnostic Settings<a class="anchor" href="#setup-diagnostic-settings" aria-hidden="true">#</a></h3>
+<p>Discovers resources and creates diagnostic settings (supports dry-run):</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">python setup_diagnostic_settings.py \
+  --subscription-id &lt;SUBSCRIPTION_ID&gt; \
+  --workspace-id &lt;WORKSPACE_RESOURCE_ID&gt; \
+  --storage-account-id &lt;STORAGE_ACCOUNT_RESOURCE_ID&gt; \
+  --dry-run</code></pre>
+<h3 id="validate-exports">Validate Exports<a class="anchor" href="#validate-exports" aria-hidden="true">#</a></h3>
+<p>Inspects storage containers and reports on ingested data:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">python validate_exports.py \
+  --storage-account &lt;STORAGE_ACCOUNT_NAME&gt;</code></pre>
+<h2 id="data-format-reference">Data Format Reference<a class="anchor" href="#data-format-reference" aria-hidden="true">#</a></h2>
+<h3 id="focus-cost-format">FOCUS Cost Format<a class="anchor" href="#focus-cost-format" aria-hidden="true">#</a></h3>
+<p>The Cost Management export uses the <a href="https://focus.finops.org/" target="_blank" rel="noopener">FinOps Open Cost and Usage Specification (FOCUS)</a> format. Key columns:</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Column</th>
+<th>Description</th>
+</tr>
+</thead><tbody><tr>
+<td><code>BillingAccountId</code></td>
+<td>Billing account identifier</td>
+</tr>
+<tr>
+<td><code>BillingPeriodStart</code></td>
+<td>Start of billing period</td>
+</tr>
+<tr>
+<td><code>ChargeCategory</code></td>
+<td>Usage, Purchase, Tax, etc.</td>
+</tr>
+<tr>
+<td><code>BilledCost</code></td>
+<td>Amount billed</td>
+</tr>
+<tr>
+<td><code>EffectiveCost</code></td>
+<td>Net cost after discounts</td>
+</tr>
+<tr>
+<td><code>PricingUnit</code></td>
+<td>Unit of pricing</td>
+</tr>
+<tr>
+<td><code>ResourceId</code></td>
+<td>Azure resource ID</td>
+</tr>
+<tr>
+<td><code>ResourceName</code></td>
+<td>Resource display name</td>
+</tr>
+<tr>
+<td><code>ServiceName</code></td>
+<td>Azure service name</td>
+</tr>
+<tr>
+<td><code>Tags</code></td>
+<td>Resource tags as JSON</td>
+</tr>
+</tbody></table></div>
+<h3 id="resource-graph-parquet-schema">Resource Graph Parquet Schema<a class="anchor" href="#resource-graph-parquet-schema" aria-hidden="true">#</a></h3>
+<p>Exported by <code>resource_graph_export.py</code>:</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody><tr>
+<td><code>id</code></td>
+<td>string</td>
+<td>Full resource ID</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td>Resource name</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>string</td>
+<td>Resource type (e.g., <code>Microsoft.Compute/virtualMachines</code>)</td>
+</tr>
+<tr>
+<td><code>location</code></td>
+<td>string</td>
+<td>Azure region</td>
+</tr>
+<tr>
+<td><code>resourceGroup</code></td>
+<td>string</td>
+<td>Resource group name</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>map</td>
+<td>Resource tags</td>
+</tr>
+<tr>
+<td><code>subscriptionId</code></td>
+<td>string</td>
+<td>Subscription ID</td>
+</tr>
+</tbody></table></div>
+<h2 id="storage-layout">Storage Layout<a class="anchor" href="#storage-layout" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>&lt;storage-account&gt;/
+├── costs/
+│   └── focus/
+│       └── &lt;yyyyMMdd-yyyyMMdd&gt;/
+│           └── *.parquet          # FOCUS cost data
+├── metrics/
+│   └── am-&lt;workspace&gt;/
+│       └── AppMetrics/
+│           └── y=*/m=*/d=*/h=*/  # Log Analytics metrics export
+├── logs/
+│   └── am-&lt;workspace&gt;/
+│       └── App*/
+│           └── y=*/m=*/d=*/h=*/  # Log Analytics log export
+├── metadata/
+│   └── resource-graph/
+│       └── year=*/month=*/day=*/
+│           ├── all_resources_with_tags_*.parquet
+│           ├── resource_counts_by_type_*.parquet
+│           └── resources_by_location_*.parquet
+└── diagnostics/
+    └── insights-*/
+        └── resourceId=*/
+            └── y=*/m=*/d=*/h=*/  # Diagnostic settings output</code></pre>
+<h2 id="integration-with-the-fabric-control-tower">Integration with the Fabric Control Tower<a class="anchor" href="#integration-with-the-fabric-control-tower" aria-hidden="true">#</a></h2>
+<p>This landing zone is the data source for the <strong><a href="../fabric-control-tower/README.html">Fabric Control Tower</a></strong> you connect in <strong><a href="../../challenges/challenge-03-onelake-foundation.html">Challenge 3</a></strong>. The ADLS Gen2 storage account serves as a OneLake shortcut target:</p>
+<ol>
+<li><strong>Fabric Lakehouse</strong> creates shortcuts to each container in this storage account</li>
+<li><strong>Spark notebooks</strong> read Parquet cost data and resource metadata</li>
+<li><strong>Power BI</strong> datasets are built on top of the lakehouse tables</li>
+<li><strong>Cost dashboards</strong> combine FOCUS cost data with resource tags for showback/chargeback</li>
+</ol>
+<p>The storage account uses hierarchical namespace (ADLS Gen2) and date-partitioned directories for optimal Spark performance.</p>
+<h2 id="infrastructure-resources">Infrastructure Resources<a class="anchor" href="#infrastructure-resources" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Resource</th>
+<th>Purpose</th>
+</tr>
+</thead><tbody><tr>
+<td>ADLS Gen2 Storage Account</td>
+<td>Central data landing zone</td>
+</tr>
+<tr>
+<td>Log Analytics Workspace</td>
+<td>Log and metric collection</td>
+</tr>
+<tr>
+<td>Data Export Rules</td>
+<td>Continuous export from workspace to storage</td>
+</tr>
+<tr>
+<td>Cost Management Export</td>
+<td>Daily FOCUS cost data</td>
+</tr>
+<tr>
+<td>Diagnostic Settings</td>
+<td>Resource-level telemetry capture</td>
+</tr>
+<tr>
+<td>User-Assigned Managed Identity</td>
+<td>Service authentication</td>
+</tr>
+<tr>
+<td>Key Vault</td>
+<td>Secrets and connection details</td>
+</tr>
+</tbody></table></div>
+<h2 id="cicd">CI/CD<a class="anchor" href="#cicd" aria-hidden="true">#</a></h2>
+<p>Two GitHub Actions workflows automate deployment:</p>
+<ul>
+<li><strong>deploy.yml</strong> — provisions infrastructure on push to <code>main</code> and runs the resource graph export</li>
+<li><strong>scheduled-export.yml</strong> — runs the resource graph export daily at 2:00 AM UTC via cron</li>
+</ul>
+<p>Both workflows use OIDC (federated credentials) for passwordless Azure authentication.</p>
+
+        </article>
+        
+        <div class="filetree">
+          <div class="filetree-head">📁 observability-ingestion — 14 files · click any file to view it here (syntax-highlighted)</div>
+          <ul>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2F.github%2Fworkflows%2Fdeploy.yml"><span class="ic">›</span>observability-ingestion/.github/workflows/deploy.yml</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2F.github%2Fworkflows%2Fscheduled-export.yml"><span class="ic">›</span>observability-ingestion/.github/workflows/scheduled-export.yml</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2F.gitignore"><span class="ic">›</span>observability-ingestion/.gitignore</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Fazure.yaml"><span class="ic">›</span>observability-ingestion/azure.yaml</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Finfra%2Fmain.bicep"><span class="ic">›</span>observability-ingestion/infra/main.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Finfra%2Fmain.parameters.json"><span class="ic">›</span>observability-ingestion/infra/main.parameters.json</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Finfra%2Fmodules%2Fcost-export.bicep"><span class="ic">›</span>observability-ingestion/infra/modules/cost-export.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Finfra%2Fmodules%2Fdiagnostic-settings.bicep"><span class="ic">›</span>observability-ingestion/infra/modules/diagnostic-settings.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Finfra%2Fmodules%2Fmonitoring.bicep"><span class="ic">›</span>observability-ingestion/infra/modules/monitoring.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Finfra%2Fmodules%2Fstorage.bicep"><span class="ic">›</span>observability-ingestion/infra/modules/storage.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Fsrc%2Fscripts%2Frequirements.txt"><span class="ic">›</span>observability-ingestion/src/scripts/requirements.txt</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Fsrc%2Fscripts%2Fresource_graph_export.py"><span class="ic">›</span>observability-ingestion/src/scripts/resource_graph_export.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Fsrc%2Fscripts%2Fsetup_diagnostic_settings.py"><span class="ic">›</span>observability-ingestion/src/scripts/setup_diagnostic_settings.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2Fsrc%2Fscripts%2Fvalidate_exports.py"><span class="ic">›</span>observability-ingestion/src/scripts/validate_exports.py</a></li>
+          </ul>
+        </div>
+        
+        <div class="source-bar">
+          <a href="../../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/resources/observability-ingestion/README.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

@@ -149,6 +149,22 @@
       transition: all 0.18s ease;
     }
     .nav-repo:hover { border-color: var(--rvap-blue); color: var(--rvap-blue); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-cta {
+      font-family: var(--ff-mono);
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      color: #fff;
+      background: var(--rvap-blue);
+      text-decoration: none;
+      padding: 8px 15px;
+      border: 1px solid var(--rvap-blue);
+      border-radius: 8px;
+      white-space: nowrap;
+      transition: all 0.18s ease;
+    }
+    .nav-cta:hover { background: var(--deep-navy); border-color: var(--deep-navy); }
+    @media (max-width: 640px) { .nav-repo { display: none; } }
 
     /* ════════════════════════════════════════════ HERO ════════════════════════════════════════════ */
     .hero {
@@ -548,7 +564,10 @@
       <a class="nav-brand" href="./" aria-label="RVAP · Real Value Acceleration Program — Home">
         <img src="assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
       </a>
-      <a class="nav-repo" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">View on GitHub ↗</a>
+      <div class="nav-actions">
+        <a class="nav-cta" href="builder.html">Compose your delivery →</a>
+        <a class="nav-repo" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">View on GitHub ↗</a>
+      </div>
     </div>
   </nav>
 
@@ -572,8 +591,9 @@
             performance</strong> across the AI-agent estate. Built on the customer's own Azure and Fabric.
           </p>
           <div class="hero-cta-row">
-            <a class="btn btn-primary" href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-00-mission-setup.md" target="_blank" rel="noopener">Start Challenge 00 ↗</a>
-            <a class="btn btn-ghost" href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/docs/architecture.md" target="_blank" rel="noopener">Reference architecture ↗</a>
+            <a class="btn btn-primary" href="challenges/challenge-00-mission-setup.html">Start Challenge 00 →</a>
+            <a class="btn btn-ghost" href="builder.html">Compose your delivery →</a>
+            <a class="btn btn-ghost" href="docs/architecture.html">Reference architecture →</a>
           </div>
         </div>
         <div class="stats">
@@ -658,14 +678,15 @@
       a.dataset.cat = cat;
       a.dataset.cats = item.categories.join(' ');
       a.href = item.url;
-      a.target = '_blank';
-      a.rel = 'noopener';
+      const external = /^(https?:)?\/\//.test(item.url);
+      if (external) { a.target = '_blank'; a.rel = 'noopener'; }
 
       const badgeText = item.badge || CAT_LABEL[cat];
+      const arrow = external ? '↗' : '→';
       const tagsHtml = (item.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join('');
 
       a.innerHTML = `
-        <div class="card-head"><span class="badge">${esc(badgeText)}</span><span class="card-arrow">↗</span></div>
+        <div class="card-head"><span class="badge">${esc(badgeText)}</span><span class="card-arrow">${arrow}</span></div>
         <h3 class="card-title">${esc(item.name)}</h3>
         <p class="card-desc">${esc(item.description)}</p>
         ${tagsHtml ? `<div class="tags">${tagsHtml}</div>` : ''}

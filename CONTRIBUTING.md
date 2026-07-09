@@ -51,6 +51,35 @@ Keep the three business questions — **reliability, cost, performance** — thr
 3. Open a pull request with a clear description of the change and which challenge(s)/guide(s) it affects.
 4. For substantive changes, please open an Issue first so we can align on direction.
 
+## The website (GitHub Pages)
+
+The repo doubles as its own website at
+<https://microsoft.github.io/frontier-fabric-agentops-rvas/>. So visitors never have to leave the
+site, **every Markdown file is pre-rendered into a branded HTML page** that sits next to its source
+(`challenges/challenge-01-agent-telemetry.md` → `challenges/challenge-01-agent-telemetry.html`), and
+reference-implementation code is viewable in-place through `code.html`. The landing page
+(`index.html`) and the delivery composer (`builder.html`) tie it all together.
+
+GitHub Pages serves this repo in **legacy mode** (the branch root, as-is) — there is no CI build — so
+the generated HTML is committed to the repo. **If you edit any Markdown, regenerate the site** so the
+pages match:
+
+```bash
+npm install       # once, to get the `marked` renderer
+npm run build      # regenerates all *.html pages + builder-data.json
+```
+
+What the build does:
+
+- Renders every `.md` (outside `.git`, `.agents`, `node_modules`, `tools`) to a branded `.html` page.
+- Rewrites links so navigation stays on the site: `*.md` → `*.html`, directories → their `README.html`
+  (or the parent component page), and code files → the in-site `code.html` viewer.
+- Regenerates `builder-data.json` (challenge metadata + dependencies) that powers `builder.html`.
+
+Commit the regenerated `*.html` and `builder-data.json` alongside your Markdown change in the same PR.
+Do not hand-edit generated `.html` files or `builder-data.json` — your changes will be overwritten on
+the next build. Styling lives in `assets/css/site.css`; the generator lives in `tools/build.js`.
+
 ## Reporting issues
 
 Use GitHub Issues for bug reports, unclear instructions, broken links, or environment/setup problems

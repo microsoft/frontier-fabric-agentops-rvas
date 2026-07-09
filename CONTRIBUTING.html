@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contributing to the Frontier Fabric AgentOps RVAS · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Thanks for your interest in improving this RVAS! This repo is an open teaching asset — the more
+real-world the challenges, hints, and coach guides are, the better the experience fo">
+  <link rel="icon" type="image/png" href="assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="index.html" aria-label="RVAP · Home">
+        <img src="assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#ways-to-contribute">Ways to contribute</a></li>
+          <li><a class="h2" href="#golden-rule-challenges-and-coach-guides-travel-together">Golden rule: challenges and coach guides travel together</a></li>
+          <li><a class="h2" href="#house-style">House style</a></li>
+          <li><a class="h2" href="#making-changes">Making changes</a></li>
+          <li><a class="h2" href="#the-website-github-pages">The website (GitHub Pages)</a></li>
+          <li><a class="h2" href="#reporting-issues">Reporting issues</a></li>
+          <li><a class="h2" href="#contributor-license-agreement">Contributor License Agreement</a></li>
+          <li><a class="h2" href="#code-of-conduct">Code of Conduct</a></li>
+          <li><a class="h2" href="#trademarks">Trademarks</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="index.html">Home</a> <span class="sep">/</span> <span>Contributing to the Frontier Fabric AgentOps RVAS</span></div>
+        <article class="article prose">
+<h1 id="contributing-to-the-frontier-fabric-agentops-rvas">Contributing to the Frontier Fabric AgentOps RVAS</h1>
+<p>Thanks for your interest in improving this RVAS! This repo is an open teaching asset — the more
+real-world the challenges, hints, and coach guides are, the better the experience for the next
+customer team that runs it. Contributions of all sizes are welcome, from fixing a typo to authoring a
+brand-new challenge.</p>
+<h2 id="ways-to-contribute">Ways to contribute<a class="anchor" href="#ways-to-contribute" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Contribution</th>
+<th>Where it lives</th>
+</tr>
+</thead><tbody><tr>
+<td>Improve or clarify an attendee challenge</td>
+<td><code>challenges/challenge-0X-*.md</code></td>
+</tr>
+<tr>
+<td>Sharpen a coach guide (pitfalls, talking points, reference path)</td>
+<td><code>coach/challenge-0X-guide.md</code></td>
+</tr>
+<tr>
+<td>Fix or extend the reference implementation</td>
+<td><code>resources/**</code></td>
+</tr>
+<tr>
+<td>Update architecture, prerequisites, or FAQ</td>
+<td><code>docs/**</code></td>
+</tr>
+<tr>
+<td>Add a brand-new challenge or stretch goal</td>
+<td><code>challenges/</code> <strong>and</strong> <code>coach/</code> (always add both)</td>
+</tr>
+<tr>
+<td>Report a bug or unclear instruction</td>
+<td>GitHub Issues</td>
+</tr>
+</tbody></table></div>
+<h2 id="golden-rule-challenges-and-coach-guides-travel-together">Golden rule: challenges and coach guides travel together<a class="anchor" href="#golden-rule-challenges-and-coach-guides-travel-together" aria-hidden="true">#</a></h2>
+<p>Every attendee-facing challenge in <code>challenges/</code> has a matching instructor guide in <code>coach/</code>. If you
+change one, update the other in the same pull request so they never drift:</p>
+<ul>
+<li>A new task in a challenge needs a matching checkpoint + reference path in the guide.</li>
+<li>A renamed file needs its prev/next nav links and the coach cross-link updated.</li>
+</ul>
+<h2 id="house-style">House style<a class="anchor" href="#house-style" aria-hidden="true">#</a></h2>
+<p><strong>Attendee challenges</strong> (<code>challenges/</code>) describe <strong>what</strong> to accomplish, not <strong>how</strong>:</p>
+<ol>
+<li>A short &quot;mission log&quot; blockquote story hook at the top.</li>
+<li><code>## Objectives</code> and <code>## Prerequisites</code>.</li>
+<li><code>## Your mission</code> — numbered task groups describing the goal, not click-by-click steps.</li>
+<li><code>## Success criteria</code> — a verifiable checklist.</li>
+<li><code>## Hints</code> — progressive disclosure inside <code>&lt;details&gt;&lt;summary&gt;…&lt;/summary&gt;&lt;/details&gt;</code> blocks.</li>
+<li><code>## Resources</code> — links into <code>resources/</code> and <code>docs/</code>.</li>
+<li>A footer with <code>⬅️ Previous</code> / <code>➡️ Next</code> navigation links.</li>
+</ol>
+<p><strong>Coach guides</strong> (<code>coach/</code>) give instructors the answers:</p>
+<ol>
+<li>A snapshot table (duration, difficulty, dependencies, business question).</li>
+<li>Coaching objectives and a concrete reference path (exact commands/paths).</li>
+<li>Checkpoint verification, a common-pitfalls table, talking points, and an &quot;if they finish early&quot; note.</li>
+</ol>
+<p>Keep the three business questions — <strong>reliability, cost, performance</strong> — threaded through new content.</p>
+<h2 id="making-changes">Making changes<a class="anchor" href="#making-changes" aria-hidden="true">#</a></h2>
+<ol>
+<li>Fork the repo and create a topic branch: <code>git checkout -b improve-challenge-04</code>.</li>
+<li>Make your changes. Keep relative Markdown links valid (challenge nav, coach cross-links, <code>resources/</code> and <code>docs/</code> references).</li>
+<li>Open a pull request with a clear description of the change and which challenge(s)/guide(s) it affects.</li>
+<li>For substantive changes, please open an Issue first so we can align on direction.</li>
+</ol>
+<h2 id="the-website-github-pages">The website (GitHub Pages)<a class="anchor" href="#the-website-github-pages" aria-hidden="true">#</a></h2>
+<p>The repo doubles as its own website at
+<a href="https://microsoft.github.io/frontier-fabric-agentops-rvas/" target="_blank" rel="noopener">https://microsoft.github.io/frontier-fabric-agentops-rvas/</a>. So visitors never have to leave the
+site, <strong>every Markdown file is pre-rendered into a branded HTML page</strong> that sits next to its source
+(<code>challenges/challenge-01-agent-telemetry.md</code> → <code>challenges/challenge-01-agent-telemetry.html</code>), and
+reference-implementation code is viewable in-place through <code>code.html</code>. The landing page
+(<code>index.html</code>) and the delivery composer (<code>builder.html</code>) tie it all together.</p>
+<p>GitHub Pages serves this repo in <strong>legacy mode</strong> (the branch root, as-is) — there is no CI build — so
+the generated HTML is committed to the repo. <strong>If you edit any Markdown, regenerate the site</strong> so the
+pages match:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">npm install       # once, to get the `marked` renderer
+npm run build      # regenerates all *.html pages + builder-data.json</code></pre>
+<p>What the build does:</p>
+<ul>
+<li>Renders every <code>.md</code> (outside <code>.git</code>, <code>.agents</code>, <code>node_modules</code>, <code>tools</code>) to a branded <code>.html</code> page.</li>
+<li>Rewrites links so navigation stays on the site: <code>*.md</code> → <code>*.html</code>, directories → their <code>README.html</code>
+(or the parent component page), and code files → the in-site <code>code.html</code> viewer.</li>
+<li>Regenerates <code>builder-data.json</code> (challenge metadata + dependencies) that powers <code>builder.html</code>.</li>
+</ul>
+<p>Commit the regenerated <code>*.html</code> and <code>builder-data.json</code> alongside your Markdown change in the same PR.
+Do not hand-edit generated <code>.html</code> files or <code>builder-data.json</code> — your changes will be overwritten on
+the next build. Styling lives in <code>assets/css/site.css</code>; the generator lives in <code>tools/build.js</code>.</p>
+<h2 id="reporting-issues">Reporting issues<a class="anchor" href="#reporting-issues" aria-hidden="true">#</a></h2>
+<p>Use GitHub Issues for bug reports, unclear instructions, broken links, or environment/setup problems
+encountered during a run. Please include the challenge number, your environment (Azure region, Fabric
+capacity SKU), and what you expected vs. what happened.</p>
+<h2 id="contributor-license-agreement">Contributor License Agreement<a class="anchor" href="#contributor-license-agreement" aria-hidden="true">#</a></h2>
+<p>This project welcomes contributions and suggestions. Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit <a href="https://cla.opensource.microsoft.com" target="_blank" rel="noopener">https://cla.opensource.microsoft.com</a>.</p>
+<p>When you submit a pull request, a CLA bot will automatically determine whether you need to provide a
+CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.</p>
+<h2 id="code-of-conduct">Code of Conduct<a class="anchor" href="#code-of-conduct" aria-hidden="true">#</a></h2>
+<p>This project has adopted the <a href="https://opensource.microsoft.com/codeofconduct/" target="_blank" rel="noopener">Microsoft Open Source Code of Conduct</a>.
+For more information see the <a href="https://opensource.microsoft.com/codeofconduct/faq/" target="_blank" rel="noopener">Code of Conduct FAQ</a>
+or contact <a href="mailto:opencode@microsoft.com" target="_blank" rel="noopener">opencode@microsoft.com</a> with any additional questions or comments.</p>
+<h2 id="trademarks">Trademarks<a class="anchor" href="#trademarks" aria-hidden="true">#</a></h2>
+<p>This project may contain trademarks or logos for projects, products, or services. Authorized use of
+Microsoft trademarks or logos is subject to and must follow
+<a href="https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general" target="_blank" rel="noopener">Microsoft&#39;s Trademark &amp; Brand Guidelines</a>.
+Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or
+imply Microsoft sponsorship. Any use of third-party trademarks or logos is subject to those
+third-party&#39;s policies.</p>
+
+        </article>
+        
+        
+        <div class="source-bar">
+          <a href="index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

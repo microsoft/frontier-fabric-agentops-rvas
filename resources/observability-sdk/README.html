@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Observability SDK — AI Factory Framework · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Shared Python library that provides structured event logging, OpenTelemetry metrics &amp; traces, and Azure Monitor integration for AI-powered agents.">
+  <link rel="icon" type="image/png" href="../../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../../index.html" aria-label="RVAP · Home">
+        <img src="../../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#installation">Installation</a></li>
+          <li><a class="h2" href="#quick-start">Quick Start</a></li>
+          <li><a class="h3" href="#using-decorators">Using Decorators</a></li>
+          <li><a class="h2" href="#event-reference">Event Reference</a></li>
+          <li><a class="h2" href="#metrics-reference">Metrics Reference</a></li>
+          <li><a class="h2" href="#kpi-targets">KPI Targets</a></li>
+          <li><a class="h2" href="#azure-monitor-application-insights">Azure Monitor / Application Insights</a></li>
+          <li><a class="h2" href="#alert-configuration">Alert Configuration</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../../index.html">Home</a> <span class="sep">/</span> <a href="../../resources/README.html">Resources</a> <span class="sep">/</span> <span>Observability SDK — AI Factory Framework</span></div><div class="meta-row"><span class="chip cat-resources">Resources</span></div>
+        <article class="article prose">
+<h1 id="observability-sdk-—-ai-factory-framework">Observability SDK — AI Factory Framework</h1>
+<p>Shared Python library that provides <strong>structured event logging</strong>, <strong>OpenTelemetry metrics &amp; traces</strong>, and <strong>Azure Monitor integration</strong> for AI-powered agents.</p>
+<h2 id="installation">Installation<a class="anchor" href="#installation" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">pip install -e /path/to/observability-sdk</code></pre>
+<h2 id="quick-start">Quick Start<a class="anchor" href="#quick-start" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-python">from observability_sdk import AgentTracker, create_context
+
+ctx = create_context(
+    service=&quot;billing-agent&quot;,
+    agent=&quot;BillingAgent&quot;,
+    version=&quot;1.3.0&quot;,
+    channel=&quot;web&quot;,
+    environment=&quot;prod&quot;,
+    client_id_hash=&quot;c9f1a2&quot;,
+)
+
+tracker = AgentTracker(ctx)
+
+with tracker.track_request(input_type=&quot;billing_question&quot;):
+    with tracker.track_step(&quot;ocr_extraction&quot;):
+        invoice_id = extract_invoice(image)
+
+    with tracker.track_external_call(&quot;DOKOS_API&quot;) as ext:
+        data = dokos.get(invoice_id)
+        ext.status = 200
+
+    tracker.record_llm_usage(
+        tokens_in=350, tokens_out=120,
+        cost_estimated=0.0071, model=&quot;gpt-4o-mini&quot;,
+    )
+
+# All events are available in tracker.events</code></pre>
+<h3 id="using-decorators">Using Decorators<a class="anchor" href="#using-decorators" aria-hidden="true">#</a></h3>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-python">from observability_sdk import track_agent, track_step, track_external
+
+@track_agent(name=&quot;BillingAgent&quot;, version=&quot;1.3.0&quot;)
+def handle_billing(question: str, tracker=None):
+    result = parse_invoice(question, tracker=tracker)
+    return result
+
+@track_step(&quot;invoice_parsing&quot;)
+def parse_invoice(text: str, tracker=None):
+    ...
+
+@track_external(&quot;DOKOS_API&quot;)
+def call_dokos(invoice_id: str, tracker=None):
+    ...</code></pre>
+<h2 id="event-reference">Event Reference<a class="anchor" href="#event-reference" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Event</th>
+<th>Key Fields</th>
+</tr>
+</thead><tbody><tr>
+<td><code>AgentStart</code></td>
+<td><code>agent</code>, <code>input_type</code></td>
+</tr>
+<tr>
+<td><code>AgentStep</code></td>
+<td><code>step</code>, <code>duration_ms</code>, <code>success</code></td>
+</tr>
+<tr>
+<td><code>ExternalCall</code></td>
+<td><code>dependency</code>, <code>duration_ms</code>, <code>status</code></td>
+</tr>
+<tr>
+<td><code>AgentEnd</code></td>
+<td><code>agent</code>, <code>total_duration_ms</code>, <code>status</code></td>
+</tr>
+<tr>
+<td><code>Error</code></td>
+<td><code>step</code>, <code>error_type</code>, <code>retry</code></td>
+</tr>
+</tbody></table></div>
+<p>Every event is merged with the <strong>common log base</strong>:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-json">{
+  &quot;timestamp&quot;: &quot;2024-11-10T14:23:01Z&quot;,
+  &quot;level&quot;: &quot;INFO&quot;,
+  &quot;service&quot;: &quot;billing-agent&quot;,
+  &quot;agent&quot;: &quot;BillingAgent&quot;,
+  &quot;agent_version&quot;: &quot;1.3.0&quot;,
+  &quot;request_id&quot;: &quot;req-abc12345&quot;,
+  &quot;client_id_hash&quot;: &quot;c9f1a2&quot;,
+  &quot;channel&quot;: &quot;web&quot;,
+  &quot;environment&quot;: &quot;prod&quot;
+}</code></pre>
+<h2 id="metrics-reference">Metrics Reference<a class="anchor" href="#metrics-reference" aria-hidden="true">#</a></h2>
+<p>All metrics follow the namespace pattern <code>metrics.agent.{agent_name}.*</code>.</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Metric</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody><tr>
+<td><code>agent_execution_time_ms</code></td>
+<td>Histogram</td>
+<td>End-to-end agent latency</td>
+</tr>
+<tr>
+<td><code>success_count</code></td>
+<td>Counter</td>
+<td>Successful executions</td>
+</tr>
+<tr>
+<td><code>error_count</code></td>
+<td>Counter</td>
+<td>Failed executions</td>
+</tr>
+<tr>
+<td><code>retries_count</code></td>
+<td>Counter</td>
+<td>Retry attempts</td>
+</tr>
+<tr>
+<td><code>llm_tokens_in</code></td>
+<td>Counter</td>
+<td>LLM input tokens</td>
+</tr>
+<tr>
+<td><code>llm_tokens_out</code></td>
+<td>Counter</td>
+<td>LLM output tokens</td>
+</tr>
+<tr>
+<td><code>llm_cost_estimated</code></td>
+<td>Gauge</td>
+<td>Estimated LLM cost (USD)</td>
+</tr>
+<tr>
+<td><code>cache_hit</code></td>
+<td>Counter</td>
+<td>Cache hits</td>
+</tr>
+<tr>
+<td><code>cache_miss</code></td>
+<td>Counter</td>
+<td>Cache misses</td>
+</tr>
+</tbody></table></div>
+<h2 id="kpi-targets">KPI Targets<a class="anchor" href="#kpi-targets" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>KPI</th>
+<th>Target</th>
+</tr>
+</thead><tbody><tr>
+<td>P95 latency</td>
+<td>&lt; 15 000 ms</td>
+</tr>
+<tr>
+<td>Error rate</td>
+<td>&lt; 1 %</td>
+</tr>
+<tr>
+<td>Retry rate</td>
+<td>&lt; 3 %</td>
+</tr>
+<tr>
+<td>Avg cost / request</td>
+<td>Tracked via <code>llm_cost_estimated</code></td>
+</tr>
+</tbody></table></div>
+<h2 id="azure-monitor-application-insights">Azure Monitor / Application Insights<a class="anchor" href="#azure-monitor-application-insights" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-python">from observability_sdk import configure_azure_monitor
+
+configure_azure_monitor(
+    connection_string=&quot;InstrumentationKey=...&quot;,
+    service_name=&quot;billing-agent&quot;,
+    service_version=&quot;1.3.0&quot;,
+    agent_name=&quot;BillingAgent&quot;,
+    environment=&quot;prod&quot;,
+)</code></pre>
+<p>This wires up:</p>
+<ul>
+<li><strong>Trace exporter</strong> — spans appear in the Application Insights <em>Transaction search</em>.</li>
+<li><strong>Metric exporter</strong> — counters and histograms flow into <em>Metrics Explorer</em>.</li>
+<li><strong>Log exporter</strong> — structured JSON events appear in <em>Traces</em> / <em>Custom Events</em>.</li>
+</ul>
+<h2 id="alert-configuration">Alert Configuration<a class="anchor" href="#alert-configuration" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-python">from observability_sdk import AlertConfig, MetricsSnapshot, check_thresholds
+
+config = AlertConfig(
+    error_rate_threshold=0.02,
+    p95_latency_threshold_ms=15_000,
+    retry_rate_threshold=0.03,
+    daily_cost_variance_threshold=0.20,
+)
+
+snapshot = MetricsSnapshot(error_rate=0.03, p95_latency_ms=16_000)
+alerts = check_thresholds(snapshot, config)
+
+for alert in alerts:
+    print(f&quot;[{alert.severity}] {alert.name}: {alert.message}&quot;)</code></pre>
+<p><strong>Severity levels:</strong></p>
+<div class="table-wrap"><table><thead><tr>
+<th>Severity</th>
+<th>Triggers</th>
+</tr>
+</thead><tbody><tr>
+<td><code>CRITICAL</code></td>
+<td>Error rate, P95 latency, retry rate</td>
+</tr>
+<tr>
+<td><code>IMPORTANT</code></td>
+<td>Daily cost variance</td>
+</tr>
+<tr>
+<td><code>DEGRADATION</code></td>
+<td>Cache hit rate, parsing time</td>
+</tr>
+</tbody></table></div>
+
+        </article>
+        
+        <div class="filetree">
+          <div class="filetree-head">📁 observability-sdk — 9 files · click any file to view it here (syntax-highlighted)</div>
+          <ul>
+            <li><a href="../../code.html?path=resources%2Fobservability-sdk%2Fexamples%2Fbilling_agent_example.py"><span class="ic">›</span>observability-sdk/examples/billing_agent_example.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-sdk%2Fobservability_sdk%2F__init__.py"><span class="ic">›</span>observability-sdk/observability_sdk/__init__.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-sdk%2Fobservability_sdk%2Falerts.py"><span class="ic">›</span>observability-sdk/observability_sdk/alerts.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-sdk%2Fobservability_sdk%2Fazure_monitor.py"><span class="ic">›</span>observability-sdk/observability_sdk/azure_monitor.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-sdk%2Fobservability_sdk%2Fdecorators.py"><span class="ic">›</span>observability-sdk/observability_sdk/decorators.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-sdk%2Fobservability_sdk%2Fevents.py"><span class="ic">›</span>observability-sdk/observability_sdk/events.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-sdk%2Fobservability_sdk%2Fmetrics.py"><span class="ic">›</span>observability-sdk/observability_sdk/metrics.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-sdk%2Fobservability_sdk%2Ftracker.py"><span class="ic">›</span>observability-sdk/observability_sdk/tracker.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fobservability-sdk%2Fpyproject.toml"><span class="ic">›</span>observability-sdk/pyproject.toml</a></li>
+          </ul>
+        </div>
+        
+        <div class="source-bar">
+          <a href="../../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/resources/observability-sdk/README.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

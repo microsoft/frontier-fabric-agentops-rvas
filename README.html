@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontier Fabric AgentOps RVAS · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Frontier Fabric AgentOps RVAS">
+  <link rel="icon" type="image/png" href="assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="index.html" aria-label="RVAP · Home">
+        <img src="assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h3" href="#build-an-agentops-control-tower-on-microsoft-fabric">Build an AgentOps Control Tower on Microsoft Fabric</a></li>
+          <li><a class="h2" href="#the-mission">The Mission</a></li>
+          <li><a class="h2" href="#what-youll-build">What You&#39;ll Build</a></li>
+          <li><a class="h2" href="#rvas-format">RVAS Format</a></li>
+          <li><a class="h2" href="#the-challenges">The Challenges</a></li>
+          <li><a class="h2" href="#getting-started">Getting Started</a></li>
+          <li><a class="h2" href="#repository-structure">Repository Structure</a></li>
+          <li><a class="h2" href="#outcomes">Outcomes</a></li>
+          <li><a class="h2" href="#contributing">Contributing</a></li>
+          <li><a class="h2" href="#license">License</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="index.html">Home</a> <span class="sep">/</span> <span>Frontier Fabric AgentOps RVAS</span></div>
+        <article class="article prose">
+<h1 id="frontier-fabric-agentops-rvas">Frontier Fabric AgentOps RVAS</h1>
+<h3 id="build-an-agentops-control-tower-on-microsoft-fabric">Build an <strong>AgentOps Control Tower</strong> on Microsoft Fabric<a class="anchor" href="#build-an-agentops-control-tower-on-microsoft-fabric" aria-hidden="true">#</a></h3>
+<blockquote>
+<p>A hands-on, challenge-based RVAS (Real Value Acceleration Solutions) where your team builds a Fabric-based control tower that
+<strong>ingests and correlates telemetry from Azure services and Foundry-built agents</strong> — enabling
+end-to-end monitoring, analytics, and dashboards for <strong>reliability, cost, and performance</strong>.</p>
+</blockquote>
+<p><img src="https://img.shields.io/badge/format-RVAS-blueviolet" alt="RVAS">
+<img src="https://img.shields.io/badge/Microsoft-Fabric-117865" alt="Microsoft Fabric">
+<img src="https://img.shields.io/badge/Azure%20AI-Foundry-0078D4" alt="Azure AI Foundry">
+<img src="https://img.shields.io/badge/level-200--400-orange" alt="Level">
+<img src="https://img.shields.io/badge/duration-1.5--2%20days-informational" alt="Duration">
+<img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></p>
+<blockquote>
+<p><strong>🌐 Explore it online:</strong> browse every challenge, coach guide, doc, and reference file — without
+leaving the browser — at <strong><a href="https://microsoft.github.io/frontier-fabric-agentops-rvas/" target="_blank" rel="noopener">https://microsoft.github.io/frontier-fabric-agentops-rvas/</a></strong>. Running
+this for a customer? Use the <strong><a href="https://microsoft.github.io/frontier-fabric-agentops-rvas/builder.html" target="_blank" rel="noopener">delivery composer</a></strong>
+to pick the challenges that fit their environment and export a tailored delivery brief.</p>
+</blockquote>
+<hr>
+<h2 id="the-mission">The Mission<a class="anchor" href="#the-mission" aria-hidden="true">#</a></h2>
+<p>Your customer has gone all-in on AI agents. Teams across the business are shipping agents built on
+<strong>Azure AI Foundry</strong>, running on <strong>Azure Container Apps</strong>, and backed by <strong>Cosmos DB</strong>. Adoption is
+exploding — and so is the blind spot.</p>
+<p>Nobody can answer the questions leadership keeps asking:</p>
+<ul>
+<li><strong>Reliability</strong> — Which agents are healthy? Where are errors and latency spikes coming from?</li>
+<li><strong>Cost</strong> — What is each agent costing us? Which team or use case owns that spend?</li>
+<li><strong>Performance</strong> — Are we meeting SLAs? How many tokens are we burning, and is it trending up?</li>
+</ul>
+<p>The telemetry exists, but it is scattered across Application Insights, Azure Monitor, Cost
+Management, Resource Graph, and Cosmos DB. The customer has chosen <strong>Microsoft Fabric</strong> to unify it
+all into a single <strong>AgentOps Control Tower</strong>.</p>
+<p><strong>That is your job.</strong> Over the course of this RVAS your team will stand up the end-to-end
+platform: light up a live agent workload, land its telemetry in a lake, connect it to Fabric with
+zero-copy OneLake shortcuts and Cosmos DB Mirroring, refine it through a medallion architecture, and
+deliver the Control Tower dashboards that finally give the business a single pane of glass.</p>
+<p>This is <strong>not</strong> a guided click-through. Each challenge gives you a goal and success criteria — <em>how</em>
+you get there is up to your team. Coaches are in the room to unblock you, not to hand you the answer.</p>
+<hr>
+<h2 id="what-youll-build">What You&#39;ll Build<a class="anchor" href="#what-youll-build" aria-hidden="true">#</a></h2>
+<div class="mermaid">graph TB
+    subgraph SRC[&quot;Telemetry Sources (Azure)&quot;]
+        FOUNDRY[&quot;Azure AI Foundry&lt;br/&gt;(agent models)&quot;]
+        ACA[&quot;Container Apps&lt;br/&gt;FE · BE · Agent&quot;]
+        CDB[&quot;Cosmos DB&lt;br/&gt;(conversations)&quot;]
+        APPI[&quot;Application Insights&quot;]
+        ACM[&quot;Cost Management&lt;br/&gt;(FOCUS export)&quot;]
+        ARG[&quot;Resource Graph&lt;br/&gt;(metadata)&quot;]
+        ACA &lt;-.-&gt; FOUNDRY
+        ACA --&gt; CDB
+        ACA --&gt; APPI
+    end
+    subgraph LZ[&quot;Landing Zone&quot;]
+        ADLS[&quot;ADLS Gen2&lt;br/&gt;costs · metrics · logs · metadata · diagnostics&quot;]
+    end
+    subgraph FAB[&quot;Microsoft Fabric — AgentOps Control Tower&quot;]
+        subgraph ONE[&quot;OneLake&quot;]
+            SC[&quot;Shortcuts (zero-copy)&quot;]
+            MIR[&quot;Cosmos DB Mirroring&quot;]
+        end
+        subgraph MED[&quot;Medallion Lakehouse&quot;]
+            BRZ[&quot;Bronze (raw)&quot;] --&gt; SLV[&quot;Silver (curated)&quot;] --&gt; GLD[&quot;Gold (data products)&quot;]
+        end
+        SEM[&quot;Direct Lake&lt;br/&gt;Semantic Model&quot;]
+        SC --&gt; BRZ
+        MIR --&gt; BRZ
+        GLD --&gt; SEM
+    end
+    subgraph SERVE[&quot;Control Tower&quot;]
+        PBI[&quot;Power BI Dashboards&lt;br/&gt;Reliability · Cost · Performance&quot;]
+        ACT[&quot;Real-time Alerts&lt;br/&gt;(Data Activator)&quot;]
+    end
+    APPI --&gt; ADLS
+    ACM --&gt; ADLS
+    ARG --&gt; ADLS
+    ADLS --&gt; SC
+    CDB -. mirror .-&gt; MIR
+    SEM --&gt; PBI
+    GLD --&gt; ACT</div>
+<p>By the end you will have a working pipeline that flows from <strong>a user&#39;s click</strong>, through <strong>agent
+inference and tool calls</strong>, into <strong>OneLake</strong>, and out to <strong>executive dashboards and live alerts</strong> —
+all on first-party Microsoft technology.</p>
+<hr>
+<h2 id="rvas-format">RVAS Format<a class="anchor" href="#rvas-format" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Style</strong></td>
+<td>Team-based (3–5 people), coach-facilitated, challenge-driven</td>
+</tr>
+<tr>
+<td><strong>Level</strong></td>
+<td>200–400 (intermediate to advanced)</td>
+</tr>
+<tr>
+<td><strong>Duration</strong></td>
+<td>1.5–2 days (7 challenges, ~1.5–2.5 hrs each; Challenge 6 is a stretch)</td>
+</tr>
+<tr>
+<td><strong>Environment</strong></td>
+<td>The <strong>customer&#39;s own</strong> Azure subscription(s) + a Microsoft Fabric capacity (<strong>trial capacity is fine</strong>)</td>
+</tr>
+<tr>
+<td><strong>Roles</strong></td>
+<td>Platform/Cloud engineer · Data engineer · FinOps practitioner · AI engineer (mix per team)</td>
+</tr>
+</tbody></table></div>
+<p>Teams progress through the challenges in order — each one builds on the last. You are encouraged to
+divide and conquer within a challenge, then regroup at each success checkpoint.</p>
+<hr>
+<h2 id="the-challenges">The Challenges<a class="anchor" href="#the-challenges" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>#</th>
+<th>Challenge</th>
+<th>What you&#39;ll achieve</th>
+<th>Primary skills</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>0</strong></td>
+<td><a href="challenges/challenge-00-mission-setup.html">Mission Briefing &amp; Environment Setup</a></td>
+<td>Azure + Fabric trial capacity ready, tooling installed, team onboarded</td>
+<td>Setup, Fabric admin</td>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td><a href="challenges/challenge-01-agent-telemetry.html">Light Up the Agents</a></td>
+<td>Deploy the Foundry agent workload and confirm telemetry is flowing</td>
+<td>Azure, Container Apps, App Insights</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><a href="challenges/challenge-02-landing-zone.html">Build the Telemetry Landing Zone</a></td>
+<td>Land cost, metrics, logs, metadata &amp; diagnostics in ADLS Gen2</td>
+<td>Azure Monitor, FinOps, IaC</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><a href="challenges/challenge-03-onelake-foundation.html">Connect Fabric to the Enterprise</a></td>
+<td>Lakehouse + OneLake shortcuts + Cosmos DB Mirroring (zero-copy)</td>
+<td>Fabric, OneLake</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><a href="challenges/challenge-04-medallion-pipeline.html">Refine the Signal</a></td>
+<td>Bronze→Silver→Gold medallion pipeline correlating all sources</td>
+<td>PySpark, data engineering</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><a href="challenges/challenge-05-control-tower-dashboards.html">Stand Up the Control Tower</a></td>
+<td>Direct Lake semantic model + Reliability/Cost/Performance dashboards</td>
+<td>Power BI, DAX, semantic modeling</td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td><a href="challenges/challenge-06-operationalize.html">Make It Operational</a> 🏆</td>
+<td>Stretch: real-time alerts, FinOps chargeback, RLS, automation</td>
+<td>Data Activator, FinOps, governance</td>
+</tr>
+</tbody></table></div>
+<p>See the <a href="challenges/README.html"><strong>Challenge Index</strong></a> for the full arc, dependencies, and scoring.</p>
+<hr>
+<h2 id="getting-started">Getting Started<a class="anchor" href="#getting-started" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Read the mission</strong> (above) and the <a href="docs/architecture.html">reference architecture</a>.</li>
+<li><strong>Confirm prerequisites</strong> — work through <a href="docs/prerequisites.html"><code>docs/prerequisites.md</code></a> with your coach <strong>before day 1</strong>. This covers Azure roles, Fabric trial capacity, and local tooling.</li>
+<li><strong>Start with <a href="challenges/challenge-00-mission-setup.html">Challenge 0</a>.</strong></li>
+<li>Keep the <a href="docs/faq.html">FAQ</a> handy.</li>
+</ol>
+<blockquote>
+<p>💡 <strong>Coaches:</strong> start at the <a href="coach/README.html">Coach Handbook</a>. Each challenge has a matching coach
+guide with the reference solution, key commands, common pitfalls, and talking points.</p>
+</blockquote>
+<hr>
+<h2 id="repository-structure">Repository Structure<a class="anchor" href="#repository-structure" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>frontier-fabric-agentops-rvas/
+├── README.md                     ← you are here
+├── docs/
+│   ├── architecture.md           # Reference architecture &amp; data flows
+│   ├── prerequisites.md          # Azure + Fabric trial capacity + tooling setup
+│   └── faq.md                    # Frequently asked questions
+├── challenges/                   # 👩‍💻 Attendee-facing challenge guides (WHAT to build)
+│   ├── README.md                 # Challenge index, dependencies, scoring
+│   └── challenge-00 … 06.md
+├── coach/                        # 🧑‍🏫 Instructor-facing guides (HOW it&#39;s done)
+│   ├── README.md                 # Coach handbook: logistics, timing, facilitation
+│   └── challenge-00 … 06-guide.md
+└── resources/                    # 🧰 Provided reference assets (IaC, code, notebooks)
+    ├── README.md
+    ├── agent-workload/           # Foundry agent runtime (Container Apps, APIM, Cosmos DB)
+    ├── observability-ingestion/  # ADLS Gen2 landing zone + export scripts
+    ├── fabric-control-tower/     # Fabric workspace setup, medallion notebooks, pipelines, model
+    └── observability-sdk/        # Shared Python SDK for agent telemetry</code></pre>
+<p>The <code>resources/</code> directory contains a <strong>complete reference implementation</strong>. Teams are encouraged to
+deploy the provided infrastructure as a foundation and focus their creative energy on the Fabric
+Control Tower itself. Coaches hold the keys to the reference solution for each challenge.</p>
+<hr>
+<h2 id="outcomes">Outcomes<a class="anchor" href="#outcomes" aria-hidden="true">#</a></h2>
+<p>After this RVAS, your team will be able to:</p>
+<ul>
+<li>Deploy and instrument <strong>Azure AI Foundry agents</strong> that emit production-grade telemetry.</li>
+<li>Build a unified <strong>observability landing zone</strong> spanning telemetry, cost, and metadata.</li>
+<li>Use <strong>OneLake shortcuts</strong> and <strong>Cosmos DB Mirroring</strong> to bring enterprise data into Fabric with zero copy.</li>
+<li>Engineer a <strong>medallion (Bronze/Silver/Gold)</strong> lakehouse that correlates reliability, cost, and performance signals.</li>
+<li>Deliver <strong>Direct Lake</strong> Power BI dashboards and <strong>real-time alerts</strong> for an AgentOps Control Tower.</li>
+<li>Apply <strong>FinOps</strong> practices (FOCUS cost normalization, chargeback/showback) to AI workloads.</li>
+</ul>
+<hr>
+<h2 id="contributing">Contributing<a class="anchor" href="#contributing" aria-hidden="true">#</a></h2>
+<p>This RVAS is maintained as an open asset. See <a href="CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a> for how to
+propose improvements, report issues, or add challenges. Bug reports and feature requests are welcome
+via GitHub Issues.</p>
+<h2 id="license">License<a class="anchor" href="#license" aria-hidden="true">#</a></h2>
+<p>Licensed under the <a href="code.html?path=LICENSE">MIT License</a>.</p>
+
+        </article>
+        
+        
+        <div class="source-bar">
+          <a href="index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/README.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false, theme: 'base', themeVariables: {
+      primaryColor:'#EAF2FD', primaryBorderColor:'#1A77E3', primaryTextColor:'#032254',
+      lineColor:'#6B7280', fontFamily:'Inter, Segoe UI, sans-serif' } });
+    mermaid.run({ querySelector: '.mermaid' });
+  </script>
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

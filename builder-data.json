@@ -1,0 +1,140 @@
+{
+  "challenges": [
+    {
+      "num": 0,
+      "badge": "CH 00",
+      "title": "Mission Briefing & Environment Setup",
+      "url": "challenges/challenge-00-mission-setup.html",
+      "est": "1–1.5 h",
+      "hoursMin": 1,
+      "hoursMax": 1.5,
+      "level": "100",
+      "roles": [
+        "Everyone"
+      ],
+      "theme": "Access, tooling, Fabric capacity",
+      "dependsOn": [],
+      "stretch": false
+    },
+    {
+      "num": 1,
+      "badge": "CH 01",
+      "title": "Light Up the Agents",
+      "url": "challenges/challenge-01-agent-telemetry.html",
+      "est": "1.5–2 h",
+      "hoursMin": 1.5,
+      "hoursMax": 2,
+      "level": "200",
+      "roles": [
+        "Cloud/Platform engineer",
+        "AI engineer"
+      ],
+      "theme": "Deploy a Foundry agent workload that emits telemetry",
+      "dependsOn": [
+        0
+      ],
+      "stretch": false
+    },
+    {
+      "num": 2,
+      "badge": "CH 02",
+      "title": "Build the Telemetry Landing Zone",
+      "url": "challenges/challenge-02-landing-zone.html",
+      "est": "1.5–2 h",
+      "hoursMin": 1.5,
+      "hoursMax": 2,
+      "level": "200",
+      "roles": [
+        "Cloud/Platform engineer",
+        "FinOps practitioner",
+        "Data engineer"
+      ],
+      "theme": "Land cost, metrics, logs & metadata in ADLS Gen2",
+      "dependsOn": [
+        0
+      ],
+      "stretch": false
+    },
+    {
+      "num": 3,
+      "badge": "CH 03",
+      "title": "Connect Fabric to the Enterprise",
+      "url": "challenges/challenge-03-onelake-foundation.html",
+      "est": "2 h",
+      "hoursMin": 2,
+      "hoursMax": 2,
+      "level": "300",
+      "roles": [
+        "Data engineer",
+        "Fabric engineer",
+        "platform engineer"
+      ],
+      "theme": "Lakehouse, OneLake shortcuts, Cosmos DB Mirroring",
+      "dependsOn": [
+        1,
+        2
+      ],
+      "stretch": false
+    },
+    {
+      "num": 4,
+      "badge": "CH 04",
+      "title": "Refine the Signal",
+      "url": "challenges/challenge-04-medallion-pipeline.html",
+      "est": "2–2.5 h",
+      "hoursMin": 2,
+      "hoursMax": 2.5,
+      "level": "300",
+      "roles": [
+        "Data engineer",
+        "Fabric engineer",
+        "FinOps practitioner"
+      ],
+      "theme": "Bronze → Silver → Gold medallion + pipeline",
+      "dependsOn": [
+        3
+      ],
+      "stretch": false
+    },
+    {
+      "num": 5,
+      "badge": "CH 05",
+      "title": "Stand Up the Control Tower",
+      "url": "challenges/challenge-05-control-tower-dashboards.html",
+      "est": "2–2.5 h",
+      "hoursMin": 2,
+      "hoursMax": 2.5,
+      "level": "300",
+      "roles": [
+        "BI engineer",
+        "data engineer",
+        "FinOps practitioner"
+      ],
+      "theme": "Direct Lake model + Power BI dashboards",
+      "dependsOn": [
+        4
+      ],
+      "stretch": false
+    },
+    {
+      "num": 6,
+      "badge": "CH 06 · Stretch",
+      "title": "Make It Operational",
+      "url": "challenges/challenge-06-operationalize.html",
+      "est": "1.5–2 h",
+      "hoursMin": 1.5,
+      "hoursMax": 2,
+      "level": "400 (stretch / finale)",
+      "roles": [
+        "Fabric engineer",
+        "FinOps practitioner",
+        "platform engineer"
+      ],
+      "theme": "Stretch: alerts, chargeback, RLS, automation",
+      "dependsOn": [
+        5
+      ],
+      "stretch": true
+    }
+  ]
+}

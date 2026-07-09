@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Workload — Reference Component · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Agent Workload — Reference Component">
+  <link rel="icon" type="image/png" href="../../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../../index.html" aria-label="RVAP · Home">
+        <img src="../../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#architecture-overview">Architecture Overview</a></li>
+          <li><a class="h3" href="#architecture-diagram">Architecture Diagram</a></li>
+          <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
+          <li><a class="h2" href="#quick-start">Quick Start</a></li>
+          <li><a class="h2" href="#services">Services</a></li>
+          <li><a class="h3" href="#frontend-—-srcfrontend">Frontend — src/frontend</a></li>
+          <li><a class="h3" href="#backend-—-srcbackend">Backend — src/backend</a></li>
+          <li><a class="h3" href="#agent-—-srcagent">Agent — src/agent</a></li>
+          <li><a class="h2" href="#api-reference">API Reference</a></li>
+          <li><a class="h3" href="#backend-service-api">Backend Service (/api)</a></li>
+          <li><a class="h3" href="#agent-service-apiagent">Agent Service (/api/agent)</a></li>
+          <li><a class="h2" href="#environment-variables">Environment Variables</a></li>
+          <li><a class="h3" href="#backend-service">Backend Service</a></li>
+          <li><a class="h3" href="#agent-service">Agent Service</a></li>
+          <li><a class="h3" href="#frontend-service">Frontend Service</a></li>
+          <li><a class="h2" href="#local-development">Local Development</a></li>
+          <li><a class="h3" href="#1-backend">1. Backend</a></li>
+          <li><a class="h3" href="#2-agent">2. Agent</a></li>
+          <li><a class="h3" href="#3-frontend">3. Frontend</a></li>
+          <li><a class="h2" href="#monitoring-observability">Monitoring &amp; Observability</a></li>
+          <li><a class="h3" href="#application-insights-integration">Application Insights Integration</a></li>
+          <li><a class="h3" href="#cosmos-db-query-metrics">Cosmos DB Query Metrics</a></li>
+          <li><a class="h3" href="#apim-analytics-dashboard">APIM Analytics Dashboard</a></li>
+          <li><a class="h2" href="#infrastructure">Infrastructure</a></li>
+          <li><a class="h2" href="#contributing">Contributing</a></li>
+          <li><a class="h2" href="#license">License</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../../index.html">Home</a> <span class="sep">/</span> <a href="../../resources/README.html">Resources</a> <span class="sep">/</span> <span>Agent Workload — Reference Component</span></div><div class="meta-row"><span class="chip cat-resources">Resources</span></div>
+        <article class="article prose">
+<h1 id="agent-workload-—-reference-component">Agent Workload — Reference Component</h1>
+<blockquote>
+<p><strong>Part of the <a href="../../README.html">Frontier Fabric AgentOps RVAS</a>.</strong> This is the telemetry
+<strong>source</strong> you deploy in <strong><a href="../../challenges/challenge-01-agent-telemetry.html">Challenge 1</a></strong> — a
+full-stack Azure AI Foundry agent that emits the traces, custom token/cost metrics, and
+conversation data the Control Tower later correlates.</p>
+</blockquote>
+<!-- Badges -->
+<p><img src="https://img.shields.io/badge/Azure-Container%20Apps-blue" alt="Azure">
+<img src="https://img.shields.io/badge/Python-3.12-green" alt="Python">
+<img src="https://img.shields.io/badge/Node.js-20-green" alt="Node.js">
+<img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></p>
+<blockquote>
+<p>Full-stack AI agent runtime with end-to-end observability — from user click to model inference.</p>
+</blockquote>
+<hr>
+<h2 id="architecture-overview">Architecture Overview<a class="anchor" href="#architecture-overview" aria-hidden="true">#</a></h2>
+<p>The <strong>Agents Runtime</strong> is the core execution block of the observability platform. It orchestrates user interactions through a gateway, processes requests across three microservices, persists data, and emits telemetry at every layer.</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Component</th>
+<th>Role</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Azure AI Foundry</strong></td>
+<td>Provides the AI model endpoint (GPT-4o / GPT-4o-mini) for agent inference via managed deployments.</td>
+</tr>
+<tr>
+<td><strong>Azure Container Apps</strong></td>
+<td>Hosts three microservices — frontend, backend, and agent — in a shared managed environment with built-in autoscaling.</td>
+</tr>
+<tr>
+<td><strong>Azure API Management</strong></td>
+<td>Unified API gateway with PTU-aware load balancing, rate limiting, and centralized analytics.</td>
+</tr>
+<tr>
+<td><strong>Azure Cosmos DB</strong></td>
+<td>Stores conversations, individual interactions, and agent configuration using a serverless throughput model.</td>
+</tr>
+<tr>
+<td><strong>Application Insights</strong></td>
+<td>Full-stack telemetry — distributed traces, live metrics, dependency maps, and custom counters for token usage.</td>
+</tr>
+</tbody></table></div>
+<h3 id="architecture-diagram">Architecture Diagram<a class="anchor" href="#architecture-diagram" aria-hidden="true">#</a></h3>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>┌──────────┐
+│   User   │
+└────┬─────┘
+     │ HTTPS
+     ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    API Management Gateway                    │
+│            (PTU load balancing · rate limiting)               │
+└────┬─────────────────┬──────────────────┬────────────────────┘
+     │                 │                  │
+     ▼                 ▼                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Container Apps Environment                      │
+│                                                              │
+│  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────┐ │
+│  │  Frontend   │  │   Backend    │  │       Agent          │ │
+│  │  (Next.js)  │  │  (FastAPI)   │  │     (FastAPI)        │ │
+│  │  Port 3000  │  │  Port 8000   │  │     Port 8001        │ │
+│  └─────────────┘  └──────┬───────┘  └──────────┬──────────┘ │
+│                          │                      │            │
+│                          ▼                      ▼            │
+│                   ┌────────────┐       ┌─────────────────┐   │
+│                   │ Cosmos DB  │       │ Azure AI Foundry │   │
+│                   │ (agentsdb) │       │  (GPT-4o model)  │   │
+│                   └────────────┘       └─────────────────┘   │
+│                                                              │
+│         ┌──────────────────────────────────┐                 │
+│         │      Application Insights        │                 │
+│         │  (traces · metrics · logs · map) │                 │
+│         └──────────────────────────────────┘                 │
+└──────────────────────────────────────────────────────────────┘</code></pre>
+<hr>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Tool</th>
+<th>Version</th>
+<th>Install</th>
+</tr>
+</thead><tbody><tr>
+<td>Azure Subscription</td>
+<td>Contributor access</td>
+<td><a href="https://azure.microsoft.com/free/" target="_blank" rel="noopener">azure.com</a></td>
+</tr>
+<tr>
+<td>Azure CLI (<code>az</code>)</td>
+<td>2.60+</td>
+<td><code>brew install azure-cli</code> or <a href="https://learn.microsoft.com/cli/azure/install-azure-cli" target="_blank" rel="noopener">docs</a></td>
+</tr>
+<tr>
+<td>Azure Developer CLI (<code>azd</code>)</td>
+<td>1.10+</td>
+<td><code>curl -fsSL https://aka.ms/install-azd.sh | bash</code></td>
+</tr>
+<tr>
+<td>Docker Desktop</td>
+<td>Latest</td>
+<td><a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">docker.com</a></td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td>20+</td>
+<td><code>nvm install 20</code> or <a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a></td>
+</tr>
+<tr>
+<td>Python</td>
+<td>3.12+</td>
+<td><code>pyenv install 3.12</code> or <a href="https://www.python.org/" target="_blank" rel="noopener">python.org</a></td>
+</tr>
+</tbody></table></div>
+<hr>
+<h2 id="quick-start">Quick Start<a class="anchor" href="#quick-start" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash"># Authenticate with Azure
+azd auth login
+
+# Initialize the environment (first time only)
+azd init
+
+# Provision infrastructure and deploy all services
+azd up</code></pre>
+<p>After deployment completes, <code>azd</code> prints the service URLs:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>  frontend  https://frontend.&lt;env&gt;.&lt;region&gt;.azurecontainerapps.io
+  backend   https://backend.&lt;env&gt;.&lt;region&gt;.azurecontainerapps.io
+  agent     https://agent.&lt;env&gt;.&lt;region&gt;.azurecontainerapps.io</code></pre>
+<hr>
+<h2 id="services">Services<a class="anchor" href="#services" aria-hidden="true">#</a></h2>
+<h3 id="frontend-—-srcfrontend">Frontend — <code>src/frontend</code><a class="anchor" href="#frontend-—-srcfrontend" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table><thead><tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Technology</strong></td>
+<td>Next.js 14 (React, TypeScript)</td>
+</tr>
+<tr>
+<td><strong>Port</strong></td>
+<td>3000</td>
+</tr>
+<tr>
+<td><strong>Purpose</strong></td>
+<td>Modern chat interface for user interactions with the AI agent. Renders streaming responses, manages conversation state, and provides a clean UX for the RVAS.</td>
+</tr>
+</tbody></table></div>
+<h3 id="backend-—-srcbackend">Backend — <code>src/backend</code><a class="anchor" href="#backend-—-srcbackend" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table><thead><tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Technology</strong></td>
+<td>FastAPI (Python 3.12)</td>
+</tr>
+<tr>
+<td><strong>Port</strong></td>
+<td>8000</td>
+</tr>
+<tr>
+<td><strong>Purpose</strong></td>
+<td>API layer for conversation management. Handles CRUD operations on conversations and messages, persists data to Cosmos DB, and routes agent invocations to the agent service.</td>
+</tr>
+</tbody></table></div>
+<h3 id="agent-—-srcagent">Agent — <code>src/agent</code><a class="anchor" href="#agent-—-srcagent" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table><thead><tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Technology</strong></td>
+<td>FastAPI (Python 3.12)</td>
+</tr>
+<tr>
+<td><strong>Port</strong></td>
+<td>8001</td>
+</tr>
+<tr>
+<td><strong>Purpose</strong></td>
+<td>AI agent runtime that receives user messages, constructs prompts with conversation context, invokes the Azure AI Foundry model endpoint, and returns completions. Supports both synchronous and streaming responses.</td>
+</tr>
+</tbody></table></div>
+<hr>
+<h2 id="api-reference">API Reference<a class="anchor" href="#api-reference" aria-hidden="true">#</a></h2>
+<h3 id="backend-service-api">Backend Service (<code>/api</code>)<a class="anchor" href="#backend-service-api" aria-hidden="true">#</a></h3>
+<h4 id="create-a-conversation">Create a Conversation</h4>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-http">POST /api/conversations
+Content-Type: application/json
+
+{
+  &quot;title&quot;: &quot;New Conversation&quot;
+}</code></pre>
+<p><strong>Response</strong> <code>201 Created</code></p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-json">{
+  &quot;id&quot;: &quot;conv-abc123&quot;,
+  &quot;title&quot;: &quot;New Conversation&quot;,
+  &quot;created_at&quot;: &quot;2024-01-15T10:30:00Z&quot;,
+  &quot;updated_at&quot;: &quot;2024-01-15T10:30:00Z&quot;
+}</code></pre>
+<h4 id="get-a-conversation">Get a Conversation</h4>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-http">GET /api/conversations/{id}</code></pre>
+<p><strong>Response</strong> <code>200 OK</code></p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-json">{
+  &quot;id&quot;: &quot;conv-abc123&quot;,
+  &quot;title&quot;: &quot;New Conversation&quot;,
+  &quot;messages&quot;: [
+    {
+      &quot;role&quot;: &quot;user&quot;,
+      &quot;content&quot;: &quot;Hello!&quot;,
+      &quot;timestamp&quot;: &quot;2024-01-15T10:31:00Z&quot;
+    },
+    {
+      &quot;role&quot;: &quot;assistant&quot;,
+      &quot;content&quot;: &quot;Hi there! How can I help you today?&quot;,
+      &quot;timestamp&quot;: &quot;2024-01-15T10:31:02Z&quot;
+    }
+  ],
+  &quot;created_at&quot;: &quot;2024-01-15T10:30:00Z&quot;,
+  &quot;updated_at&quot;: &quot;2024-01-15T10:31:02Z&quot;
+}</code></pre>
+<h4 id="send-a-message">Send a Message</h4>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-http">POST /api/conversations/{id}/messages
+Content-Type: application/json
+
+{
+  &quot;role&quot;: &quot;user&quot;,
+  &quot;content&quot;: &quot;Explain observability in distributed systems.&quot;
+}</code></pre>
+<p><strong>Response</strong> <code>200 OK</code></p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-json">{
+  &quot;role&quot;: &quot;assistant&quot;,
+  &quot;content&quot;: &quot;Observability in distributed systems refers to...&quot;,
+  &quot;timestamp&quot;: &quot;2024-01-15T10:32:05Z&quot;,
+  &quot;usage&quot;: {
+    &quot;prompt_tokens&quot;: 128,
+    &quot;completion_tokens&quot;: 256,
+    &quot;total_tokens&quot;: 384
+  }
+}</code></pre>
+<h4 id="health-check-backend">Health Check (Backend)</h4>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-http">GET /api/health</code></pre>
+<p><strong>Response</strong> <code>200 OK</code></p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-json">{ &quot;status&quot;: &quot;healthy&quot;, &quot;service&quot;: &quot;backend&quot;, &quot;version&quot;: &quot;1.0.0&quot; }</code></pre>
+<h3 id="agent-service-apiagent">Agent Service (<code>/api/agent</code>)<a class="anchor" href="#agent-service-apiagent" aria-hidden="true">#</a></h3>
+<h4 id="invoke-agent-synchronous">Invoke Agent (Synchronous)</h4>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-http">POST /api/agent/invoke
+Content-Type: application/json
+
+{
+  &quot;messages&quot;: [
+    { &quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a helpful assistant.&quot; },
+    { &quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is Azure Container Apps?&quot; }
+  ],
+  &quot;temperature&quot;: 0.7,
+  &quot;max_tokens&quot;: 1024
+}</code></pre>
+<p><strong>Response</strong> <code>200 OK</code></p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-json">{
+  &quot;message&quot;: {
+    &quot;role&quot;: &quot;assistant&quot;,
+    &quot;content&quot;: &quot;Azure Container Apps is a serverless container platform...&quot;
+  },
+  &quot;usage&quot;: {
+    &quot;prompt_tokens&quot;: 64,
+    &quot;completion_tokens&quot;: 200,
+    &quot;total_tokens&quot;: 264
+  },
+  &quot;model&quot;: &quot;gpt-4o&quot;,
+  &quot;duration_ms&quot;: 1523
+}</code></pre>
+<h4 id="invoke-agent-streaming">Invoke Agent (Streaming)</h4>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-http">POST /api/agent/stream
+Content-Type: application/json
+
+{
+  &quot;messages&quot;: [
+    { &quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Write a haiku about cloud computing.&quot; }
+  ]
+}</code></pre>
+<p><strong>Response</strong> <code>200 OK</code> (Server-Sent Events)</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>data: {&quot;delta&quot;: &quot;Servers &quot;, &quot;type&quot;: &quot;content&quot;}
+data: {&quot;delta&quot;: &quot;in the sky,&quot;, &quot;type&quot;: &quot;content&quot;}
+data: {&quot;delta&quot;: &quot;\n&quot;, &quot;type&quot;: &quot;content&quot;}
+data: {&quot;delta&quot;: &quot;Scaling &quot;, &quot;type&quot;: &quot;content&quot;}
+data: {&quot;delta&quot;: &quot;without limits—&quot;, &quot;type&quot;: &quot;content&quot;}
+data: {&quot;delta&quot;: &quot;\n&quot;, &quot;type&quot;: &quot;content&quot;}
+data: {&quot;delta&quot;: &quot;Code &quot;, &quot;type&quot;: &quot;content&quot;}
+data: {&quot;delta&quot;: &quot;runs everywhere.&quot;, &quot;type&quot;: &quot;content&quot;}
+data: {&quot;type&quot;: &quot;done&quot;, &quot;usage&quot;: {&quot;prompt_tokens&quot;: 32, &quot;completion_tokens&quot;: 18, &quot;total_tokens&quot;: 50}}</code></pre>
+<h4 id="health-check-agent">Health Check (Agent)</h4>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-http">GET /api/health</code></pre>
+<p><strong>Response</strong> <code>200 OK</code></p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-json">{ &quot;status&quot;: &quot;healthy&quot;, &quot;service&quot;: &quot;agent&quot;, &quot;version&quot;: &quot;1.0.0&quot; }</code></pre>
+<hr>
+<h2 id="environment-variables">Environment Variables<a class="anchor" href="#environment-variables" aria-hidden="true">#</a></h2>
+<h3 id="backend-service">Backend Service<a class="anchor" href="#backend-service" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table><thead><tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody><tr>
+<td><code>COSMOS_ENDPOINT</code></td>
+<td>Azure Cosmos DB account endpoint URL</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>COSMOS_DATABASE</code></td>
+<td>Cosmos DB database name (default: <code>agentsdb</code>)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>AGENT_SERVICE_URL</code></td>
+<td>Internal URL of the agent service</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>APPLICATIONINSIGHTS_CONNECTION_STRING</code></td>
+<td>Application Insights connection string for telemetry</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>AZURE_CLIENT_ID</code></td>
+<td>Managed identity client ID for Cosmos DB authentication</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>PORT</code></td>
+<td>Server port (default: <code>8000</code>)</td>
+<td>No</td>
+</tr>
+</tbody></table></div>
+<h3 id="agent-service">Agent Service<a class="anchor" href="#agent-service" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table><thead><tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody><tr>
+<td><code>AZURE_OPENAI_ENDPOINT</code></td>
+<td>Azure AI Foundry / OpenAI endpoint URL</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>AZURE_OPENAI_DEPLOYMENT</code></td>
+<td>Model deployment name (e.g., <code>gpt-4o</code>)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>AZURE_OPENAI_API_VERSION</code></td>
+<td>API version (default: <code>2024-06-01</code>)</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>APPLICATIONINSIGHTS_CONNECTION_STRING</code></td>
+<td>Application Insights connection string for telemetry</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>AZURE_CLIENT_ID</code></td>
+<td>Managed identity client ID for Azure OpenAI authentication</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>PORT</code></td>
+<td>Server port (default: <code>8001</code>)</td>
+<td>No</td>
+</tr>
+</tbody></table></div>
+<h3 id="frontend-service">Frontend Service<a class="anchor" href="#frontend-service" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table><thead><tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody><tr>
+<td><code>NEXT_PUBLIC_API_BASE_URL</code></td>
+<td>Backend API base URL exposed to the browser</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>APPLICATIONINSIGHTS_CONNECTION_STRING</code></td>
+<td>Application Insights connection string for telemetry</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>PORT</code></td>
+<td>Server port (default: <code>3000</code>)</td>
+<td>No</td>
+</tr>
+</tbody></table></div>
+<hr>
+<h2 id="local-development">Local Development<a class="anchor" href="#local-development" aria-hidden="true">#</a></h2>
+<h3 id="1-backend">1. Backend<a class="anchor" href="#1-backend" aria-hidden="true">#</a></h3>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd src/backend
+python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r requirements.txt
+
+# Set required environment variables
+export COSMOS_ENDPOINT=&quot;https://&lt;your-account&gt;.documents.azure.com:443/&quot;
+export COSMOS_DATABASE=&quot;agentsdb&quot;
+export AGENT_SERVICE_URL=&quot;http://localhost:8001&quot;
+export APPLICATIONINSIGHTS_CONNECTION_STRING=&quot;&lt;your-connection-string&gt;&quot;
+
+uvicorn app:app --reload --port 8000</code></pre>
+<h3 id="2-agent">2. Agent<a class="anchor" href="#2-agent" aria-hidden="true">#</a></h3>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd src/agent
+python -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r requirements.txt
+
+# Set required environment variables
+export AZURE_OPENAI_ENDPOINT=&quot;https://&lt;your-resource&gt;.openai.azure.com/&quot;
+export AZURE_OPENAI_DEPLOYMENT=&quot;gpt-4o&quot;
+export APPLICATIONINSIGHTS_CONNECTION_STRING=&quot;&lt;your-connection-string&gt;&quot;
+
+uvicorn app:app --reload --port 8001</code></pre>
+<h3 id="3-frontend">3. Frontend<a class="anchor" href="#3-frontend" aria-hidden="true">#</a></h3>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd src/frontend
+npm install
+
+# Create .env.local
+echo &#39;NEXT_PUBLIC_API_BASE_URL=http://localhost:8000&#39; &gt; .env.local
+
+npm run dev</code></pre>
+<p>The frontend is available at <code>http://localhost:3000</code>.</p>
+<hr>
+<h2 id="monitoring-observability">Monitoring &amp; Observability<a class="anchor" href="#monitoring-observability" aria-hidden="true">#</a></h2>
+<h3 id="application-insights-integration">Application Insights Integration<a class="anchor" href="#application-insights-integration" aria-hidden="true">#</a></h3>
+<p>All three services emit telemetry through the <strong>Azure Monitor OpenTelemetry SDK</strong>. Traces, metrics, and logs are collected automatically and correlated across service boundaries.</p>
+<h4 id="distributed-tracing">Distributed Tracing</h4>
+<p>Every inbound HTTP request generates a trace that flows through the entire call chain:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>Frontend → APIM → Backend → Agent → Azure OpenAI</code></pre>
+<p>Each span in the trace includes:</p>
+<ul>
+<li>HTTP method, URL, and status code</li>
+<li>Duration and dependency details</li>
+<li>Custom attributes (conversation ID, model name, token counts)</li>
+</ul>
+<p><strong>View traces:</strong> Azure Portal → Application Insights → Transaction search → filter by operation name.</p>
+<h4 id="application-map">Application Map</h4>
+<p>The Application Map automatically discovers service dependencies and displays:</p>
+<ul>
+<li>Request rates and failure rates between services</li>
+<li>Average response times per dependency</li>
+<li>Cosmos DB and Azure OpenAI as external dependencies</li>
+</ul>
+<p><strong>View the map:</strong> Azure Portal → Application Insights → Application map.</p>
+<h4 id="custom-metrics">Custom Metrics</h4>
+<p>The agent service emits custom metrics for model usage:</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Metric</th>
+<th>Description</th>
+</tr>
+</thead><tbody><tr>
+<td><code>agent.invocations</code></td>
+<td>Count of agent invocations (sync + stream)</td>
+</tr>
+<tr>
+<td><code>agent.tokens.prompt</code></td>
+<td>Prompt tokens consumed per request</td>
+</tr>
+<tr>
+<td><code>agent.tokens.completion</code></td>
+<td>Completion tokens generated per request</td>
+</tr>
+<tr>
+<td><code>agent.duration_ms</code></td>
+<td>End-to-end model inference duration</td>
+</tr>
+</tbody></table></div>
+<p><strong>View metrics:</strong> Azure Portal → Application Insights → Metrics → select custom namespace.</p>
+<h4 id="live-metrics">Live Metrics</h4>
+<p>Monitor real-time request rates, failure rates, and dependency durations during the RVAS.</p>
+<p><strong>View live metrics:</strong> Azure Portal → Application Insights → Live metrics.</p>
+<h4 id="log-analytics-kql">Log Analytics (KQL)</h4>
+<p>Query structured logs across all services:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-kql">// End-to-end latency for agent invocations
+requests
+| where name == &quot;POST /api/agent/invoke&quot;
+| summarize avg(duration), percentile(duration, 95) by bin(timestamp, 5m)
+| render timechart</code></pre>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-kql">// Token usage over time
+customMetrics
+| where name == &quot;agent.tokens.completion&quot;
+| summarize sum(value) by bin(timestamp, 1h)
+| render columnchart</code></pre>
+<h3 id="cosmos-db-query-metrics">Cosmos DB Query Metrics<a class="anchor" href="#cosmos-db-query-metrics" aria-hidden="true">#</a></h3>
+<p>Cosmos DB request units (RU) and latency are captured as dependency telemetry in Application Insights. Filter dependencies by type <code>Azure DocumentDB</code> to analyze:</p>
+<ul>
+<li>RU consumption per query</li>
+<li>Latency distribution (p50, p95, p99)</li>
+<li>Throttled requests (HTTP 429)</li>
+</ul>
+<h3 id="apim-analytics-dashboard">APIM Analytics Dashboard<a class="anchor" href="#apim-analytics-dashboard" aria-hidden="true">#</a></h3>
+<p>API Management provides built-in analytics:</p>
+<ul>
+<li><strong>Requests:</strong> Total calls, success/failure rates, response times by API and operation</li>
+<li><strong>Geography:</strong> Request distribution by region</li>
+<li><strong>Errors:</strong> Top failing operations with error details</li>
+<li><strong>Capacity:</strong> Gateway utilization and backend health</li>
+</ul>
+<p><strong>View analytics:</strong> Azure Portal → API Management → Analytics.</p>
+<hr>
+<h2 id="infrastructure">Infrastructure<a class="anchor" href="#infrastructure" aria-hidden="true">#</a></h2>
+<p>The infrastructure is defined in Bicep modules under <code>infra/</code>:</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Module</th>
+<th>Resources Provisioned</th>
+</tr>
+</thead><tbody><tr>
+<td><code>main.bicep</code></td>
+<td>Orchestrates all modules; defines parameters and outputs</td>
+</tr>
+<tr>
+<td><code>containerApps.bicep</code></td>
+<td>Container Apps Environment, three Container Apps (frontend, backend, agent), scaling rules, managed identity assignments</td>
+</tr>
+<tr>
+<td><code>cosmosDb.bicep</code></td>
+<td>Cosmos DB account (serverless), <code>agentsdb</code> database, <code>conversations</code> and <code>interactions</code> containers with partition keys</td>
+</tr>
+<tr>
+<td><code>apiManagement.bicep</code></td>
+<td>APIM instance, API definitions, policies for rate limiting and PTU load balancing, named values</td>
+</tr>
+<tr>
+<td><code>monitoring.bicep</code></td>
+<td>Log Analytics workspace, Application Insights instance, diagnostic settings for all resources</td>
+</tr>
+<tr>
+<td><code>aiFoundry.bicep</code></td>
+<td>Azure AI Services account, model deployment (GPT-4o), managed identity role assignment</td>
+</tr>
+<tr>
+<td><code>security.bicep</code></td>
+<td>User-assigned managed identities, role assignments (Cosmos DB Data Contributor, Cognitive Services OpenAI User)</td>
+</tr>
+</tbody></table></div>
+<hr>
+<h2 id="contributing">Contributing<a class="anchor" href="#contributing" aria-hidden="true">#</a></h2>
+<p>Contributions are welcome! Please follow these steps:</p>
+<ol>
+<li>Fork the repository</li>
+<li>Create a feature branch: <code>git checkout -b feature/my-feature</code></li>
+<li>Make your changes and add tests where applicable</li>
+<li>Ensure all existing tests pass</li>
+<li>Commit with a descriptive message: <code>git commit -m &quot;feat: add conversation export&quot;</code></li>
+<li>Push to your fork: <code>git push origin feature/my-feature</code></li>
+<li>Open a Pull Request against <code>main</code></li>
+</ol>
+<p>Please follow the <a href="https://www.conventionalcommits.org/" target="_blank" rel="noopener">Conventional Commits</a> specification for commit messages.</p>
+<hr>
+<h2 id="license">License<a class="anchor" href="#license" aria-hidden="true">#</a></h2>
+<p>This project is licensed under the <strong>MIT License</strong>.</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>MIT License
+
+Copyright (c) 2024 Observability Platform
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</code></pre>
+
+        </article>
+        
+        <div class="filetree">
+          <div class="filetree-head">📁 agent-workload — 24 files · click any file to view it here (syntax-highlighted)</div>
+          <ul>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.github%2Fworkflows%2Fdeploy.yml"><span class="ic">›</span>agent-workload/.github/workflows/deploy.yml</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.gitignore"><span class="ic">›</span>agent-workload/.gitignore</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fazure.yaml"><span class="ic">›</span>agent-workload/azure.yaml</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Finfra%2Fmain.bicep"><span class="ic">›</span>agent-workload/infra/main.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Finfra%2Fmain.parameters.json"><span class="ic">›</span>agent-workload/infra/main.parameters.json</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Finfra%2Fmodules%2Fapi-management.bicep"><span class="ic">›</span>agent-workload/infra/modules/api-management.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Finfra%2Fmodules%2Fcontainer-apps.bicep"><span class="ic">›</span>agent-workload/infra/modules/container-apps.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Finfra%2Fmodules%2Fcosmos-db.bicep"><span class="ic">›</span>agent-workload/infra/modules/cosmos-db.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Finfra%2Fmodules%2Fmonitoring.bicep"><span class="ic">›</span>agent-workload/infra/modules/monitoring.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Fagent%2FDockerfile"><span class="ic">›</span>agent-workload/src/agent/Dockerfile</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Fagent%2Fapp.py"><span class="ic">›</span>agent-workload/src/agent/app.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Fagent%2Frequirements.txt"><span class="ic">›</span>agent-workload/src/agent/requirements.txt</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Fbackend%2FDockerfile"><span class="ic">›</span>agent-workload/src/backend/Dockerfile</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Fbackend%2Fapp.py"><span class="ic">›</span>agent-workload/src/backend/app.py</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Fbackend%2Frequirements.txt"><span class="ic">›</span>agent-workload/src/backend/requirements.txt</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2FDockerfile"><span class="ic">›</span>agent-workload/src/frontend/Dockerfile</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2Fnext.config.js"><span class="ic">›</span>agent-workload/src/frontend/next.config.js</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2Fpackage.json"><span class="ic">›</span>agent-workload/src/frontend/package.json</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2Fpublic%2F.gitkeep"><span class="ic">›</span>agent-workload/src/frontend/public/.gitkeep</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2Fsrc%2Fapp%2Fglobals.css"><span class="ic">›</span>agent-workload/src/frontend/src/app/globals.css</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2Fsrc%2Fapp%2Flayout.tsx"><span class="ic">›</span>agent-workload/src/frontend/src/app/layout.tsx</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2Fsrc%2Fapp%2Fpage.tsx"><span class="ic">›</span>agent-workload/src/frontend/src/app/page.tsx</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2Fsrc%2Fapp%2Fproviders.tsx"><span class="ic">›</span>agent-workload/src/frontend/src/app/providers.tsx</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2Ftsconfig.json"><span class="ic">›</span>agent-workload/src/frontend/tsconfig.json</a></li>
+          </ul>
+        </div>
+        
+        <div class="source-bar">
+          <a href="../../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/resources/agent-workload/README.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

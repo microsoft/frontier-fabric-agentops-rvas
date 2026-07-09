@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compose your delivery · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Pick the challenges that fit your customer and compose a custom AgentOps Control Tower delivery — with live effort, level, role and dependency planning, plus an exportable brief.">
+  <link rel="icon" type="image/png" href="assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <style>
+    .bld-hero { position: relative; z-index: 1; padding: 46px 0 26px; }
+    .bld-hero h1 { font-family: var(--ff-display); font-size: clamp(28px, 4vw, 44px); color: var(--deep-navy); margin: 0 0 10px; letter-spacing: -0.02em; }
+    .bld-hero p { font-size: 17px; color: var(--text-2); max-width: 60ch; margin: 0; line-height: 1.6; }
+    .bld-hero .eyebrow { display:inline-block; font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rvap-blue); font-weight: 600; margin-bottom: 14px; }
+
+    .bld-layout { display: grid; grid-template-columns: 1fr 380px; gap: 30px; align-items: start; position: relative; z-index: 1; padding-bottom: 70px; }
+    @media (max-width: 940px) { .bld-layout { grid-template-columns: 1fr; } }
+
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; align-items: center; }
+    .presets .plabel { font-family: var(--ff-mono); font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-right: 4px; }
+    .chip-btn { font-family: var(--ff-body); font-size: 13px; font-weight: 600; color: var(--deep-navy); background: #fff; border: 1px solid var(--border); border-radius: 999px; padding: 7px 14px; cursor: pointer; transition: all .15s ease; }
+    .chip-btn:hover { border-color: var(--rvap-blue); color: var(--rvap-blue); }
+    .chip-btn.ghost { color: var(--text-2b); }
+
+    .ch-list { display: flex; flex-direction: column; gap: 12px; }
+    .ch-card { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start;
+      background: #fff; border: 1.5px solid var(--border); border-radius: 14px; padding: 16px 18px;
+      cursor: pointer; transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; }
+    .ch-card:hover { border-color: #c2d4ee; box-shadow: var(--shadow-card); }
+    .ch-card.sel { border-color: var(--rvap-blue); background: var(--surface); box-shadow: 0 0 0 3px rgba(26,119,227,.10); }
+    .ch-card.locked { opacity: .72; }
+    .ch-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border); display: grid; place-items: center; margin-top: 2px; transition: all .15s ease; background:#fff; flex: none; }
+    .ch-card.sel .ch-check { background: var(--rvap-blue); border-color: var(--rvap-blue); }
+    .ch-check svg { width: 13px; height: 13px; stroke: #fff; stroke-width: 3.5; fill: none; opacity: 0; transition: opacity .12s; }
+    .ch-card.sel .ch-check svg { opacity: 1; }
+    .ch-check input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .ch-head { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-bottom: 5px; }
+    .ch-badge { font-family: var(--ff-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #fff; background: var(--deep-navy); border-radius: 6px; padding: 3px 8px; }
+    .ch-card.sel .ch-badge { background: var(--rvap-blue); }
+    .ch-title { font-family: var(--ff-display); font-size: 17px; font-weight: 700; color: var(--deep-navy); line-height: 1.25; }
+    .stretch-tag { font-family: var(--ff-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--purple); border: 1px solid var(--purple); border-radius: 5px; padding: 2px 6px; }
+    .ch-theme { font-size: 14px; color: var(--text-2); line-height: 1.5; margin: 0 0 9px; }
+    .ch-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+    .m-chip { font-family: var(--ff-mono); font-size: 11px; color: var(--text-2b); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; }
+    .m-chip.dep { color: var(--warn-fg, #8a5a00); background: #FFF7E6; border-color: #F2D999; }
+    .m-chip.dep.ok { color: var(--teal); background: #E9F6F6; border-color: #B7E0E1; }
+    .ch-open { font-family: var(--ff-mono); font-size: 11.5px; color: var(--rvap-blue); text-decoration: none; margin-left: auto; align-self: center; white-space: nowrap; }
+    .ch-open:hover { text-decoration: underline; }
+
+    /* Plan panel */
+    .plan { position: sticky; top: 84px; background: #fff; border: 1.5px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-card); overflow: hidden; }
+    .plan-head { background: linear-gradient(135deg, var(--deep-navy) 0%, #0F3A7A 62%, var(--rvap-blue) 130%); color: #fff; padding: 18px 20px; }
+    .plan-head h2 { font-family: var(--ff-display); font-size: 18px; margin: 0 0 3px; color: #fff; }
+    .plan-head .fmt { font-family: var(--ff-mono); font-size: 12px; color: #cfe0f7; }
+    .plan-body { padding: 18px 20px; }
+    .plan-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .pstat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+    .pstat .n { font-family: var(--ff-display); font-size: 21px; font-weight: 800; color: var(--rvap-blue); line-height: 1; }
+    .pstat .l { font-family: var(--ff-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); margin-top: 5px; }
+    .plan-sec { margin-bottom: 15px; }
+    .plan-sec h3 { font-family: var(--ff-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin: 0 0 8px; }
+    .plan-order { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+    .plan-order li { display: flex; gap: 8px; align-items: baseline; font-size: 13.5px; color: var(--text); }
+    .plan-order li .on { font-family: var(--ff-mono); font-size: 11px; color: var(--text-3); flex: none; width: 30px; }
+    .plan-order li a { color: var(--deep-navy); text-decoration: none; }
+    .plan-order li a:hover { color: var(--rvap-blue); text-decoration: underline; }
+    .tagrow { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { font-family: var(--ff-mono); font-size: 11px; color: var(--text-2); background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; }
+    .warnbox { background: #FFF7E6; border: 1px solid #F2D999; border-radius: 10px; padding: 12px 14px; margin-bottom: 15px; }
+    .warnbox p { margin: 0 0 8px; font-size: 13px; color: #7a5200; line-height: 1.5; }
+    .warnbox p:last-child { margin: 0; }
+    .plan-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .plan-empty { text-align: center; color: var(--text-2b); font-size: 14px; padding: 10px 0 4px; line-height: 1.5; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--deep-navy); color: #fff; font-size: 13.5px; padding: 11px 18px; border-radius: 10px; box-shadow: var(--shadow-pop, 0 10px 30px rgba(3,34,84,.25)); opacity: 0; pointer-events: none; transition: all .25s ease; z-index: 50; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media print {
+      .site-nav, footer, .presets, .ch-open, .plan-actions, .orb, .bld-hero p, .toast { display: none !important; }
+      .bld-layout { grid-template-columns: 1fr; display: block; }
+      .plan { position: static; box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; margin-bottom: 20px; }
+      .ch-card { break-inside: avoid; }
+      .ch-card:not(.sel) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="index.html" aria-label="RVAP · Home">
+        <img src="assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="challenges/README.html">Challenges</a>
+        <a class="nav-link hide-sm" href="resources/README.html">Resources</a>
+        <a class="nav-link solid" href="builder.html" aria-current="page">Compose delivery</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container bld-hero">
+    <div class="breadcrumb"><a href="index.html">Home</a> <span class="sep">/</span> <span>Compose your delivery</span></div>
+    <span class="eyebrow">Delivery composer</span>
+    <h1>Compose your customer delivery</h1>
+    <p>Select the challenges that fit your customer's environment, maturity and time budget. The plan on the right keeps a live tally of effort, skill level, roles and prerequisites — then export a delivery brief, print it, or share the exact selection with a link.</p>
+  </div>
+
+  <div class="container bld-layout">
+    <div>
+      <div class="presets" id="presets">
+        <span class="plabel">Start from</span>
+        <button class="chip-btn" data-preset="full">Full program</button>
+        <button class="chip-btn" data-preset="core">Core (no stretch)</button>
+        <button class="chip-btn" data-preset="data">Data foundation</button>
+        <button class="chip-btn" data-preset="agent">Agent taster</button>
+        <button class="chip-btn ghost" data-preset="all">Select all</button>
+        <button class="chip-btn ghost" data-preset="none">Clear</button>
+      </div>
+      <div class="ch-list" id="chList"><div class="plan-empty">Loading challenges…</div></div>
+    </div>
+
+    <aside class="plan" id="plan">
+      <div class="plan-head">
+        <h2>Your delivery plan</h2>
+        <div class="fmt" id="planFmt">Nothing selected yet</div>
+      </div>
+      <div class="plan-body" id="planBody">
+        <div class="plan-empty">Pick one or more challenges to build your plan.</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">AgentOps Control Tower · compose a delivery that fits the customer.</div>
+      </div>
+      <a class="footer-cta" href="challenges/README.html">↗ Browse all challenges</a>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const REPO = 'https://github.com/microsoft/frontier-fabric-agentops-rvas';
+    const SITE = 'https://microsoft.github.io/frontier-fabric-agentops-rvas/';
+    const DAY_HOURS = 6.5;
+    const PRESETS = {
+      full: [0,1,2,3,4,5,6],
+      core: [0,1,2,3,4,5],
+      data: [0,1,2,3,4],
+      agent: [0,1],
+    };
+
+    let CH = [];            // challenge array from builder-data.json
+    let byNum = {};         // num -> challenge
+    let selected = new Set();
+
+    const $ = (s, r=document) => r.querySelector(s);
+    const esc = (s) => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+    function toast(msg) {
+      const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+      clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    function fmtHours(min, max) {
+      const f = (n) => Number.isInteger(n) ? n : n.toFixed(1);
+      return min === max ? `${f(min)} h` : `${f(min)}–${f(max)} h`;
+    }
+    function fmtDays(hoursMax) {
+      const d = Math.round((hoursMax / DAY_HOURS) * 2) / 2;
+      if (d <= 0.5) return '≈ half a day';
+      return `≈ ${Number.isInteger(d) ? d : d.toFixed(1)} day${d > 1 ? 's' : ''}`;
+    }
+    function suggestFormat(hoursMax) {
+      const d = hoursMax / DAY_HOURS;
+      if (d <= 0.55) return 'Fits a lunch & learn / taster';
+      if (d <= 1.05) return 'Fits a 1-day workshop';
+      if (d <= 1.6) return 'Fits a 1.5-day workshop';
+      if (d <= 2.1) return 'Fits a 2-day immersion';
+      if (d <= 3.1) return 'Fits a 3-day deep dive';
+      return 'A multi-day engagement';
+    }
+
+    // ---- selection persistence (hash > localStorage > default) ----
+    function readInitialSelection() {
+      const m = location.hash.match(/c=([0-9,]+)/);
+      if (m) return m[1].split(',').map(Number).filter(n => !isNaN(n));
+      try {
+        const ls = JSON.parse(localStorage.getItem('rvas-delivery') || 'null');
+        if (Array.isArray(ls)) return ls;
+      } catch (e) {}
+      return PRESETS.full.slice();
+    }
+    function persist() {
+      const arr = [...selected].sort((a,b) => a-b);
+      const hash = arr.length ? '#c=' + arr.join(',') : ' ';
+      history.replaceState(null, '', location.pathname + (arr.length ? hash : ''));
+      try { localStorage.setItem('rvas-delivery', JSON.stringify(arr)); } catch (e) {}
+    }
+
+    function unmetDeps() {
+      const missing = new Set();
+      selected.forEach(n => {
+        (byNum[n]?.dependsOn || []).forEach(d => { if (!selected.has(d)) missing.add(d); });
+      });
+      return [...missing].sort((a,b) => a-b);
+    }
+
+    function render() {
+      renderList();
+      renderPlan();
+      persist();
+    }
+
+    function renderList() {
+      const list = $('#chList');
+      list.innerHTML = '';
+      CH.forEach(c => {
+        const sel = selected.has(c.num);
+        const card = document.createElement('label');
+        card.className = 'ch-card' + (sel ? ' sel' : '');
+        const deps = (c.dependsOn || []);
+        const depHtml = deps.length
+          ? `<span class="m-chip dep ${deps.every(d => selected.has(d)) ? 'ok' : ''}">Requires ${deps.map(d => 'CH ' + String(d).padStart(2,'0')).join(', ')}</span>`
+          : '';
+        card.innerHTML =
+          `<span class="ch-check"><input type="checkbox" ${sel ? 'checked' : ''} aria-label="Include ${esc(c.title)}">` +
+            `<svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"></polyline></svg></span>` +
+          `<div>` +
+            `<div class="ch-head">` +
+              `<span class="ch-badge">${esc(c.badge)}</span>` +
+              `<span class="ch-title">${esc(c.title)}</span>` +
+              (c.stretch ? `<span class="stretch-tag">Stretch</span>` : '') +
+              `<a class="ch-open" href="${esc(c.url)}">Open ↗</a>` +
+            `</div>` +
+            `<p class="ch-theme">${esc(c.theme)}</p>` +
+            `<div class="ch-meta">` +
+              `<span class="m-chip">⏱ ${esc(c.est)}</span>` +
+              `<span class="m-chip">Level ${esc(c.level)}</span>` +
+              `<span class="m-chip">${esc((c.roles||[]).join(' · '))}</span>` +
+              depHtml +
+            `</div>` +
+          `</div>`;
+        const cb = card.querySelector('input');
+        cb.addEventListener('change', (e) => {
+          if (cb.checked) selected.add(c.num); else selected.delete(c.num);
+          render();
+        });
+        // let the "Open" link work without toggling
+        card.querySelector('.ch-open').addEventListener('click', (e) => e.stopPropagation());
+        list.appendChild(card);
+      });
+    }
+
+    function selectedSorted() {
+      return [...selected].sort((a,b) => a-b).map(n => byNum[n]).filter(Boolean);
+    }
+
+    function renderPlan() {
+      const body = $('#planBody');
+      const fmtEl = $('#planFmt');
+      const items = selectedSorted();
+      if (!items.length) {
+        fmtEl.textContent = 'Nothing selected yet';
+        body.innerHTML = '<div class="plan-empty">Pick one or more challenges to build your plan.</div>';
+        return;
+      }
+      const min = items.reduce((s,c) => s + (c.hoursMin||0), 0);
+      const max = items.reduce((s,c) => s + (c.hoursMax||0), 0);
+      const levels = [...new Set(items.map(c => parseInt(c.level,10)).filter(n => !isNaN(n)))].sort((a,b)=>a-b);
+      const levelStr = levels.length ? (levels[0] === levels[levels.length-1] ? String(levels[0]) : `${levels[0]}–${levels[levels.length-1]}`) : '—';
+      const roles = [];
+      items.forEach(c => (c.roles||[]).forEach(r => { if (!roles.some(x => x.toLowerCase() === r.toLowerCase())) roles.push(r); }));
+      const missing = unmetDeps();
+
+      fmtEl.textContent = suggestFormat(max);
+
+      const order = items.map(c =>
+        `<li><span class="on">CH ${String(c.num).padStart(2,'0')}</span><a href="${esc(c.url)}">${esc(c.title)}</a></li>`
+      ).join('');
+
+      const warn = missing.length ? (
+        `<div class="warnbox">` +
+          `<p><strong>Missing prerequisite${missing.length>1?'s':''}:</strong> ${missing.map(d => 'CH ' + String(d).padStart(2,'0') + ' ' + esc(byNum[d]?.title||'')).join(', ')}. ` +
+          `Some selected challenges build on these.</p>` +
+          `<button class="btn btn-primary btn-sm" id="fixDeps">Add prerequisite${missing.length>1?'s':''}</button>` +
+        `</div>`
+      ) : '';
+
+      body.innerHTML =
+        warn +
+        `<div class="plan-stats">` +
+          `<div class="pstat"><div class="n">${items.length}</div><div class="l">Challenge${items.length>1?'s':''}</div></div>` +
+          `<div class="pstat"><div class="n">${fmtHours(min,max)}</div><div class="l">Effort · ${fmtDays(max)}</div></div>` +
+          `<div class="pstat"><div class="n">${levelStr}</div><div class="l">Skill level</div></div>` +
+          `<div class="pstat"><div class="n">${roles.length}</div><div class="l">Role${roles.length>1?'s':''} involved</div></div>` +
+        `</div>` +
+        `<div class="plan-sec"><h3>Delivery order</h3><ol class="plan-order">${order}</ol></div>` +
+        `<div class="plan-sec"><h3>Roles involved</h3><div class="tagrow">${roles.map(r=>`<span class="tag">${esc(r)}</span>`).join('')}</div></div>` +
+        `<div class="plan-actions">` +
+          `<button class="btn btn-primary" id="copyMd">Copy delivery brief (Markdown)</button>` +
+          `<button class="btn btn-ghost" id="copyLink">Copy shareable link</button>` +
+          `<button class="btn btn-ghost" id="printPlan">Print / Save as PDF</button>` +
+        `</div>`;
+
+      const fix = $('#fixDeps');
+      if (fix) fix.addEventListener('click', () => {
+        // add all transitive prerequisites
+        let added = true;
+        while (added) {
+          added = false;
+          [...selected].forEach(n => (byNum[n]?.dependsOn||[]).forEach(d => { if (!selected.has(d)) { selected.add(d); added = true; } }));
+        }
+        render(); toast('Prerequisites added');
+      });
+      $('#copyMd').addEventListener('click', copyMarkdown);
+      $('#copyLink').addEventListener('click', copyLink);
+      $('#printPlan').addEventListener('click', () => window.print());
+    }
+
+    function buildMarkdown() {
+      const items = selectedSorted();
+      const min = items.reduce((s,c) => s + (c.hoursMin||0), 0);
+      const max = items.reduce((s,c) => s + (c.hoursMax||0), 0);
+      const levels = [...new Set(items.map(c => parseInt(c.level,10)).filter(n => !isNaN(n)))].sort((a,b)=>a-b);
+      const levelStr = levels.length ? (levels[0] === levels[levels.length-1] ? String(levels[0]) : `${levels[0]}–${levels[levels.length-1]}`) : '—';
+      const roles = [];
+      items.forEach(c => (c.roles||[]).forEach(r => { if (!roles.some(x => x.toLowerCase() === r.toLowerCase())) roles.push(r); }));
+      const link = SITE + 'builder.html#c=' + items.map(c=>c.num).join(',');
+
+      let md = `# AgentOps Control Tower — Custom Delivery Plan\n\n`;
+      md += `**${items.length} challenge${items.length>1?'s':''}** · **Effort ${fmtHours(min,max)}** (${fmtDays(max)}) · **Level ${levelStr}** · ${suggestFormat(max)}\n\n`;
+      md += `| # | Challenge | Est. | Level | Focus |\n|---|-----------|------|-------|-------|\n`;
+      items.forEach(c => {
+        md += `| ${String(c.num).padStart(2,'0')} | ${c.title}${c.stretch ? ' _(stretch)_' : ''} | ${c.est} | ${c.level} | ${c.theme} |\n`;
+      });
+      md += `\n**Roles involved:** ${roles.join(', ') || '—'}\n\n`;
+      md += `**Challenge links:**\n`;
+      items.forEach(c => { md += `- CH ${String(c.num).padStart(2,'0')} — ${c.title}: ${SITE + c.url}\n`; });
+      md += `\n_Composed with the delivery composer:_ ${link}\n`;
+      return md;
+    }
+
+    function copyMarkdown() {
+      if (!selected.size) return;
+      navigator.clipboard.writeText(buildMarkdown())
+        .then(() => toast('Delivery brief copied as Markdown'))
+        .catch(() => toast('Copy failed — check clipboard permissions'));
+    }
+    function copyLink() {
+      const arr = [...selected].sort((a,b)=>a-b);
+      const url = SITE + 'builder.html' + (arr.length ? '#c=' + arr.join(',') : '');
+      navigator.clipboard.writeText(url)
+        .then(() => toast('Shareable link copied'))
+        .catch(() => toast('Copy failed — check clipboard permissions'));
+    }
+
+    function applyPreset(key) {
+      if (key === 'all') selected = new Set(CH.map(c => c.num));
+      else if (key === 'none') selected = new Set();
+      else if (PRESETS[key]) selected = new Set(PRESETS[key]);
+      render();
+      toast(key === 'none' ? 'Cleared' : 'Preset applied');
+    }
+
+    async function init() {
+      $('#presets').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-preset]');
+        if (b) applyPreset(b.dataset.preset);
+      });
+      try {
+        const res = await fetch('builder-data.json', { cache: 'no-cache' });
+        const data = await res.json();
+        CH = (data.challenges || data).slice().sort((a,b) => a.num - b.num);
+        byNum = Object.fromEntries(CH.map(c => [c.num, c]));
+        const init = readInitialSelection().filter(n => byNum[n] !== undefined);
+        selected = new Set(init);
+        render();
+      } catch (err) {
+        $('#chList').innerHTML = '<div class="plan-empty">Could not load the challenge catalogue. ' +
+          '<a href="challenges/README.html">Browse challenges instead →</a></div>';
+      }
+    }
+    init();
+  </script>
+</body>
+</html>

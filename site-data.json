@@ -3,149 +3,235 @@
     {
       "name": "Mission Briefing & Environment Setup",
       "badge": "CH 00",
-      "categories": ["challenges"],
+      "categories": [
+        "challenges"
+      ],
       "group": "Foundation & Sources",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-00-mission-setup.md",
+      "url": "challenges/challenge-00-mission-setup.html",
       "description": "Get the tenant agent-ready: Azure subscriptions, Fabric trial capacity, tooling, and the whole team onboarded.",
-      "tags": ["Setup", "Fabric admin"]
+      "tags": [
+        "Setup",
+        "Fabric admin"
+      ]
     },
     {
       "name": "Light Up the Agents",
       "badge": "CH 01",
-      "categories": ["challenges"],
+      "categories": [
+        "challenges"
+      ],
       "group": "Foundation & Sources",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-01-agent-telemetry.md",
+      "url": "challenges/challenge-01-agent-telemetry.html",
       "description": "Deploy the Foundry agent workload on Container Apps + Cosmos DB and confirm telemetry is flowing to App Insights.",
-      "tags": ["Azure", "Container Apps", "App Insights"]
+      "tags": [
+        "Azure",
+        "Container Apps",
+        "App Insights"
+      ]
     },
     {
       "name": "Build the Telemetry Landing Zone",
       "badge": "CH 02",
-      "categories": ["challenges"],
+      "categories": [
+        "challenges"
+      ],
       "group": "Foundation & Sources",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-02-landing-zone.md",
+      "url": "challenges/challenge-02-landing-zone.html",
       "description": "Land cost, metrics, logs, metadata & diagnostics in ADLS Gen2 as one analytics-ready landing zone.",
-      "tags": ["Azure Monitor", "FinOps", "IaC"]
+      "tags": [
+        "Azure Monitor",
+        "FinOps",
+        "IaC"
+      ]
     },
     {
       "name": "Connect Fabric to the Enterprise",
       "badge": "CH 03",
-      "categories": ["challenges"],
+      "categories": [
+        "challenges"
+      ],
       "group": "Fabric & Medallion",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-03-onelake-foundation.md",
+      "url": "challenges/challenge-03-onelake-foundation.html",
       "description": "Bring enterprise data into Fabric with zero copy — a Lakehouse, OneLake shortcuts, and Cosmos DB Mirroring.",
-      "tags": ["Fabric", "OneLake", "Mirroring"]
+      "tags": [
+        "Fabric",
+        "OneLake",
+        "Mirroring"
+      ]
     },
     {
       "name": "Refine the Signal",
       "badge": "CH 04",
-      "categories": ["challenges"],
+      "categories": [
+        "challenges"
+      ],
       "group": "Fabric & Medallion",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-04-medallion-pipeline.md",
+      "url": "challenges/challenge-04-medallion-pipeline.html",
       "description": "Engineer a Bronze → Silver → Gold medallion pipeline that correlates reliability, cost, and performance signals.",
-      "tags": ["PySpark", "Data Engineering"]
+      "tags": [
+        "PySpark",
+        "Data Engineering"
+      ]
     },
     {
       "name": "Stand Up the Control Tower",
       "badge": "CH 05",
-      "categories": ["challenges"],
+      "categories": [
+        "challenges"
+      ],
       "group": "Control Tower & Evolve",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-05-control-tower-dashboards.md",
+      "url": "challenges/challenge-05-control-tower-dashboards.html",
       "description": "Build a Direct Lake semantic model and the Reliability / Cost / Performance dashboards — the single pane of glass.",
-      "tags": ["Power BI", "DAX", "Semantic Model"]
+      "tags": [
+        "Power BI",
+        "DAX",
+        "Semantic Model"
+      ]
     },
     {
       "name": "Make It Operational",
       "badge": "CH 06 · Stretch",
-      "categories": ["challenges"],
+      "categories": [
+        "challenges"
+      ],
       "group": "Control Tower & Evolve",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-06-operationalize.md",
+      "url": "challenges/challenge-06-operationalize.html",
       "description": "Stretch goal: real-time alerts with Data Activator, FinOps chargeback, row-level security, and automation.",
-      "tags": ["Data Activator", "FinOps", "Governance"]
+      "tags": [
+        "Data Activator",
+        "FinOps",
+        "Governance"
+      ]
     },
-
     {
       "name": "Agent Workload",
       "badge": "Resource",
-      "categories": ["resources"],
+      "categories": [
+        "resources"
+      ],
       "group": "Reference Implementation",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/tree/main/resources/agent-workload",
+      "url": "resources/agent-workload/README.html",
       "description": "Full-stack Foundry agent app — frontend, backend API, and agent orchestration you light up in Challenge 1.",
-      "tags": ["Container Apps", "APIM", "Cosmos DB", "Foundry"]
+      "tags": [
+        "Container Apps",
+        "APIM",
+        "Cosmos DB",
+        "Foundry"
+      ]
     },
     {
       "name": "Observability Ingestion",
       "badge": "Resource",
-      "categories": ["resources"],
+      "categories": [
+        "resources"
+      ],
       "group": "Reference Implementation",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/tree/main/resources/observability-ingestion",
+      "url": "resources/observability-ingestion/README.html",
       "description": "The landing zone that collects telemetry, cost, and metadata into an ADLS Gen2 data lake.",
-      "tags": ["ADLS Gen2", "Cost Mgmt", "Resource Graph"]
+      "tags": [
+        "ADLS Gen2",
+        "Cost Mgmt",
+        "Resource Graph"
+      ]
     },
     {
       "name": "Fabric Control Tower",
       "badge": "Resource",
-      "categories": ["resources"],
+      "categories": [
+        "resources"
+      ],
       "group": "Reference Implementation",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/tree/main/resources/fabric-control-tower",
+      "url": "resources/fabric-control-tower/README.html",
       "description": "Workspace setup, medallion notebooks, pipelines, and the Direct Lake semantic model that powers the dashboards.",
-      "tags": ["Lakehouse", "PySpark", "Power BI"]
+      "tags": [
+        "Lakehouse",
+        "PySpark",
+        "Power BI"
+      ]
     },
     {
       "name": "Observability SDK",
       "badge": "Resource",
-      "categories": ["resources"],
+      "categories": [
+        "resources"
+      ],
       "group": "Reference Implementation",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/tree/main/resources/observability-sdk",
+      "url": "resources/observability-sdk/README.html",
       "description": "Shared Python library that enforces a consistent OpenTelemetry event schema across every agent.",
-      "tags": ["Python", "OpenTelemetry", "App Insights"]
+      "tags": [
+        "Python",
+        "OpenTelemetry",
+        "App Insights"
+      ]
     },
-
     {
       "name": "Reference Architecture",
       "badge": "Doc",
-      "categories": ["docs"],
+      "categories": [
+        "docs"
+      ],
       "group": "Documentation",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/docs/architecture.md",
+      "url": "docs/architecture.html",
       "description": "The end-to-end architecture and the four data stages — Emit, Ingest, Process, Serve — you build challenge by challenge.",
-      "tags": ["Architecture", "Data Flow"]
+      "tags": [
+        "Architecture",
+        "Data Flow"
+      ]
     },
     {
       "name": "Prerequisites",
       "badge": "Doc",
-      "categories": ["docs"],
+      "categories": [
+        "docs"
+      ],
       "group": "Documentation",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/docs/prerequisites.md",
+      "url": "docs/prerequisites.html",
       "description": "Azure roles, Fabric trial capacity, and local tooling to set up with your coach before Day 1.",
-      "tags": ["Setup", "Tooling"]
+      "tags": [
+        "Setup",
+        "Tooling"
+      ]
     },
     {
       "name": "FAQ",
       "badge": "Doc",
-      "categories": ["docs"],
+      "categories": [
+        "docs"
+      ],
       "group": "Documentation",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/docs/faq.md",
+      "url": "docs/faq.html",
       "description": "Frequently asked questions on cost, capacity, model choice, and running the event.",
-      "tags": ["Help"]
+      "tags": [
+        "Help"
+      ]
     },
-
     {
       "name": "Coach Handbook",
       "badge": "Coach",
-      "categories": ["coach"],
+      "categories": [
+        "coach"
+      ],
       "group": "Instructor Toolkit",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/coach/README.md",
+      "url": "coach/README.html",
       "description": "Logistics, timing, sample agenda, facilitation philosophy, and the reference-reveal policy for instructors.",
-      "tags": ["Facilitation", "Agenda"]
+      "tags": [
+        "Facilitation",
+        "Agenda"
+      ]
     },
     {
       "name": "Per-Challenge Coach Guides",
       "badge": "Coach",
-      "categories": ["coach"],
+      "categories": [
+        "coach"
+      ],
       "group": "Instructor Toolkit",
-      "url": "https://github.com/microsoft/frontier-fabric-agentops-rvas/tree/main/coach",
+      "url": "coach/challenge-00-guide.html",
       "description": "Reference solutions, key commands, common pitfalls, and talking points for all seven challenges.",
-      "tags": ["Solutions", "Pitfalls"]
+      "tags": [
+        "Solutions",
+        "Pitfalls"
+      ]
     }
   ]
 }

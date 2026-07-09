@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenges — AgentOps Control Tower · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Welcome to the build. These seven challenges take you from an empty subscription to a fully
+operational AgentOps Control Tower on Microsoft Fabric.">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#how-the-challenges-work">How the challenges work</a></li>
+          <li><a class="h2" href="#the-arc">The arc</a></li>
+          <li><a class="h2" href="#scoring">Scoring</a></li>
+          <li><a class="h2" href="#what-done-looks-like">What &quot;done&quot; looks like</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../challenges/README.html">Challenges</a> <span class="sep">/</span> <span>Challenges — AgentOps Control Tower</span></div><div class="meta-row"><span class="chip cat-challenges">Challenges</span></div>
+        <article class="article prose">
+<h1 id="challenges-—-agentops-control-tower">Challenges — AgentOps Control Tower</h1>
+<p>Welcome to the build. These seven challenges take you from an empty subscription to a fully
+operational <strong>AgentOps Control Tower</strong> on Microsoft Fabric.</p>
+<h2 id="how-the-challenges-work">How the challenges work<a class="anchor" href="#how-the-challenges-work" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Goal-oriented, not click-by-click.</strong> Each challenge gives you a scenario, clear <strong>objectives</strong>,
+and <strong>success criteria</strong>. <em>How</em> you get there is your team&#39;s call. The
+<a href="../resources/README.html"><code>resources/</code></a> folder is your toolbox.</li>
+<li><strong>Sequential.</strong> Each challenge builds on the previous one — complete them in order.</li>
+<li><strong>Checkpoints.</strong> When you meet the success criteria, show your coach for a ✅ before moving on.</li>
+<li><strong>Hints are there if you need them.</strong> Each challenge ends with hints and links. Try first, then
+peek. Coaches hold the full reference solution.</li>
+</ul>
+<h2 id="the-arc">The arc<a class="anchor" href="#the-arc" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>#</th>
+<th>Challenge</th>
+<th>Depends on</th>
+<th>Est.</th>
+<th>Theme</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>0</strong></td>
+<td><a href="challenge-00-mission-setup.html">Mission Briefing &amp; Environment Setup</a></td>
+<td>—</td>
+<td>1–1.5 h</td>
+<td>Access, tooling, Fabric capacity</td>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td><a href="challenge-01-agent-telemetry.html">Light Up the Agents</a></td>
+<td>0</td>
+<td>1.5–2 h</td>
+<td>Deploy a Foundry agent workload that emits telemetry</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><a href="challenge-02-landing-zone.html">Build the Telemetry Landing Zone</a></td>
+<td>0</td>
+<td>1.5–2 h</td>
+<td>Land cost, metrics, logs &amp; metadata in ADLS Gen2</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><a href="challenge-03-onelake-foundation.html">Connect Fabric to the Enterprise</a></td>
+<td>1, 2</td>
+<td>2 h</td>
+<td>Lakehouse, OneLake shortcuts, Cosmos DB Mirroring</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><a href="challenge-04-medallion-pipeline.html">Refine the Signal</a></td>
+<td>3</td>
+<td>2–2.5 h</td>
+<td>Bronze → Silver → Gold medallion + pipeline</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><a href="challenge-05-control-tower-dashboards.html">Stand Up the Control Tower</a></td>
+<td>4</td>
+<td>2–2.5 h</td>
+<td>Direct Lake model + Power BI dashboards</td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td><a href="challenge-06-operationalize.html">Make It Operational</a> 🏆</td>
+<td>5</td>
+<td>1.5–2 h</td>
+<td>Stretch: alerts, chargeback, RLS, automation</td>
+</tr>
+</tbody></table></div>
+<div class="mermaid">graph LR
+    C0[0 · Setup] --&gt; C1[1 · Agents]
+    C0 --&gt; C2[2 · Landing Zone]
+    C1 --&gt; C3[3 · Fabric Foundation]
+    C2 --&gt; C3
+    C3 --&gt; C4[4 · Medallion]
+    C4 --&gt; C5[5 · Control Tower]
+    C5 --&gt; C6[6 · Operationalize 🏆]</div>
+<blockquote>
+<p>💡 Short on time? Challenges 1 and 2 are independent of each other and can be tackled <strong>in
+parallel</strong> by splitting your team. They must both finish before Challenge 3.</p>
+</blockquote>
+<h2 id="scoring">Scoring<a class="anchor" href="#scoring" aria-hidden="true">#</a></h2>
+<p>This is a learning RVAS, not a competition — but if your event wants friendly scoring, here&#39;s a
+simple rubric (coaches can adapt). Points are awarded per challenge at the success checkpoint.</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Challenge</th>
+<th>Base points</th>
+<th>Bonus opportunities</th>
+</tr>
+</thead><tbody><tr>
+<td>0</td>
+<td>5</td>
+<td>Everyone on the team can <code>az login</code> + reach Fabric (+5)</td>
+</tr>
+<tr>
+<td>1</td>
+<td>15</td>
+<td>Custom token/cost metric visible in App Insights (+5); end-to-end trace shown (+5)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>15</td>
+<td>All 5 data domains landing (+5); FOCUS cost file validated (+5)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>20</td>
+<td>Mirroring latency &lt; 1 min demonstrated (+5); zero-copy explained to coach (+5)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>25</td>
+<td>Gold correlates cost <strong>and</strong> agent telemetry (+10); pipeline runs green end-to-end (+5)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>20</td>
+<td>All three dashboard themes built (+5); Direct Lake confirmed (+5)</td>
+</tr>
+<tr>
+<td>6 🏆</td>
+<td>20</td>
+<td>Live alert fires (+5); chargeback by team/use case (+5); RLS (+5)</td>
+</tr>
+</tbody></table></div>
+<p><strong>Judging themes</strong> (for a showcase at the end): <em>Does the Control Tower answer the three business
+questions — reliability, cost, performance? Is the data correlated, not just collected? Could the
+customer actually run on this?</em></p>
+<h2 id="what-done-looks-like">What &quot;done&quot; looks like<a class="anchor" href="#what-done-looks-like" aria-hidden="true">#</a></h2>
+<p>By the end of Challenge 5 your team can stand in front of the customer&#39;s leadership and answer, live:</p>
+<ol>
+<li><strong>Which agents are healthy right now, and where are the errors?</strong> (Reliability)</li>
+<li><strong>What is each agent / team / use case costing us?</strong> (Cost)</li>
+<li><strong>Are we meeting our SLAs, and how much are we scaling?</strong> (Performance)</li>
+</ol>
+<p>Challenge 6 makes it <em>operational</em> — the Control Tower starts telling <strong>you</strong> when something&#39;s wrong.</p>
+<hr>
+<p>Ready? Start with <strong><a href="challenge-00-mission-setup.html">Challenge 0 — Mission Briefing &amp; Environment Setup</a></strong>.</p>
+
+        </article>
+        
+        
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/README.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false, theme: 'base', themeVariables: {
+      primaryColor:'#EAF2FD', primaryBorderColor:'#1A77E3', primaryTextColor:'#032254',
+      lineColor:'#6B7280', fontFamily:'Inter, Segoe UI, sans-serif' } });
+    mermaid.run({ querySelector: '.mermaid' });
+  </script>
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

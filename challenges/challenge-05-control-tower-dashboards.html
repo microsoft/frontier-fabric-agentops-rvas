@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stand Up the Control Tower · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Stand Up the Control Tower">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#objectives">Objectives</a></li>
+          <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
+          <li><a class="h2" href="#the-dashboard-contract">The dashboard contract</a></li>
+          <li><a class="h2" href="#your-mission">Your mission</a></li>
+          <li><a class="h3" href="#1-create-the-direct-lake-semantic-model">1. Create the Direct Lake semantic model</a></li>
+          <li><a class="h3" href="#2-define-the-key-measures">2. Define the key measures</a></li>
+          <li><a class="h3" href="#3-build-the-reliability-page">3. Build the Reliability page</a></li>
+          <li><a class="h3" href="#4-build-the-cost-page">4. Build the Cost page</a></li>
+          <li><a class="h3" href="#5-build-the-performance-page">5. Build the Performance page</a></li>
+          <li><a class="h3" href="#6-confirm-direct-lake-mode">6. Confirm Direct Lake mode</a></li>
+          <li><a class="h2" href="#success-criteria">Success criteria</a></li>
+          <li><a class="h2" href="#hints">Hints</a></li>
+          <li><a class="h2" href="#resources">Resources</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../challenges/README.html">Challenges</a> <span class="sep">/</span> <span>Stand Up the Control Tower</span></div>
+        <div class="meta-row">
+          <span class="chip cat-challenges">CH 05</span>
+          <span class="chip"><span class="k">Est.</span> 2–2.5 h</span>
+          <span class="chip"><span class="k">Level</span> 300</span>
+          <span class="chip">BI engineer</span><span class="chip">data engineer</span><span class="chip">FinOps practitioner</span>
+        </div>
+        <article class="article prose">
+<h1 id="challenge-5-—-stand-up-the-control-tower">Challenge 5 — Stand Up the Control Tower</h1>
+<hr>
+<blockquote>
+<p><strong>Mission log.</strong>
+The lake is full, the Gold tables are polished, and leadership is done waiting for screenshots from
+five different portals. This is the payoff: turn the medallion data products into a live <strong>AgentOps
+Control Tower</strong> that answers the three questions in one place — reliability, cost, and performance.</p>
+</blockquote>
+<p>In this challenge your team builds the semantic model and Power BI report that the customer will use
+in the showcase. The goal is not a beautiful wallpaper dashboard; it is a single pane of glass that can
+answer operational questions <strong>live</strong> from the Gold Delta tables.</p>
+<h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
+<p>By the end of this challenge you will have:</p>
+<ul>
+<li>A <strong>Direct Lake semantic model</strong> over the Challenge 4 Gold tables.</li>
+<li>Relationships from facts to the date and resource dimensions so filters behave correctly.</li>
+<li>Core DAX measures for cost, reliability, performance, and agent adoption.</li>
+<li>Power BI report pages mapped to the three business questions:
+<strong>Reliability</strong>, <strong>Cost</strong>, and <strong>Performance</strong>.</li>
+<li>Proof that the model reads Delta directly — no import dataset, no scheduled data refresh.</li>
+</ul>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li>✅ Challenge 4 complete — populated Gold tables in the Fabric Lakehouse.</li>
+<li>The Fabric Control Tower assets in
+<a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/</code></a>.</li>
+<li>The semantic model reference at
+<a href="../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsemantic_model.json"><code>resources/fabric-control-tower/src/setup/semantic_model.json</code></a>.</li>
+<li>The architecture north star in <a href="../docs/architecture.html"><code>docs/architecture.md</code></a>, especially the
+Gold data products and Core KPIs.</li>
+</ul>
+<h2 id="the-dashboard-contract">The dashboard contract<a class="anchor" href="#the-dashboard-contract" aria-hidden="true">#</a></h2>
+<p>Your report must answer the same questions the customer asked on day one:</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Business question</th>
+<th>What the Control Tower must show</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Reliability</strong></td>
+<td>Which agents are healthy? Where are errors, latency spikes, and pipeline issues coming from?</td>
+</tr>
+<tr>
+<td><strong>Cost</strong></td>
+<td>What is each service, agent, team, or use case costing? Which drivers are changing fastest?</td>
+</tr>
+<tr>
+<td><strong>Performance</strong></td>
+<td>Are we meeting SLAs? How much traffic, token usage, satisfaction, and capacity are we seeing?</td>
+</tr>
+</tbody></table></div>
+<p>The Gold layer gives you the data products. The semantic model makes them trustworthy. The report makes
+them usable under pressure.</p>
+<h2 id="your-mission">Your mission<a class="anchor" href="#your-mission" aria-hidden="true">#</a></h2>
+<h3 id="1-create-the-direct-lake-semantic-model">1. Create the Direct Lake semantic model<a class="anchor" href="#1-create-the-direct-lake-semantic-model" aria-hidden="true">#</a></h3>
+<p>Build or import a semantic model over the Gold Delta tables produced in Challenge 4:</p>
+<ul>
+<li><code>gold_cost_summary</code></li>
+<li><code>gold_operational_metrics</code></li>
+<li><code>gold_agent_analytics</code></li>
+<li><code>gold_capacity_usage</code></li>
+<li><code>gold_resource_inventory</code></li>
+<li><code>dim_date</code></li>
+<li><code>dim_resource</code></li>
+</ul>
+<p>Use the provided
+<a href="../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsemantic_model.json"><code>src/setup/semantic_model.json</code></a> as
+the reference for table bindings, Direct Lake partitions, relationships, and starter measures. If your
+workspace uses the provided display names, you may see tables such as <code>CostSummary</code>,
+<code>OperationalMetrics</code>, <code>AgentAnalytics</code>, <code>CapacityUsage</code>, <code>ResourceInventory</code>, and <code>Calendar</code> mapped to
+the Gold entities.</p>
+<p>Make sure the model has relationships from the fact tables to the date and resource dimensions. This is
+what allows one date slicer or one resource filter to control the whole report.</p>
+<h3 id="2-define-the-key-measures">2. Define the key measures<a class="anchor" href="#2-define-the-key-measures" aria-hidden="true">#</a></h3>
+<p>Create the core measures called out in the Fabric Control Tower README:</p>
+<ul>
+<li><code>TotalCost</code></li>
+<li><code>CostMoM%</code></li>
+<li><code>CapacityUtilization</code></li>
+<li><code>ErrorRate</code></li>
+<li><code>P95Latency</code></li>
+<li><code>AvgSatisfaction</code></li>
+<li><code>ConversationCount</code></li>
+<li>A cost-per-request or cost-per-agent measure</li>
+</ul>
+<p>Add time intelligence so the report can show <strong>YTD</strong>, <strong>MTD</strong>, prior period, and rolling 30-day views.
+The measures do not need to be fancy, but they must be correct and reusable across pages.</p>
+<h3 id="3-build-the-reliability-page">3. Build the Reliability page<a class="anchor" href="#3-build-the-reliability-page" aria-hidden="true">#</a></h3>
+<p>Design this page around the question: <strong>Which agents are healthy, and where are the errors?</strong></p>
+<p>Include visuals that cover:</p>
+<ul>
+<li>Error rate trend by agent, service, or error type.</li>
+<li>P95/P99 latency trends and outliers.</li>
+<li>Availability scorecards.</li>
+<li>Pipeline health or latest Gold refresh status if your team captured it.</li>
+</ul>
+<p>A coach should be able to point at one unhealthy agent or service and ask, &quot;What changed?&quot; Your page
+should make the answer obvious.</p>
+<h3 id="4-build-the-cost-page">4. Build the Cost page<a class="anchor" href="#4-build-the-cost-page" aria-hidden="true">#</a></h3>
+<p>Design this page around the question: <strong>What is each agent or team costing us?</strong></p>
+<p>Include visuals that cover:</p>
+<ul>
+<li>Total cost by service, resource group, agent, or tag.</li>
+<li>Month-over-month trend and forecast.</li>
+<li>Run rate by team or use case where tags support it.</li>
+<li>Top cost drivers table.</li>
+<li>Cost-per-request or cost-per-agent KPI.</li>
+</ul>
+<p>Make the page useful for a FinOps conversation: show where spend is, who owns it, and whether it is
+getting better or worse.</p>
+<h3 id="5-build-the-performance-page">5. Build the Performance page<a class="anchor" href="#5-build-the-performance-page" aria-hidden="true">#</a></h3>
+<p>Design this page around the question: <strong>Are we meeting SLAs, and how much are we scaling?</strong></p>
+<p>Include visuals that cover:</p>
+<ul>
+<li>Throughput by minute or hour.</li>
+<li>Prompt and completion token consumption.</li>
+<li>Satisfaction trend.</li>
+<li>Capacity utilization.</li>
+<li>Conversation volume and response-time trends.</li>
+</ul>
+<p>Connect performance to reliability and cost. High traffic is good only if latency, errors, satisfaction,
+and spend stay under control.</p>
+<h3 id="6-confirm-direct-lake-mode">6. Confirm Direct Lake mode<a class="anchor" href="#6-confirm-direct-lake-mode" aria-hidden="true">#</a></h3>
+<p>Before you claim victory, prove the model is actually Direct Lake:</p>
+<ul>
+<li>Storage mode is <strong>Direct Lake</strong> for the Gold-backed tables.</li>
+<li>The report is not using an imported copy of the data.</li>
+<li>There is no scheduled data refresh required for the report to see newly written Delta rows.</li>
+<li>After a pipeline run updates Gold, the report reflects the latest data once the model schema is in
+sync.</li>
+</ul>
+<h2 id="success-criteria">Success criteria<a class="anchor" href="#success-criteria" aria-hidden="true">#</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> A working Power BI Control Tower report answers <strong>Reliability</strong>, <strong>Cost</strong>, and <strong>Performance</strong> live</li>
+<li><input disabled="" type="checkbox"> The semantic model is confirmed as <strong>Direct Lake</strong> over the Gold Delta tables</li>
+<li><input disabled="" type="checkbox"> Relationships to the date and resource dimensions are present and filters work across pages</li>
+<li><input disabled="" type="checkbox"> Measures are correct for at least <code>TotalCost</code>, <code>ErrorRate</code>, <code>P95Latency</code>, and cost-per-agent or cost-per-request</li>
+<li><input disabled="" type="checkbox"> Cross-filtering works: selecting an agent/service/resource changes the related cost, reliability, and performance visuals</li>
+<li><input disabled="" type="checkbox"> Your team can explain which Gold table powers each major page</li>
+</ul>
+<blockquote>
+<p>🧭 <strong>Checkpoint:</strong> show your coach the report and answer the three business questions live, using
+slicers and cross-filtering instead of switching back to raw tables.</p>
+</blockquote>
+<h2 id="hints">Hints<a class="anchor" href="#hints" aria-hidden="true">#</a></h2>
+<details>
+<summary>Starting from the provided semantic model</summary>
+
+<p>Use the JSON model definition as your map:</p>
+<p><a href="../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsemantic_model.json"><code>resources/fabric-control-tower/src/setup/semantic_model.json</code></a></p>
+<p>Look for:</p>
+<ul>
+<li>Gold table bindings such as <code>gold_cost_summary</code>, <code>gold_operational_metrics</code>,
+<code>gold_agent_analytics</code>, <code>gold_capacity_usage</code>, and <code>gold_resource_inventory</code>.</li>
+<li><code>mode: &quot;directLake&quot;</code> partitions on the Gold-backed tables.</li>
+<li>Date relationships into the provided calendar/date table.</li>
+<li>Resource relationships into the resource inventory/dimension table.</li>
+</ul>
+<p>If you build manually in Fabric, reproduce the same model shape rather than inventing a new schema.</p>
+</details>
+
+<details>
+<summary>DAX starter pack</summary>
+
+<p>The reference README lists the key measures. Adapt names only if your semantic model uses different
+physical table names.</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-DAX">TotalCost = SUM(fact_costs[BilledCost])
+
+CapacityUtilization = AVERAGE(fact_metrics[CPUPercent])
+
+ErrorRate =
+DIVIDE(
+    COUNTROWS(FILTER(fact_operations, [Severity] = &quot;Error&quot;)),
+    COUNTROWS(fact_operations)
+)
+
+P95Latency = PERCENTILE.INC(fact_operations[DurationMs], 0.95)
+
+AvgSatisfaction = AVERAGE(fact_agent_analytics[SatisfactionScore])
+
+ConversationCount = DISTINCTCOUNT(fact_agent_analytics[ConversationId])</code></pre>
+<p>If you imported the provided JSON model, compare these with the measures already defined on
+<code>CostSummary</code>, <code>OperationalMetrics</code>, <code>CapacityUsage</code>, and <code>AgentAnalytics</code>.</p>
+</details>
+
+<details>
+<summary>Testing cross-filtering</summary>
+
+<p>Pick one agent, service, or resource and select it on a visual. Confirm all three pages respond:</p>
+<ul>
+<li>Cost cards and trend narrow to that selection.</li>
+<li>Error rate and latency visuals change.</li>
+<li>Conversation volume, token usage, and satisfaction update.</li>
+</ul>
+<p>If only one visual changes, check relationships, inactive relationships, or mismatched dimension keys.</p>
+</details>
+
+<details>
+<summary>Direct Lake sanity checks</summary>
+
+<p>In the semantic model settings or model view, confirm the Gold-backed tables use <strong>Direct Lake</strong> storage
+mode. Avoid unsupported transformations or DAX patterns that force a fallback path. If the Gold schema
+changed after your model was created, resync the model schema — Direct Lake reflects data changes, but
+new columns and renamed tables still need model metadata alignment.</p>
+</details>
+
+<h2 id="resources">Resources<a class="anchor" href="#resources" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/README.md</code></a> — semantic model, measures, and report page guidance</li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsemantic_model.json"><code>resources/fabric-control-tower/src/setup/semantic_model.json</code></a> — provided semantic model definition</li>
+<li><a href="../docs/architecture.html"><code>docs/architecture.md</code></a> — Gold tables, Core KPIs, and the three business questions</li>
+<li><a href="https://learn.microsoft.com/fabric/get-started/direct-lake-overview" target="_blank" rel="noopener">Direct Lake overview</a></li>
+</ul>
+<hr>
+<p>⬅️ Previous: <strong><a href="challenge-04-medallion-pipeline.html">Challenge 4 — Refine the Signal</a></strong><br>➡️ Next: <strong><a href="challenge-06-operationalize.html">Challenge 6 — Make It Operational</a></strong></p>
+
+        </article>
+        
+        
+        <nav class="pager" aria-label="Challenge navigation">
+          <a class="prev" href="challenge-04-medallion-pipeline.html"><div class="dir">← Previous</div><div class="ttl">Refine the Signal</div></a>
+          <a class="next" href="challenge-06-operationalize.html"><div class="dir">Next →</div><div class="ttl">Make It Operational</div></a>
+        </nav>
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-05-control-tower-dashboards.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

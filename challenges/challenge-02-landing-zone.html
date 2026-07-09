@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build the Telemetry Landing Zone · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Build the Telemetry Landing Zone">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#objectives">Objectives</a></li>
+          <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
+          <li><a class="h2" href="#the-landing-zone">The landing zone</a></li>
+          <li><a class="h2" href="#your-mission">Your mission</a></li>
+          <li><a class="h3" href="#1-deploy-the-ingestion-infrastructure">1. Deploy the ingestion infrastructure</a></li>
+          <li><a class="h3" href="#2-wire-platform-diagnostics-into-the-lake">2. Wire platform diagnostics into the lake</a></li>
+          <li><a class="h3" href="#3-land-cost-and-resource-metadata">3. Land cost and resource metadata</a></li>
+          <li><a class="h3" href="#4-validate-the-data-lake">4. Validate the data lake</a></li>
+          <li><a class="h3" href="#5-record-the-coordinates-for-fabric">5. Record the coordinates for Fabric</a></li>
+          <li><a class="h2" href="#success-criteria">Success criteria</a></li>
+          <li><a class="h2" href="#hints">Hints</a></li>
+          <li><a class="h2" href="#resources">Resources</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../challenges/README.html">Challenges</a> <span class="sep">/</span> <span>Build the Telemetry Landing Zone</span></div>
+        <div class="meta-row">
+          <span class="chip cat-challenges">CH 02</span>
+          <span class="chip"><span class="k">Est.</span> 1.5–2 h</span>
+          <span class="chip"><span class="k">Level</span> 200</span>
+          <span class="chip">Cloud/Platform engineer</span><span class="chip">FinOps practitioner</span><span class="chip">Data engineer</span>
+        </div>
+        <article class="article prose">
+<h1 id="challenge-2-—-build-the-telemetry-landing-zone">Challenge 2 — Build the Telemetry Landing Zone</h1>
+<hr>
+<blockquote>
+<p><strong>Mission log.</strong>
+The agents are talking. Now the Control Tower needs a place for every signal to land — cost,
+metrics, logs, resource inventory, and platform diagnostics. Scattered telemetry is noise; a
+governed lake landing zone is the first step toward intelligence.</p>
+</blockquote>
+<p>In this challenge your team builds the <strong>Ingest</strong> stage of the platform: a secure ADLS Gen2 landing
+zone that Microsoft Fabric will read in Challenge 3 with OneLake shortcuts. You are not building the
+dashboards yet. You are preparing the runway so the Control Tower can correlate reliability, cost, and
+performance later.</p>
+<h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
+<p>By the end of this challenge you will have:</p>
+<ul>
+<li>Deployed the observability ingestion infrastructure in <a href="../resources/observability-ingestion/README.html"><code>resources/observability-ingestion/</code></a>.</li>
+<li>Created an <strong>ADLS Gen2</strong> storage account with five landing containers:
+<code>costs</code>, <code>metrics</code>, <code>logs</code>, <code>metadata</code>, and <code>diagnostics</code>.</li>
+<li>Enabled <strong>Log Analytics data export</strong> so application telemetry flows continuously to storage.</li>
+<li>Configured <strong>Cost Management FOCUS</strong> export for FinOps-ready Parquet cost data.</li>
+<li>Exported <strong>Azure Resource Graph</strong> metadata and tags to Parquet.</li>
+<li>Wired <strong>diagnostic settings</strong> so Azure platform logs and metrics land in the lake.</li>
+<li>Recorded the storage account coordinates Fabric will need next.</li>
+</ul>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li>✅ Challenge 0 complete — Azure access, region, subscription, and roles confirmed.</li>
+<li><strong>Cost Management Reader</strong> at the billing/subscription scope for the person configuring cost export.</li>
+<li>The reference ingestion asset in
+<a href="../resources/observability-ingestion/README.html"><code>resources/observability-ingestion/</code></a>.</li>
+<li>Challenge 1 is strongly recommended because it gives you real agent workload resources to diagnose,
+but Challenges 1 and 2 can run <strong>in parallel</strong> if you split the team.</li>
+</ul>
+<h2 id="the-landing-zone">The landing zone<a class="anchor" href="#the-landing-zone" aria-hidden="true">#</a></h2>
+<p>The provided ingestion layer lands four Azure signal families into one ADLS Gen2 account:</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Source</th>
+<th>Container</th>
+<th>Format</th>
+<th>Cadence</th>
+</tr>
+</thead><tbody><tr>
+<td>Azure Cost Management</td>
+<td><code>costs</code></td>
+<td>FOCUS Parquet (Snappy)</td>
+<td>Daily / triggered</td>
+</tr>
+<tr>
+<td>Log Analytics data export</td>
+<td><code>metrics</code></td>
+<td>JSON</td>
+<td>Continuous</td>
+</tr>
+<tr>
+<td>Log Analytics data export</td>
+<td><code>logs</code></td>
+<td>JSON</td>
+<td>Continuous</td>
+</tr>
+<tr>
+<td>Azure Resource Graph</td>
+<td><code>metadata</code></td>
+<td>Parquet (Snappy)</td>
+<td>On demand / scheduled</td>
+</tr>
+<tr>
+<td>Diagnostic settings</td>
+<td><code>diagnostics</code></td>
+<td>JSON</td>
+<td>Continuous</td>
+</tr>
+</tbody></table></div>
+<p>That storage account becomes the <strong>OneLake shortcut target</strong> in Challenge 3. Treat its name, resource
+ID, and DFS endpoint as mission-critical coordinates.</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>Azure Monitor + Cost + Resource Graph + Diagnostics
+                         │
+                         ▼
+ADLS Gen2 landing zone: costs · metrics · logs · metadata · diagnostics
+                         │
+                         ▼
+Challenge 3: Fabric Lakehouse + OneLake shortcuts</code></pre>
+<h2 id="your-mission">Your mission<a class="anchor" href="#your-mission" aria-hidden="true">#</a></h2>
+<h3 id="1-deploy-the-ingestion-infrastructure">1. Deploy the ingestion infrastructure<a class="anchor" href="#1-deploy-the-ingestion-infrastructure" aria-hidden="true">#</a></h3>
+<ul>
+<li>Provision the ingestion stack from <a href="../resources/observability-ingestion/README.html"><code>resources/observability-ingestion/</code></a>.</li>
+<li>Confirm the deployment creates:<ul>
+<li>ADLS Gen2 storage with hierarchical namespace enabled</li>
+<li>Five containers: <code>costs</code>, <code>metrics</code>, <code>logs</code>, <code>metadata</code>, <code>diagnostics</code></li>
+<li>Log Analytics workspace with data export enabled</li>
+<li>Cost Management FOCUS export</li>
+<li>Key Vault</li>
+<li>User-assigned managed identity</li>
+</ul>
+</li>
+<li>Capture the outputs for the storage account and Log Analytics workspace.</li>
+</ul>
+<h3 id="2-wire-platform-diagnostics-into-the-lake">2. Wire platform diagnostics into the lake<a class="anchor" href="#2-wire-platform-diagnostics-into-the-lake" aria-hidden="true">#</a></h3>
+<ul>
+<li>Discover which Azure resources in your subscription support diagnostic settings.</li>
+<li>Configure supported resources to send logs and metrics to both:<ul>
+<li>the landing zone storage account, and</li>
+<li>the Log Analytics workspace.</li>
+</ul>
+</li>
+<li>Include the resources deployed in Challenge 1 if they exist: Container Apps, API Management,
+Cosmos DB, Application Insights/Log Analytics, and related platform services.</li>
+<li>Use a dry run first so the team can see what will change before applying it.</li>
+</ul>
+<h3 id="3-land-cost-and-resource-metadata">3. Land cost and resource metadata<a class="anchor" href="#3-land-cost-and-resource-metadata" aria-hidden="true">#</a></h3>
+<ul>
+<li>Trigger or confirm the <strong>Cost Management FOCUS</strong> export into the <code>costs</code> container.</li>
+<li>Run the <strong>Resource Graph</strong> metadata export into the <code>metadata</code> container.</li>
+<li>Confirm metadata includes resource IDs, names, types, locations, resource groups, tags, and
+subscription IDs.</li>
+<li>Watch for date-partitioned paths — this layout is what makes Spark reads efficient later.</li>
+</ul>
+<h3 id="4-validate-the-data-lake">4. Validate the data lake<a class="anchor" href="#4-validate-the-data-lake" aria-hidden="true">#</a></h3>
+<ul>
+<li>Inspect all five containers and confirm files are appearing where expected.</li>
+<li>Validate file counts, total sizes, latest timestamps, and sample Parquet schemas.</li>
+<li>Pay special attention to:<ul>
+<li><code>costs/focus/...</code> — FOCUS Parquet</li>
+<li><code>metadata/resource-graph/...</code> — Resource Graph Parquet</li>
+<li><code>metrics/...</code> and <code>logs/...</code> — Log Analytics exports</li>
+<li><code>diagnostics/...</code> — diagnostic settings output</li>
+</ul>
+</li>
+</ul>
+<h3 id="5-record-the-coordinates-for-fabric">5. Record the coordinates for Fabric<a class="anchor" href="#5-record-the-coordinates-for-fabric" aria-hidden="true">#</a></h3>
+<p>Before moving on, write down:</p>
+<ul>
+<li>Storage account name</li>
+<li>Storage account resource ID</li>
+<li>DFS endpoint URL: <code>https://&lt;storage-account&gt;.dfs.core.windows.net</code></li>
+<li>Log Analytics workspace name and resource ID</li>
+<li>Cost export name</li>
+</ul>
+<p>Challenge 3 depends on these values to create OneLake shortcuts without copying data.</p>
+<h2 id="success-criteria">Success criteria<a class="anchor" href="#success-criteria" aria-hidden="true">#</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> ADLS Gen2 storage exists with hierarchical namespace enabled</li>
+<li><input disabled="" type="checkbox"> All five containers exist: <code>costs</code>, <code>metrics</code>, <code>logs</code>, <code>metadata</code>, <code>diagnostics</code></li>
+<li><input disabled="" type="checkbox"> FOCUS cost Parquet is present in <code>costs</code> and validated</li>
+<li><input disabled="" type="checkbox"> Resource Graph metadata Parquet is present in <code>metadata</code></li>
+<li><input disabled="" type="checkbox"> Log Analytics data export rule is enabled for app request/dependency/trace/exception/metric tables</li>
+<li><input disabled="" type="checkbox"> Diagnostic settings are configured for supported resources and begin flowing</li>
+<li><input disabled="" type="checkbox"> <code>validate_exports.py</code> reports file counts, sizes, latest timestamps, and schemas</li>
+<li><input disabled="" type="checkbox"> The team has recorded the storage account name, resource ID, and DFS endpoint URL</li>
+</ul>
+<blockquote>
+<p>🧭 <strong>Checkpoint:</strong> show your coach the five containers, one FOCUS Parquet file, one Resource Graph
+Parquet file, the active Log Analytics export rule, and your recorded Fabric shortcut coordinates.</p>
+</blockquote>
+<h2 id="hints">Hints<a class="anchor" href="#hints" aria-hidden="true">#</a></h2>
+<details>
+<summary>Deploying the ingestion layer</summary>
+
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd resources/observability-ingestion
+azd auth login
+azd up      # use the same subscription and region from Challenge 0</code></pre>
+<p>After deployment, capture the outputs:</p>
+<ul>
+<li><code>AZURE_STORAGE_ACCOUNT_NAME</code></li>
+<li><code>AZURE_STORAGE_ACCOUNT_ID</code></li>
+<li><code>AZURE_LOG_ANALYTICS_WORKSPACE_NAME</code></li>
+<li><code>AZURE_LOG_ANALYTICS_WORKSPACE_ID</code></li>
+</ul>
+</details>
+
+<details>
+<summary>Previewing diagnostic settings before applying</summary>
+
+<p>The diagnostic setup script supports dry-run mode:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd resources/observability-ingestion/src/scripts
+pip install -r requirements.txt
+
+python setup_diagnostic_settings.py \
+  --subscription-id &lt;SUBSCRIPTION_ID&gt; \
+  --workspace-id &lt;WORKSPACE_RESOURCE_ID&gt; \
+  --storage-account-id &lt;STORAGE_ACCOUNT_RESOURCE_ID&gt; \
+  --dry-run</code></pre>
+<p>When the preview looks right, run the same command without <code>--dry-run</code>.</p>
+</details>
+
+<details>
+<summary>Exporting Resource Graph metadata</summary>
+
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd resources/observability-ingestion/src/scripts
+
+python resource_graph_export.py \
+  --subscription-id &lt;SUBSCRIPTION_ID&gt; \
+  --storage-account &lt;STORAGE_ACCOUNT_NAME&gt; \
+  --container metadata</code></pre>
+<p>The script writes Parquet files under <code>metadata/resource-graph/year=*/month=*/day=*/</code>.</p>
+</details>
+
+<details>
+<summary>Validating the landing zone</summary>
+
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd resources/observability-ingestion/src/scripts
+
+python validate_exports.py \
+  --storage-account &lt;STORAGE_ACCOUNT_NAME&gt;</code></pre>
+<p>Empty containers are useful evidence too: they usually mean an export has not run yet, no traffic has
+arrived, or a diagnostic setting has not emitted data.</p>
+</details>
+
+<details>
+<summary>Why FOCUS matters</summary>
+
+<p>FOCUS is the FinOps Open Cost and Usage Specification. It gives the Control Tower standardized fields
+such as <code>BilledCost</code>, <code>EffectiveCost</code>, <code>ServiceName</code>, <code>ResourceId</code>, and <code>Tags</code>, so Challenge 4 can
+join spend to resource metadata and Challenge 5 can show cost by service, team, and use case.</p>
+</details>
+
+<h2 id="resources">Resources<a class="anchor" href="#resources" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="../resources/observability-ingestion/README.html"><code>resources/observability-ingestion/README.md</code></a> — landing zone deployment and scripts</li>
+<li><a href="../resources/observability-ingestion/README.html"><code>resources/observability-ingestion/src/scripts/</code></a> — Resource Graph, diagnostic settings, and validation scripts</li>
+<li><a href="../docs/architecture.html"><code>docs/architecture.md</code></a> — the Ingest stage and data layout</li>
+<li>Previous: <strong><a href="challenge-01-agent-telemetry.html">Challenge 1 — Light Up the Agents</a></strong></li>
+</ul>
+<hr>
+<p>➡️ Next: <strong><a href="challenge-03-onelake-foundation.html">Challenge 3 — Connect Fabric to the Enterprise</a></strong></p>
+
+        </article>
+        
+        
+        <nav class="pager" aria-label="Challenge navigation">
+          <a class="prev" href="challenge-01-agent-telemetry.html"><div class="dir">← Previous</div><div class="ttl">Light Up the Agents</div></a>
+          <a class="next" href="challenge-03-onelake-foundation.html"><div class="dir">Next →</div><div class="ttl">Connect Fabric to the Enterprise</div></a>
+        </nav>
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-02-landing-zone.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

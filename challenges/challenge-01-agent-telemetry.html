@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Light Up the Agents · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Light Up the Agents">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#objectives">Objectives</a></li>
+          <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
+          <li><a class="h2" href="#the-workload">The workload</a></li>
+          <li><a class="h2" href="#your-mission">Your mission</a></li>
+          <li><a class="h3" href="#1-deploy-the-workload">1. Deploy the workload</a></li>
+          <li><a class="h3" href="#2-make-the-agent-work-for-its-telemetry">2. Make the agent work for its telemetry</a></li>
+          <li><a class="h3" href="#3-prove-the-signal-is-flowing">3. Prove the signal is flowing</a></li>
+          <li><a class="h3" href="#4-confirm-the-data-exhaust">4. Confirm the data exhaust</a></li>
+          <li><a class="h2" href="#success-criteria">Success criteria</a></li>
+          <li><a class="h2" href="#hints">Hints</a></li>
+          <li><a class="h2" href="#resources">Resources</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../challenges/README.html">Challenges</a> <span class="sep">/</span> <span>Light Up the Agents</span></div>
+        <div class="meta-row">
+          <span class="chip cat-challenges">CH 01</span>
+          <span class="chip"><span class="k">Est.</span> 1.5–2 h</span>
+          <span class="chip"><span class="k">Level</span> 200</span>
+          <span class="chip">Cloud/Platform engineer</span><span class="chip">AI engineer</span>
+        </div>
+        <article class="article prose">
+<h1 id="challenge-1-—-light-up-the-agents">Challenge 1 — Light Up the Agents</h1>
+<hr>
+<blockquote>
+<p><strong>Mission log.</strong>
+You can&#39;t monitor what doesn&#39;t exist yet. The Control Tower needs something to watch — a real,
+running agent that talks to a model, calls tools, stores conversations, and (crucially) <strong>emits
+telemetry at every hop</strong>. Today you bring the customer&#39;s agent workload online and prove the signal
+is flowing.</p>
+</blockquote>
+<p>This is the <strong>source</strong> of everything the Control Tower will eventually correlate: traces, custom
+token/cost metrics, and conversation records. Get it emitting cleanly and the rest of the platform
+has something real to chew on.</p>
+<h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
+<p>By the end of this challenge you will have:</p>
+<ul>
+<li>Deployed a full-stack <strong>Azure AI Foundry</strong> agent workload to Azure.</li>
+<li>Generated real agent traffic through the gateway → backend → agent → model path.</li>
+<li>Confirmed <strong>distributed traces</strong> connect every hop in Application Insights.</li>
+<li>Found the <strong>custom token/cost metrics</strong> the agent emits.</li>
+<li>Seen conversations land in <strong>Cosmos DB</strong> (the data the Control Tower will later mirror).</li>
+</ul>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li>✅ Challenge 0 complete — Azure access, region, and Foundry quota confirmed.</li>
+<li>The reference workload in <a href="../resources/agent-workload/README.html"><code>resources/agent-workload/</code></a>.</li>
+</ul>
+<h2 id="the-workload">The workload<a class="anchor" href="#the-workload" aria-hidden="true">#</a></h2>
+<p>The provided app has three Container Apps behind API Management, backed by Cosmos DB and a Foundry
+model deployment, all wired to Application Insights:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>User → API Management → Frontend (Next.js) → Backend (FastAPI) → Agent (FastAPI) → Azure AI Foundry
+                                                   │
+                                                   └→ Cosmos DB (conversations &amp; interactions)</code></pre>
+<p>Everything is instrumented with the Azure Monitor OpenTelemetry SDK, and the agent records custom
+metrics for token usage and latency.</p>
+<h2 id="your-mission">Your mission<a class="anchor" href="#your-mission" aria-hidden="true">#</a></h2>
+<h3 id="1-deploy-the-workload">1. Deploy the workload<a class="anchor" href="#1-deploy-the-workload" aria-hidden="true">#</a></h3>
+<ul>
+<li>Provision and deploy the agent stack to your chosen region using the provided infrastructure.</li>
+<li>Capture the output <strong>service URLs</strong> (frontend, backend, agent) and the names of the Application
+Insights and Cosmos DB resources.</li>
+</ul>
+<h3 id="2-make-the-agent-work-for-its-telemetry">2. Make the agent work for its telemetry<a class="anchor" href="#2-make-the-agent-work-for-its-telemetry" aria-hidden="true">#</a></h3>
+<ul>
+<li>Open the frontend and <strong>have a conversation</strong> with the agent — send several different prompts so
+there&#39;s a variety of traffic. (Bonus: script a handful of requests to the agent API to generate
+volume.)</li>
+<li>Confirm the agent is actually calling the model and returning completions (not erroring).</li>
+</ul>
+<h3 id="3-prove-the-signal-is-flowing">3. Prove the signal is flowing<a class="anchor" href="#3-prove-the-signal-is-flowing" aria-hidden="true">#</a></h3>
+<p>Using Application Insights for this workload, demonstrate <strong>all</strong> of the following:</p>
+<ul>
+<li>A <strong>distributed trace</strong> (end-to-end transaction) that shows the request flowing across the
+services and out to the model and Cosmos DB.</li>
+<li>The <strong>Application Map</strong>, showing the services and their dependencies (Cosmos DB, Azure OpenAI).</li>
+<li>The <strong>custom metrics</strong> the agent emits for <strong>token consumption</strong> (and/or latency) — and explain to
+a teammate what they&#39;ll be worth to the Control Tower later.</li>
+</ul>
+<h3 id="4-confirm-the-data-exhaust">4. Confirm the data exhaust<a class="anchor" href="#4-confirm-the-data-exhaust" aria-hidden="true">#</a></h3>
+<ul>
+<li>In Cosmos DB, find the <strong>conversations</strong> and <strong>interactions</strong> your traffic created. Note the
+database/container names and the partition key — Challenge 3 will mirror this into Fabric.</li>
+</ul>
+<h2 id="success-criteria">Success criteria<a class="anchor" href="#success-criteria" aria-hidden="true">#</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> The agent workload is deployed and the frontend responds to prompts end-to-end</li>
+<li><input disabled="" type="checkbox"> You can show one <strong>end-to-end trace</strong> spanning gateway → backend → agent → model in App Insights</li>
+<li><input disabled="" type="checkbox"> The <strong>Application Map</strong> shows the services plus Cosmos DB and Azure OpenAI as dependencies</li>
+<li><input disabled="" type="checkbox"> You can point to a <strong>custom token/cost metric</strong> emitted by the agent</li>
+<li><input disabled="" type="checkbox"> Conversation/interaction documents are visible in <strong>Cosmos DB</strong></li>
+<li><input disabled="" type="checkbox"> You&#39;ve recorded the App Insights + Cosmos DB resource names for later challenges</li>
+</ul>
+<blockquote>
+<p>🧭 <strong>Checkpoint:</strong> walk your coach through a single user message and trace its journey across the
+telemetry — from the click to the model and back.</p>
+</blockquote>
+<h2 id="hints">Hints<a class="anchor" href="#hints" aria-hidden="true">#</a></h2>
+<details>
+<summary>Deploying with azd</summary>
+
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd resources/agent-workload
+azd auth login
+azd up      # pick your env name, region, and subscription when prompted</code></pre>
+<p>Prefer <code>gpt-4o-mini</code> to conserve quota — check the model/deployment parameters before deploying.
+After deploy, <code>azd</code> prints the service URLs.</p>
+</details>
+
+<details>
+<summary>Generating a burst of traffic</summary>
+
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">AGENT=https://&lt;agent-url&gt;
+for i in $(seq 1 20); do
+  curl -s -X POST &quot;$AGENT/api/agent/invoke&quot; \
+    -H &#39;Content-Type: application/json&#39; \
+    -d &#39;{&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;Give me one fact about observability.&quot;}]}&#39; \
+    &gt;/dev/null &amp;&amp; echo &quot;req $i ok&quot;
+done</code></pre>
+</details>
+
+<details>
+<summary>Finding telemetry in Application Insights</summary>
+
+<ul>
+<li><strong>Transaction search</strong> → pick a recent <code>POST /api/...</code> → open <strong>end-to-end transaction details</strong>
+to see the waterfall across services, Cosmos DB, and Azure OpenAI.</li>
+<li><strong>Application map</strong> → hover the edges for latency/volume.</li>
+<li><strong>Metrics</strong> → choose the custom metric namespace and plot <code>agent.tokens.completion</code> (or similar).</li>
+<li><strong>Logs (KQL)</strong> to confirm token flow:<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-kql">customMetrics
+| where name startswith &quot;agent.&quot;
+| summarize sum(value) by name, bin(timestamp, 5m)</code></pre>
+</li>
+</ul>
+</details>
+
+<details>
+<summary>Where's the telemetry contract?</summary>
+
+<p>The shared <a href="../resources/observability-sdk/README.html"><code>resources/observability-sdk/</code></a> defines the event and
+metric schema (AgentStart/Step/ExternalCall/End/Error, token &amp; cost metrics). Skim its README to
+understand what the agent <em>should</em> be emitting and why it matters for cost attribution later.</p>
+</details>
+
+<h2 id="resources">Resources<a class="anchor" href="#resources" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="../resources/agent-workload/README.html"><code>resources/agent-workload/README.md</code></a> — services, APIs, env vars, monitoring</li>
+<li><a href="../resources/observability-sdk/README.html"><code>resources/observability-sdk/README.md</code></a> — the telemetry contract</li>
+<li><a href="https://learn.microsoft.com/azure/azure-monitor/app/opentelemetry-enable" target="_blank" rel="noopener">Azure Monitor OpenTelemetry</a></li>
+</ul>
+<hr>
+<p>➡️ Next: <strong><a href="challenge-02-landing-zone.html">Challenge 2 — Build the Telemetry Landing Zone</a></strong></p>
+
+        </article>
+        
+        
+        <nav class="pager" aria-label="Challenge navigation">
+          <a class="prev" href="challenge-00-mission-setup.html"><div class="dir">← Previous</div><div class="ttl">Mission Briefing &amp; Environment Setup</div></a>
+          <a class="next" href="challenge-02-landing-zone.html"><div class="dir">Next →</div><div class="ttl">Build the Telemetry Landing Zone</div></a>
+        </nav>
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-01-agent-telemetry.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

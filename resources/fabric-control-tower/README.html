@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fabric Control Tower — Reference Component · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Fabric Control Tower — Reference Component">
+  <link rel="icon" type="image/png" href="../../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../../index.html" aria-label="RVAP · Home">
+        <img src="../../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#overview">Overview</a></li>
+          <li><a class="h2" href="#architecture">Architecture</a></li>
+          <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
+          <li><a class="h2" href="#deployment">Deployment</a></li>
+          <li><a class="h3" href="#1-deploy-azure-infrastructure">1. Deploy Azure Infrastructure</a></li>
+          <li><a class="h3" href="#2-configure-fabric-workspace">2. Configure Fabric Workspace</a></li>
+          <li><a class="h3" href="#3-configure-cosmos-db-mirroring">3. Configure Cosmos DB Mirroring</a></li>
+          <li><a class="h3" href="#4-run-notebooks">4. Run Notebooks</a></li>
+          <li><a class="h2" href="#notebooks">Notebooks</a></li>
+          <li><a class="h3" href="#01bronzeingestionipynb">01_bronze_ingestion.ipynb</a></li>
+          <li><a class="h3" href="#02silvertransformationipynb">02_silver_transformation.ipynb</a></li>
+          <li><a class="h3" href="#03goldaggregationipynb">03_gold_aggregation.ipynb</a></li>
+          <li><a class="h3" href="#04cosmosmirroringtransformipynb">04_cosmos_mirroring_transform.ipynb</a></li>
+          <li><a class="h2" href="#pipeline-schedule">Pipeline Schedule</a></li>
+          <li><a class="h2" href="#semantic-model">Semantic Model</a></li>
+          <li><a class="h3" href="#tables-and-relationships">Tables and Relationships</a></li>
+          <li><a class="h3" href="#key-measures">Key Measures</a></li>
+          <li><a class="h3" href="#time-intelligence">Time Intelligence</a></li>
+          <li><a class="h2" href="#power-bi-report">Power BI Report</a></li>
+          <li><a class="h3" href="#connecting-to-the-semantic-model">Connecting to the Semantic Model</a></li>
+          <li><a class="h3" href="#suggested-report-pages">Suggested Report Pages</a></li>
+          <li><a class="h3" href="#design-guidelines">Design Guidelines</a></li>
+          <li><a class="h2" href="#integration-with-other-components">Integration with Other Components</a></li>
+          <li><a class="h2" href="#project-structure">Project Structure</a></li>
+          <li><a class="h2" href="#contributing">Contributing</a></li>
+          <li><a class="h2" href="#license">License</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../../index.html">Home</a> <span class="sep">/</span> <a href="../../resources/README.html">Resources</a> <span class="sep">/</span> <span>Fabric Control Tower — Reference Component</span></div><div class="meta-row"><span class="chip cat-resources">Resources</span></div>
+        <article class="article prose">
+<h1 id="fabric-control-tower-—-reference-component">Fabric Control Tower — Reference Component</h1>
+<blockquote>
+<p><strong>Part of the <a href="../../README.html">Frontier Fabric AgentOps RVAS</a>.</strong> This is the <strong>control
+tower</strong> itself — the Fabric workspace you stand up across
+<strong><a href="../../challenges/challenge-03-onelake-foundation.html">Challenge 3</a></strong> (OneLake foundation),
+<strong><a href="../../challenges/challenge-04-medallion-pipeline.html">Challenge 4</a></strong> (medallion pipeline), and
+<strong><a href="../../challenges/challenge-05-control-tower-dashboards.html">Challenge 5</a></strong> (Direct Lake dashboards).</p>
+</blockquote>
+<h2 id="overview">Overview<a class="anchor" href="#overview" aria-hidden="true">#</a></h2>
+<p>This component implements the Microsoft Fabric analytics layer of the AgentOps Control Tower. It processes data from Azure Monitor, Cost Management, and Cosmos DB through a <strong>medallion architecture</strong> (Bronze → Silver → Gold) in Microsoft Fabric, producing Power BI reports for operational insights.</p>
+<p>Raw telemetry — cost exports, platform metrics, diagnostic logs, and AI-agent conversations — flows into a Fabric Lakehouse via ADLS Gen2 shortcuts and Cosmos DB Mirroring. PySpark notebooks transform the data through progressively refined layers, and a Direct Lake semantic model powers interactive Power BI dashboards without any data duplication.</p>
+<h2 id="architecture">Architecture<a class="anchor" href="#architecture" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                           Data Sources                                      │
+│                                                                             │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────────┐  │
+│  │  ADLS Gen2        │  │  ADLS Gen2        │  │  Cosmos DB               │  │
+│  │  Cost Exports     │  │  Metrics / Logs   │  │  Agent Conversations     │  │
+│  │  Resource Metadata│  │  (Azure Monitor)  │  │  (Agent Workload)        │  │
+│  └────────┬─────────┘  └────────┬─────────┘  └────────────┬─────────────┘  │
+│           │                      │                          │                │
+└───────────┼──────────────────────┼──────────────────────────┼────────────────┘
+            │                      │                          │
+            ▼                      ▼                          ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Microsoft Fabric                                    │
+│                                                                             │
+│  ┌─────────────────────────────────────┐   ┌────────────────────────────┐  │
+│  │  Lakehouse (OneLake)                │   │  Mirrored Database         │  │
+│  │  ├─ Files/                          │   │  Cosmos DB → Delta Tables  │  │
+│  │  │   ├─ costs/        (shortcut)    │   │  (near-real-time sync)     │  │
+│  │  │   ├─ metrics/      (shortcut)    │   └────────────┬───────────────┘  │
+│  │  │   ├─ logs/         (shortcut)    │                │                  │
+│  │  │   └─ resource-metadata/ (shortcut│                │                  │
+│  │  └─ Tables/                         │                │                  │
+│  │      ├─ bronze_*  (raw Delta)       │◄───────────────┘                  │
+│  │      ├─ silver_*  (cleansed Delta)  │                                   │
+│  │      └─ gold_*    (aggregated Delta)│                                   │
+│  └─────────────────┬───────────────────┘                                   │
+│                    │                                                        │
+│  ┌─────────────────▼───────────────────┐                                   │
+│  │  Notebooks (PySpark)                │                                   │
+│  │  01_bronze_ingestion                │                                   │
+│  │  02_silver_transformation           │                                   │
+│  │  03_gold_aggregation                │                                   │
+│  │  04_cosmos_mirroring_transform      │                                   │
+│  └─────────────────┬───────────────────┘                                   │
+│                    │                                                        │
+│  ┌─────────────────▼───────────────────┐                                   │
+│  │  Pipelines                          │                                   │
+│  │  ├─ Load E2E Pipeline               │                                   │
+│  │  └─ Daily Refresh Pipeline          │                                   │
+│  └─────────────────┬───────────────────┘                                   │
+│                    │                                                        │
+│  ┌─────────────────▼───────────────────┐   ┌────────────────────────────┐  │
+│  │  Semantic Model (Direct Lake)       │──▶│  Power BI Reports          │  │
+│  │  fact_costs, fact_metrics, ...      │   │  Cost Overview             │  │
+│  │  dim_resource, dim_date, ...        │   │  Capacity Utilization      │  │
+│  │  Measures: TotalCost, ErrorRate ... │   │  Operational Health        │  │
+│  └─────────────────────────────────────┘   │  Agent Performance         │  │
+│                                            │  Resource Inventory        │  │
+│                                            └────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Requirement</th>
+<th>Details</th>
+</tr>
+</thead><tbody><tr>
+<td>Azure subscription</td>
+<td>Contributor access on the target resource group</td>
+</tr>
+<tr>
+<td>Microsoft Fabric capacity</td>
+<td>F2 or higher (F64+ recommended for production)</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>3.11 or later</td>
+</tr>
+<tr>
+<td>Azure CLI</td>
+<td>2.60+ with <code>az login</code> completed</td>
+</tr>
+<tr>
+<td>Azure Developer CLI (azd)</td>
+<td>Latest version</td>
+</tr>
+<tr>
+<td>GitHub OIDC</td>
+<td>Federated credential configured for the repository</td>
+</tr>
+</tbody></table></div>
+<h2 id="deployment">Deployment<a class="anchor" href="#deployment" aria-hidden="true">#</a></h2>
+<h3 id="1-deploy-azure-infrastructure">1. Deploy Azure Infrastructure<a class="anchor" href="#1-deploy-azure-infrastructure" aria-hidden="true">#</a></h3>
+<p>Provision the storage account, key vault, and managed identity used by Fabric:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">azd auth login
+azd provision</code></pre>
+<p>This creates:</p>
+<ul>
+<li><strong>Storage Account</strong> (ADLS Gen2) — landing zone for cost exports, metrics, and logs</li>
+<li><strong>Key Vault</strong> — stores connection strings and Fabric API credentials</li>
+<li><strong>User-Assigned Managed Identity</strong> — grants Fabric access to ADLS Gen2</li>
+</ul>
+<h3 id="2-configure-fabric-workspace">2. Configure Fabric Workspace<a class="anchor" href="#2-configure-fabric-workspace" aria-hidden="true">#</a></h3>
+<p>Create the Fabric workspace, lakehouse, ADLS shortcuts, and import notebooks:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">pip install -r src/setup/requirements.txt
+
+python src/setup/setup_fabric_workspace.py \
+  --workspace-name &quot;Observability-Analytics&quot; \
+  --storage-account-url &quot;https://&lt;account&gt;.dfs.core.windows.net&quot; \
+  --capacity-id &quot;&lt;fabric-capacity-id&gt;&quot;</code></pre>
+<p>The script performs the following:</p>
+<ol>
+<li>Creates (or reuses) a Fabric workspace assigned to the specified capacity.</li>
+<li>Creates an <strong>Observability</strong> lakehouse inside the workspace.</li>
+<li>Adds ADLS Gen2 shortcuts under <code>Files/</code> for each data container (<code>costs</code>, <code>metrics</code>, <code>logs</code>, <code>resource-metadata</code>).</li>
+<li>Uploads and imports all PySpark notebooks from <code>fabric/notebooks/</code>.</li>
+<li>Creates the <strong>Load E2E Pipeline</strong> and <strong>Daily Refresh Pipeline</strong>.</li>
+</ol>
+<h3 id="3-configure-cosmos-db-mirroring">3. Configure Cosmos DB Mirroring<a class="anchor" href="#3-configure-cosmos-db-mirroring" aria-hidden="true">#</a></h3>
+<p>Enable Fabric Mirroring for the Cosmos DB database containing agent conversations:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">python src/setup/setup_cosmos_mirroring.py \
+  --workspace-id &quot;&lt;workspace-id&gt;&quot; \
+  --cosmos-account &quot;&lt;cosmos-account-name&gt;&quot; \
+  --database &quot;observability&quot;</code></pre>
+<p>The script:</p>
+<ol>
+<li>Enables the Cosmos DB account for Fabric Mirroring (continuous backup, analytical store).</li>
+<li>Creates a mirrored database item in the Fabric workspace.</li>
+<li>Configures table selection and replication for the <code>conversations</code>, <code>messages</code>, and <code>feedback</code> containers.</li>
+</ol>
+<h3 id="4-run-notebooks">4. Run Notebooks<a class="anchor" href="#4-run-notebooks" aria-hidden="true">#</a></h3>
+<p>Run the notebooks in order — either manually in Fabric or via the E2E pipeline:</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Order</th>
+<th>Notebook</th>
+<th>Purpose</th>
+</tr>
+</thead><tbody><tr>
+<td>1</td>
+<td><code>01_bronze_ingestion</code></td>
+<td>Load raw Parquet into Delta tables</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>02_silver_transformation</code></td>
+<td>Cleanse, normalize, and enrich</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>03_gold_aggregation</code></td>
+<td>Build analytical aggregates</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>04_cosmos_mirroring_transform</code></td>
+<td>Transform mirrored conversation data</td>
+</tr>
+</tbody></table></div>
+<p>To trigger all four in sequence, open the <strong>Load E2E Pipeline</strong> in Fabric and click <strong>Run</strong>.</p>
+<h2 id="notebooks">Notebooks<a class="anchor" href="#notebooks" aria-hidden="true">#</a></h2>
+<h3 id="01bronzeingestionipynb">01_bronze_ingestion.ipynb<a class="anchor" href="#01bronzeingestionipynb" aria-hidden="true">#</a></h3>
+<p>Reads raw Parquet files from ADLS Gen2 shortcuts and writes Delta tables into the Lakehouse <code>Tables/</code> section.</p>
+<p><strong>Input</strong>: <code>Files/costs/</code>, <code>Files/metrics/</code>, <code>Files/logs/</code>, <code>Files/resource-metadata/</code>
+<strong>Output</strong>: <code>bronze_costs</code>, <code>bronze_metrics</code>, <code>bronze_logs</code>, <code>bronze_resource_metadata</code></p>
+<p>Key behaviors:</p>
+<ul>
+<li>Schema inference with explicit type overrides for known columns.</li>
+<li>Append mode with deduplication using <code>_source_file</code> and <code>_ingestion_timestamp</code> watermarks.</li>
+<li>Data quality checks: null key detection, row-count validation, schema-drift alerts.</li>
+</ul>
+<h3 id="02silvertransformationipynb">02_silver_transformation.ipynb<a class="anchor" href="#02silvertransformationipynb" aria-hidden="true">#</a></h3>
+<p>Cleanses and transforms Bronze tables into an analysis-ready Silver layer.</p>
+<p><strong>Transformations</strong>:</p>
+<ul>
+<li><strong>Costs</strong>: Normalizes raw billing data to the <a href="https://focus.finops.org/" target="_blank" rel="noopener">FOCUS</a> cost schema — standardized column names, currency conversion, amortization of reservations and savings plans.</li>
+<li><strong>Metrics</strong>: Pivots time-series metric records from long to wide format; interpolates missing intervals; aligns to 5-minute grain.</li>
+<li><strong>Logs</strong>: Parses semi-structured log messages; extracts severity, category, operation, and correlation ID; filters noise.</li>
+<li><strong>Resource Metadata</strong>: Flattens nested resource properties and tag maps; adds computed columns for resource age, region normalization, and service categorization.</li>
+</ul>
+<p><strong>Output</strong>: <code>silver_costs</code>, <code>silver_metrics</code>, <code>silver_logs</code>, <code>silver_resource_metadata</code></p>
+<h3 id="03goldaggregationipynb">03_gold_aggregation.ipynb<a class="anchor" href="#03goldaggregationipynb" aria-hidden="true">#</a></h3>
+<p>Creates analytical aggregates consumed by the semantic model.</p>
+<p><strong>Output tables</strong>:</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Table</th>
+<th>Description</th>
+</tr>
+</thead><tbody><tr>
+<td><code>gold_cost_summary</code></td>
+<td>Daily/monthly cost aggregates by subscription, resource group, service, and tag</td>
+</tr>
+<tr>
+<td><code>gold_capacity_usage</code></td>
+<td>Hourly capacity utilization (CPU, memory, DTU) with percentile bands</td>
+</tr>
+<tr>
+<td><code>gold_operational_metrics</code></td>
+<td>Error rates, latency percentiles (p50/p95/p99), availability per service</td>
+</tr>
+<tr>
+<td><code>gold_resource_inventory</code></td>
+<td>Current and historical resource state with SCD Type 2 tracking</td>
+</tr>
+<tr>
+<td><code>gold_agent_analytics</code></td>
+<td>Conversation counts, token usage, response times, satisfaction scores</td>
+</tr>
+<tr>
+<td><code>dim_date</code></td>
+<td>Standard date dimension (fiscal calendar, holidays, working days)</td>
+</tr>
+<tr>
+<td><code>dim_resource</code></td>
+<td>Conformed resource dimension with hierarchy (subscription → resource group → resource)</td>
+</tr>
+</tbody></table></div>
+<h3 id="04cosmosmirroringtransformipynb">04_cosmos_mirroring_transform.ipynb<a class="anchor" href="#04cosmosmirroringtransformipynb" aria-hidden="true">#</a></h3>
+<p>Transforms mirrored Cosmos DB conversation data into agent analytics.</p>
+<p><strong>Input</strong>: Mirrored tables <code>conversations</code>, <code>messages</code>, <code>feedback</code>
+<strong>Output</strong>: <code>gold_agent_analytics</code>, <code>gold_conversation_details</code></p>
+<p>Key behaviors:</p>
+<ul>
+<li>Sessionizes messages into conversation threads.</li>
+<li>Calculates per-conversation metrics: message count, total tokens, elapsed time, resolution status.</li>
+<li>Joins feedback scores and computes rolling satisfaction averages.</li>
+<li>Handles late-arriving mirrored records with merge-on-read reconciliation.</li>
+</ul>
+<h2 id="pipeline-schedule">Pipeline Schedule<a class="anchor" href="#pipeline-schedule" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Pipeline</th>
+<th>Trigger</th>
+<th>Scope</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Load E2E Pipeline</strong></td>
+<td>Manual (workflow dispatch or Fabric UI)</td>
+<td>Processes the last 3 months by default; configurable via <code>start_date</code> parameter</td>
+</tr>
+<tr>
+<td><strong>Daily Refresh Pipeline</strong></td>
+<td>Scheduled — daily at 06:00 UTC</td>
+<td>Processes the current month with incremental append</td>
+</tr>
+</tbody></table></div>
+<p>Both pipelines include:</p>
+<ul>
+<li>Dependency ordering: Bronze → Silver → Gold → Semantic Model refresh.</li>
+<li>Retry policy: 2 retries with 5-minute backoff.</li>
+<li>Failure notifications via Fabric alerts (email and Teams webhook).</li>
+</ul>
+<h2 id="semantic-model">Semantic Model<a class="anchor" href="#semantic-model" aria-hidden="true">#</a></h2>
+<p>The Direct Lake semantic model connects Power BI directly to Delta tables in OneLake — no import or DirectQuery overhead.</p>
+<h3 id="tables-and-relationships">Tables and Relationships<a class="anchor" href="#tables-and-relationships" aria-hidden="true">#</a></h3>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>dim_date ──────────┐
+                   │ 1:*
+fact_costs ◄───────┤
+                   │ 1:*
+dim_resource ──────┤
+                   │ 1:*
+fact_metrics ◄─────┤
+                   │ 1:*
+fact_operations ◄──┘
+                   
+fact_agent_analytics ──▶ dim_date</code></pre>
+<h3 id="key-measures">Key Measures<a class="anchor" href="#key-measures" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table><thead><tr>
+<th>Measure</th>
+<th>Expression (DAX)</th>
+</tr>
+</thead><tbody><tr>
+<td>TotalCost</td>
+<td><code>SUM(fact_costs[BilledCost])</code></td>
+</tr>
+<tr>
+<td>CostMoM%</td>
+<td>Month-over-month cost change percentage</td>
+</tr>
+<tr>
+<td>CapacityUtilization</td>
+<td><code>AVERAGE(fact_metrics[CPUPercent])</code></td>
+</tr>
+<tr>
+<td>ErrorRate</td>
+<td><code>DIVIDE(COUNTROWS(FILTER(fact_operations, [Severity] = &quot;Error&quot;)), COUNTROWS(fact_operations))</code></td>
+</tr>
+<tr>
+<td>P95Latency</td>
+<td><code>PERCENTILE.INC(fact_operations[DurationMs], 0.95)</code></td>
+</tr>
+<tr>
+<td>AvgSatisfaction</td>
+<td><code>AVERAGE(fact_agent_analytics[SatisfactionScore])</code></td>
+</tr>
+<tr>
+<td>ConversationCount</td>
+<td><code>DISTINCTCOUNT(fact_agent_analytics[ConversationId])</code></td>
+</tr>
+</tbody></table></div>
+<h3 id="time-intelligence">Time Intelligence<a class="anchor" href="#time-intelligence" aria-hidden="true">#</a></h3>
+<p>All cost and metric measures include time-intelligence variants: YTD, MTD, QTD, prior period, and rolling 30-day averages. These are generated via a calculation group applied to <code>dim_date</code>.</p>
+<h2 id="power-bi-report">Power BI Report<a class="anchor" href="#power-bi-report" aria-hidden="true">#</a></h2>
+<h3 id="connecting-to-the-semantic-model">Connecting to the Semantic Model<a class="anchor" href="#connecting-to-the-semantic-model" aria-hidden="true">#</a></h3>
+<ol>
+<li>Open Power BI Desktop or the Power BI service.</li>
+<li>Select <strong>OneLake data hub</strong> → choose the semantic model published from this workspace.</li>
+<li>The connection uses <strong>Direct Lake</strong> mode — no data copy is created.</li>
+</ol>
+<h3 id="suggested-report-pages">Suggested Report Pages<a class="anchor" href="#suggested-report-pages" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table><thead><tr>
+<th>Page</th>
+<th>Key Visuals</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Cost Overview</strong></td>
+<td>KPI cards (total cost, MoM trend), cost-by-service bar chart, daily cost line chart with forecast, top-10 cost drivers table</td>
+</tr>
+<tr>
+<td><strong>Capacity Utilization</strong></td>
+<td>Gauge charts per capacity metric, heatmap by resource and hour, utilization trend with threshold lines</td>
+</tr>
+<tr>
+<td><strong>Operational Health</strong></td>
+<td>Error-rate trend, P95 latency sparklines, availability scorecards, log-severity breakdown donut chart</td>
+</tr>
+<tr>
+<td><strong>Agent Performance</strong></td>
+<td>Conversation volume over time, avg response time, token consumption bar chart, satisfaction trend, resolution rate funnel</td>
+</tr>
+<tr>
+<td><strong>Resource Inventory</strong></td>
+<td>Resource count by type/region matrix, change timeline (SCD events), tag compliance percentage, orphaned resource list</td>
+</tr>
+</tbody></table></div>
+<h3 id="design-guidelines">Design Guidelines<a class="anchor" href="#design-guidelines" aria-hidden="true">#</a></h3>
+<ul>
+<li>Use the organization&#39;s brand palette for consistent theming.</li>
+<li>Apply row-level security (RLS) roles mapped to subscription or resource-group ownership.</li>
+<li>Enable paginated export for the Resource Inventory page.</li>
+</ul>
+<h2 id="integration-with-other-components">Integration with Other Components<a class="anchor" href="#integration-with-other-components" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Component</th>
+<th>Integration Point</th>
+</tr>
+</thead><tbody><tr>
+<td><strong><a href="../agent-workload/README.html">Agent Workload</a></strong></td>
+<td>AI-agent conversations are written to Cosmos DB. Fabric Mirroring replicates those records into the Lakehouse in near-real-time, where <code>04_cosmos_mirroring_transform</code> processes them into <code>gold_agent_analytics</code>.</td>
+</tr>
+<tr>
+<td><strong><a href="../observability-ingestion/README.html">Observability Ingestion</a></strong></td>
+<td>Azure Monitor diagnostic settings export metrics, logs, and cost data to ADLS Gen2. Fabric Lakehouse shortcuts expose those files as if they were local, and the Bronze notebook ingests them into Delta tables.</td>
+</tr>
+</tbody></table></div>
+<h2 id="project-structure">Project Structure<a class="anchor" href="#project-structure" aria-hidden="true">#</a></h2>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>fabric-control-tower/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml              # CI/CD pipeline
+├── infra/
+│   ├── main.bicep                  # Bicep entry point (storage, identity)
+│   └── main.parameters.json        # Default parameters
+├── fabric/
+│   ├── notebooks/
+│   │   ├── 01_bronze_ingestion.ipynb
+│   │   ├── 02_silver_transformation.ipynb
+│   │   ├── 03_gold_aggregation.ipynb
+│   │   └── 04_cosmos_mirroring_transform.ipynb
+│   └── pipelines/
+│       ├── pipeline_load_e2e.json
+│       └── pipeline_daily_refresh.json
+├── src/
+│   └── setup/
+│       ├── requirements.txt
+│       ├── semantic_model.json     # Direct Lake semantic model definition
+│       ├── setup_fabric_workspace.py
+│       └── setup_cosmos_mirroring.py
+├── .gitignore
+├── azure.yaml                      # azd manifest
+└── README.md</code></pre>
+<h2 id="contributing">Contributing<a class="anchor" href="#contributing" aria-hidden="true">#</a></h2>
+<ol>
+<li>Fork the repository and create a feature branch from <code>main</code>.</li>
+<li>Follow existing code style — run <code>ruff check</code> and <code>ruff format</code> before committing.</li>
+<li>Add or update tests for any new setup scripts.</li>
+<li>Open a pull request with a clear description of your changes.</li>
+<li>Ensure the CI pipeline passes before requesting review.</li>
+</ol>
+<h2 id="license">License<a class="anchor" href="#license" aria-hidden="true">#</a></h2>
+<p>This project is licensed under the <a href="../../code.html?path=LICENSE">MIT License</a>.</p>
+
+        </article>
+        
+        <div class="filetree">
+          <div class="filetree-head">📁 fabric-control-tower — 15 files · click any file to view it here (syntax-highlighted)</div>
+          <ul>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2F.github%2Fworkflows%2Fdeploy.yml"><span class="ic">›</span>fabric-control-tower/.github/workflows/deploy.yml</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2F.gitignore"><span class="ic">›</span>fabric-control-tower/.gitignore</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Fazure.yaml"><span class="ic">›</span>fabric-control-tower/azure.yaml</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fnotebooks%2F01_bronze_ingestion.ipynb"><span class="ic">›</span>fabric-control-tower/fabric/notebooks/01_bronze_ingestion.ipynb</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fnotebooks%2F02_silver_transformation.ipynb"><span class="ic">›</span>fabric-control-tower/fabric/notebooks/02_silver_transformation.ipynb</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fnotebooks%2F03_gold_aggregation.ipynb"><span class="ic">›</span>fabric-control-tower/fabric/notebooks/03_gold_aggregation.ipynb</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fnotebooks%2F04_cosmos_mirroring_transform.ipynb"><span class="ic">›</span>fabric-control-tower/fabric/notebooks/04_cosmos_mirroring_transform.ipynb</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fpipelines%2Fpipeline_daily_refresh.json"><span class="ic">›</span>fabric-control-tower/fabric/pipelines/pipeline_daily_refresh.json</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fpipelines%2Fpipeline_load_e2e.json"><span class="ic">›</span>fabric-control-tower/fabric/pipelines/pipeline_load_e2e.json</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Finfra%2Fmain.bicep"><span class="ic">›</span>fabric-control-tower/infra/main.bicep</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Finfra%2Fmain.parameters.json"><span class="ic">›</span>fabric-control-tower/infra/main.parameters.json</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Frequirements.txt"><span class="ic">›</span>fabric-control-tower/src/setup/requirements.txt</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsemantic_model.json"><span class="ic">›</span>fabric-control-tower/src/setup/semantic_model.json</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsetup_cosmos_mirroring.py"><span class="ic">›</span>fabric-control-tower/src/setup/setup_cosmos_mirroring.py</a></li>
+            <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsetup_fabric_workspace.py"><span class="ic">›</span>fabric-control-tower/src/setup/setup_fabric_workspace.py</a></li>
+          </ul>
+        </div>
+        
+        <div class="source-bar">
+          <a href="../../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/resources/fabric-control-tower/README.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

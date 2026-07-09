@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect Fabric to the Enterprise · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Connect Fabric to the Enterprise">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#objectives">Objectives</a></li>
+          <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
+          <li><a class="h2" href="#the-foundation">The foundation</a></li>
+          <li><a class="h2" href="#your-mission">Your mission</a></li>
+          <li><a class="h3" href="#1-give-fabric-permission-to-see-the-landing-zone">1. Give Fabric permission to see the landing zone</a></li>
+          <li><a class="h3" href="#2-create-the-lakehouse-and-onelake-shortcuts">2. Create the Lakehouse and OneLake shortcuts</a></li>
+          <li><a class="h3" href="#3-mirror-the-agent-conversation-database">3. Mirror the agent conversation database</a></li>
+          <li><a class="h3" href="#4-prove-both-paths-work">4. Prove both paths work</a></li>
+          <li><a class="h2" href="#success-criteria">Success criteria</a></li>
+          <li><a class="h2" href="#hints">Hints</a></li>
+          <li><a class="h2" href="#resources">Resources</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../challenges/README.html">Challenges</a> <span class="sep">/</span> <span>Connect Fabric to the Enterprise</span></div>
+        <div class="meta-row">
+          <span class="chip cat-challenges">CH 03</span>
+          <span class="chip"><span class="k">Est.</span> 2 h</span>
+          <span class="chip"><span class="k">Level</span> 300</span>
+          <span class="chip">Data engineer</span><span class="chip">Fabric engineer</span><span class="chip">platform engineer</span>
+        </div>
+        <article class="article prose">
+<h1 id="challenge-3-—-connect-fabric-to-the-enterprise">Challenge 3 — Connect Fabric to the Enterprise</h1>
+<hr>
+<blockquote>
+<p><strong>Mission log.</strong>
+The Control Tower has signals now — agent conversations in Cosmos DB, telemetry and cost files in
+ADLS Gen2 — but the customer&#39;s enterprise data is still sitting outside the tower walls. Your job is
+to connect it to Microsoft Fabric without copying piles of data around. This is where OneLake becomes
+the customer&#39;s unifying data estate.</p>
+</blockquote>
+<p>In this challenge you build the <strong>Fabric foundation</strong> for the rest of the RVAS: a Lakehouse that
+sees the Challenge 2 landing-zone files through <strong>OneLake shortcuts</strong>, and a mirrored Cosmos DB source
+that brings Challenge 1 agent conversations into OneLake Delta tables for near-real-time analytics.</p>
+<p>The important distinction: shortcuts are <strong>zero-copy pointers</strong> to existing files; Mirroring is
+<strong>managed replication</strong> into Fabric. You need both.</p>
+<h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
+<p>By the end of this challenge you will have:</p>
+<ul>
+<li>A team <strong>Fabric workspace</strong> assigned to your Fabric capacity.</li>
+<li>An <strong>Observability</strong> Lakehouse in that workspace.</li>
+<li>Four working <strong>OneLake shortcuts</strong> to the ADLS Gen2 landing-zone containers from Challenge 2:
+<code>costs</code>, <code>metrics</code>, <code>logs</code>, and <code>metadata</code>.</li>
+<li>Cosmos DB <strong>Mirroring</strong> configured for the agent conversation data from Challenge 1.</li>
+<li>Proof that Fabric can query both a shortcut-backed file and a mirrored Cosmos table.</li>
+<li>A crisp explanation of <strong>zero-copy shortcuts</strong> vs <strong>Mirroring replication</strong>.</li>
+</ul>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li>✅ Challenge 1 complete — the agent workload has written conversation data to Cosmos DB.</li>
+<li>✅ Challenge 2 complete — the ADLS Gen2 landing zone contains files in <code>costs</code>, <code>metrics</code>, <code>logs</code>,
+and <code>metadata</code>.</li>
+<li>Fabric capacity ID from Challenge 0.</li>
+<li>ADLS Gen2 <strong>DFS endpoint</strong> from Challenge 2, like <code>https://&lt;account&gt;.dfs.core.windows.net</code>.</li>
+<li>Cosmos DB account name and database name from Challenge 1.</li>
+<li>Fabric tenant settings allow service principal / managed identity access and <strong>Mirroring</strong>.</li>
+<li>The reference setup assets in
+<a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/</code></a>.</li>
+</ul>
+<h2 id="the-foundation">The foundation<a class="anchor" href="#the-foundation" aria-hidden="true">#</a></h2>
+<p>Your architecture now gets its Fabric entry point:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-text">Challenge 2 ADLS Gen2 landing zone       Challenge 1 Cosmos DB
+costs · metrics · logs · metadata        conversations · messages/feedback
+          │                                         │
+          │ OneLake shortcuts (zero copy)           │ Fabric Mirroring
+          ▼                                         ▼
+  Fabric Lakehouse Files/                    Mirrored Delta tables
+          └───────────────► Challenge 4 Bronze layer ◄───────────────┘</code></pre>
+<p>Shortcuts keep the source files where they are. Mirroring continuously lands operational records into
+OneLake-managed Delta tables. Challenge 4 will use both as Bronze inputs.</p>
+<h2 id="your-mission">Your mission<a class="anchor" href="#your-mission" aria-hidden="true">#</a></h2>
+<h3 id="1-give-fabric-permission-to-see-the-landing-zone">1. Give Fabric permission to see the landing zone<a class="anchor" href="#1-give-fabric-permission-to-see-the-landing-zone" aria-hidden="true">#</a></h3>
+<ul>
+<li>Identify the workspace identity / managed identity your Fabric workspace will use for shortcuts.</li>
+<li>Grant it <strong>Storage Blob Data Reader</strong> on the ADLS Gen2 storage account from Challenge 2.</li>
+<li>Confirm the storage account DFS endpoint and the four expected containers are available:
+<code>costs</code>, <code>metrics</code>, <code>logs</code>, and <code>metadata</code>.</li>
+</ul>
+<p>This is the most common failure point. If Fabric cannot read the storage account, shortcuts may create
+but browsing/querying them will fail.</p>
+<h3 id="2-create-the-lakehouse-and-onelake-shortcuts">2. Create the Lakehouse and OneLake shortcuts<a class="anchor" href="#2-create-the-lakehouse-and-onelake-shortcuts" aria-hidden="true">#</a></h3>
+<ul>
+<li>Create or reuse your team Fabric workspace on the Fabric capacity.</li>
+<li>Create a Lakehouse for the Control Tower foundation.</li>
+<li>Add OneLake shortcuts under the Lakehouse <code>Files/</code> area that point to the four ADLS Gen2 containers.</li>
+<li>Browse each shortcut and confirm you are seeing the <strong>same files</strong> that landed in Challenge 2 — not
+a copied export.</li>
+</ul>
+<p>The provided setup script can automate the workspace, Lakehouse, shortcuts, notebook imports, and
+pipeline imports:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd resources/fabric-control-tower
+pip install -r src/setup/requirements.txt
+
+python src/setup/setup_fabric_workspace.py \
+  --workspace-name &quot;Observability-Analytics&quot; \
+  --storage-account-url &quot;https://&lt;account&gt;.dfs.core.windows.net&quot; \
+  --capacity-id &quot;&lt;fabric-capacity-id&gt;&quot;</code></pre>
+<h3 id="3-mirror-the-agent-conversation-database">3. Mirror the agent conversation database<a class="anchor" href="#3-mirror-the-agent-conversation-database" aria-hidden="true">#</a></h3>
+<ul>
+<li>Enable the Cosmos DB prerequisites for Fabric Mirroring, including continuous backup / analytical
+store as required by your Cosmos DB configuration.</li>
+<li>Create a Fabric mirrored database item for the Cosmos DB database used by the agent workload.</li>
+<li>Select the conversation containers from Challenge 1. The reference assets describe
+<code>conversations</code>, <code>messages</code>, and <code>feedback</code>; the included setup script currently configures
+<code>conversations</code> and <code>interactions</code>, so verify the actual container names created by your workload.</li>
+<li>Start Mirroring and wait for the status to become healthy/running.</li>
+</ul>
+<p>Reference command:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">cd resources/fabric-control-tower
+python src/setup/setup_cosmos_mirroring.py \
+  --workspace-id &quot;&lt;fabric-workspace-id&gt;&quot; \
+  --cosmos-account &quot;&lt;cosmos-account-name&gt;&quot; \
+  --database &quot;observability&quot;</code></pre>
+<h3 id="4-prove-both-paths-work">4. Prove both paths work<a class="anchor" href="#4-prove-both-paths-work" aria-hidden="true">#</a></h3>
+<p>Show your team and coach that Fabric can read from both enterprise connection patterns:</p>
+<ul>
+<li><strong>Shortcut path:</strong> browse <code>Files/costs</code>, <code>Files/metrics</code>, <code>Files/logs</code>, and <code>Files/metadata</code> in the
+Lakehouse and open or query one file.</li>
+<li><strong>Mirroring path:</strong> open the mirrored database, confirm the expected tables are present, and verify
+the sync status shows recent activity.</li>
+<li><strong>Latency target:</strong> after adding one new agent conversation, look for it in the mirrored table within
+roughly a minute.</li>
+<li><strong>Query proof:</strong> run one simple query against a shortcut-backed file and one simple query against a
+mirrored table.</li>
+</ul>
+<h2 id="success-criteria">Success criteria<a class="anchor" href="#success-criteria" aria-hidden="true">#</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> Fabric workspace is assigned to the correct capacity and the team can open it.</li>
+<li><input disabled="" type="checkbox"> Lakehouse exists for the Control Tower foundation.</li>
+<li><input disabled="" type="checkbox"> Four shortcuts exist and browse successfully: <code>costs</code>, <code>metrics</code>, <code>logs</code>, <code>metadata</code>.</li>
+<li><input disabled="" type="checkbox"> Browsed shortcut files match the ADLS Gen2 files from Challenge 2 — no duplicate copy was made.</li>
+<li><input disabled="" type="checkbox"> Cosmos DB mirrored database exists with the expected conversation tables.</li>
+<li><input disabled="" type="checkbox"> Mirroring is running/healthy and recent records are syncing.</li>
+<li><input disabled="" type="checkbox"> Your team can query one shortcut file and one mirrored table.</li>
+<li><input disabled="" type="checkbox"> Your team can explain <strong>zero-copy shortcut</strong> vs <strong>Mirroring replication</strong> to your coach.</li>
+</ul>
+<blockquote>
+<p>🧭 <strong>Checkpoint:</strong> show your coach the Lakehouse shortcuts, the mirrored Cosmos tables, and one query
+from each path. Then explain which path copies data and which path does not.</p>
+</blockquote>
+<h2 id="hints">Hints<a class="anchor" href="#hints" aria-hidden="true">#</a></h2>
+<details>
+<summary>What does "zero copy" mean here?</summary>
+
+<p>A OneLake shortcut is a pointer. The files stay in the ADLS Gen2 storage account from Challenge 2, but
+Fabric presents them inside the Lakehouse <code>Files/</code> tree. You avoid duplicate storage, export jobs, and
+extra egress. If the source file changes, Fabric reads the source location.</p>
+</details>
+
+<details>
+<summary>Granting storage access</summary>
+
+<p>Use the storage account from Challenge 2 and grant the Fabric workspace identity / managed identity a
+data-plane role such as <strong>Storage Blob Data Reader</strong> at the storage-account scope. RBAC can take a few
+minutes to propagate before shortcut browsing works.</p>
+</details>
+
+<details>
+<summary>What the workspace setup script creates</summary>
+
+<p><a href="../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsetup_fabric_workspace.py"><code>setup_fabric_workspace.py</code></a>
+uses the Fabric REST API to:</p>
+<ol>
+<li>Create or reuse the workspace.</li>
+<li>Create the <code>Observability</code> Lakehouse.</li>
+<li>Create shortcuts for <code>costs</code>, <code>metrics</code>, <code>logs</code>, and <code>metadata</code> under <code>Files/</code>.</li>
+<li>Import notebooks from <code>resources/fabric-control-tower/fabric/notebooks/</code>.</li>
+<li>Import pipelines from <code>resources/fabric-control-tower/fabric/pipelines/</code>.</li>
+</ol>
+<p>If the Fabric API returns an async accepted response, wait for the item to finish provisioning and
+rerun the script if needed.</p>
+</details>
+
+<details>
+<summary>Checking mirrored tables</summary>
+
+<p>Open the mirrored database item in Fabric and look for the selected Cosmos DB containers as tables. If
+they are empty, generate a few more agent conversations in the Challenge 1 app, then re-check the
+Mirroring status and sync timestamp.</p>
+</details>
+
+<details>
+<summary>Quick query ideas</summary>
+
+<p>For a shortcut file, use a Fabric notebook to read a Parquet file or folder from <code>Files/costs</code> or
+<code>Files/metadata</code>. For a mirrored table, run a simple <code>SELECT TOP 10</code> in the mirrored database SQL
+endpoint or inspect it from Spark. Keep it simple — Challenge 4 will do the heavy transformation.</p>
+</details>
+
+<h2 id="resources">Resources<a class="anchor" href="#resources" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/README.md</code></a> — Fabric setup, shortcuts, Mirroring, notebooks, and pipelines</li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsetup_fabric_workspace.py"><code>resources/fabric-control-tower/src/setup/setup_fabric_workspace.py</code></a> — workspace, Lakehouse, shortcuts, imports</li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsetup_cosmos_mirroring.py"><code>resources/fabric-control-tower/src/setup/setup_cosmos_mirroring.py</code></a> — Cosmos DB Mirroring setup</li>
+<li><a href="../docs/architecture.html"><code>docs/architecture.md</code></a> — OneLake shortcuts and Mirroring in the end-to-end architecture</li>
+</ul>
+<hr>
+<p>⬅️ Previous: <strong><a href="challenge-02-landing-zone.html">Challenge 2 — Build the Telemetry Landing Zone</a></strong><br>➡️ Next: <strong><a href="challenge-04-medallion-pipeline.html">Challenge 4 — Refine the Signal</a></strong></p>
+
+        </article>
+        
+        
+        <nav class="pager" aria-label="Challenge navigation">
+          <a class="prev" href="challenge-02-landing-zone.html"><div class="dir">← Previous</div><div class="ttl">Build the Telemetry Landing Zone</div></a>
+          <a class="next" href="challenge-04-medallion-pipeline.html"><div class="dir">Next →</div><div class="ttl">Refine the Signal</div></a>
+        </nav>
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-03-onelake-foundation.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission Briefing &amp; Environment Setup · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Mission Briefing &amp; Environment Setup">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#objectives">Objectives</a></li>
+          <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
+          <li><a class="h2" href="#your-mission">Your mission</a></li>
+          <li><a class="h3" href="#1-establish-the-beachhead-azure">1. Establish the beachhead (Azure)</a></li>
+          <li><a class="h3" href="#2-confirm-your-firepower-foundry-model-quota">2. Confirm your firepower (Foundry model quota)</a></li>
+          <li><a class="h3" href="#3-raise-the-towers-platform-fabric">3. Raise the tower&#39;s platform (Fabric)</a></li>
+          <li><a class="h3" href="#4-arm-the-team-tooling-get-the-code">4. Arm the team (tooling) &amp; get the code</a></li>
+          <li><a class="h3" href="#5-record-your-coordinates">5. Record your coordinates</a></li>
+          <li><a class="h2" href="#success-criteria">Success criteria</a></li>
+          <li><a class="h2" href="#hints">Hints</a></li>
+          <li><a class="h2" href="#resources">Resources</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../challenges/README.html">Challenges</a> <span class="sep">/</span> <span>Mission Briefing &amp; Environment Setup</span></div>
+        <div class="meta-row">
+          <span class="chip cat-challenges">CH 00</span>
+          <span class="chip"><span class="k">Est.</span> 1–1.5 h</span>
+          <span class="chip"><span class="k">Level</span> 100</span>
+          <span class="chip">Everyone</span>
+        </div>
+        <article class="article prose">
+<h1 id="challenge-0-—-mission-briefing-environment-setup">Challenge 0 — Mission Briefing &amp; Environment Setup</h1>
+<hr>
+<blockquote>
+<p><strong>Mission log, Day 1.</strong>
+The customer&#39;s AI agents are multiplying faster than anyone can track. Before you can build the
+Control Tower, you need a launchpad: access to the customer&#39;s cloud, the right tools on your
+machines, and a Microsoft Fabric capacity to build on. A control tower is only as good as the
+ground it&#39;s built on — so let&#39;s pour the foundation.</p>
+</blockquote>
+<p>In this challenge your team gets fully provisioned and confirms every member can reach Azure <strong>and</strong>
+Fabric. Don&#39;t skip the verification steps — a missing role or quota gap discovered now saves hours
+later.</p>
+<h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
+<p>By the end of this challenge you will have:</p>
+<ul>
+<li>Confirmed Azure subscription access and the roles needed for the rest of the RVAS.</li>
+<li>Verified Azure AI Foundry model quota in a region that also supports Fabric.</li>
+<li>A working <strong>Microsoft Fabric capacity</strong> (trial or paid) and a <strong>team workspace</strong> on it.</li>
+<li>Local tooling installed and verified for every team member.</li>
+<li>Cloned this repository and oriented yourselves in the <code>resources/</code> toolbox.</li>
+</ul>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li>The shared <a href="../docs/prerequisites.html"><strong>Prerequisites &amp; Environment Setup</strong></a> guide — skim it as a
+team now; it is the companion to this challenge.</li>
+<li>At least one Azure subscription and a Microsoft Entra account in the same tenant you&#39;ll use for
+Fabric.</li>
+</ul>
+<h2 id="your-mission">Your mission<a class="anchor" href="#your-mission" aria-hidden="true">#</a></h2>
+<h3 id="1-establish-the-beachhead-azure">1. Establish the beachhead (Azure)<a class="anchor" href="#1-establish-the-beachhead-azure" aria-hidden="true">#</a></h3>
+<ul>
+<li>Every team member signs in: <code>az login</code>, and selects the target subscription.</li>
+<li>As a team, <strong>confirm your roles</strong> on the subscription/resource group: you need <strong>Contributor</strong>
+(deploy resources) and, ideally, <strong>User Access Administrator</strong>/Owner (so the IaC can create role
+assignments). Identify at least one person who has the rights to create role assignments.</li>
+<li>Confirm someone has <strong>Cost Management Reader</strong> at the billing scope (needed in Challenge 2).</li>
+<li>Register the resource providers you&#39;ll need so first deployments don&#39;t stall.</li>
+</ul>
+<h3 id="2-confirm-your-firepower-foundry-model-quota">2. Confirm your firepower (Foundry model quota)<a class="anchor" href="#2-confirm-your-firepower-foundry-model-quota" aria-hidden="true">#</a></h3>
+<ul>
+<li>Confirm access to <strong>Azure AI Foundry / Azure OpenAI</strong> and locate <strong>quota</strong> for <code>gpt-4o</code> or
+<code>gpt-4o-mini</code>.</li>
+<li>Pick a <strong>region</strong> that offers both the model and Microsoft Fabric, and agree on it as a team —
+you&#39;ll deploy everything there.</li>
+</ul>
+<h3 id="3-raise-the-towers-platform-fabric">3. Raise the tower&#39;s platform (Fabric)<a class="anchor" href="#3-raise-the-towers-platform-fabric" aria-hidden="true">#</a></h3>
+<ul>
+<li>Stand up a <strong>Fabric capacity</strong>: start the <strong>60-day free trial</strong> (recommended) or use a paid <strong>F2+</strong>
+capacity. Note the <strong>capacity name/ID</strong>.</li>
+<li>Create a <strong>Fabric workspace</strong> for your team and <strong>assign it to the capacity</strong>.</li>
+<li>Make sure each team member can open the workspace at
+<a href="https://app.fabric.microsoft.com" target="_blank" rel="noopener">app.fabric.microsoft.com</a>.</li>
+</ul>
+<h3 id="4-arm-the-team-tooling-get-the-code">4. Arm the team (tooling) &amp; get the code<a class="anchor" href="#4-arm-the-team-tooling-get-the-code" aria-hidden="true">#</a></h3>
+<ul>
+<li>Install and verify the local tools (<code>az</code>, <code>azd</code>, <code>python</code>, <code>node</code>, <code>docker</code>, <code>git</code>).</li>
+<li>Clone this repo and take a 5-minute tour of <code>resources/</code> — note where the agent workload, landing
+zone, and Fabric assets live. You&#39;ll come back to each.</li>
+</ul>
+<h3 id="5-record-your-coordinates">5. Record your coordinates<a class="anchor" href="#5-record-your-coordinates" aria-hidden="true">#</a></h3>
+<p>Capture these somewhere your team can see them all event — you&#39;ll reuse them constantly:</p>
+<ul>
+<li>Subscription ID(s), chosen <strong>region</strong>, resource group name convention</li>
+<li>Foundry model + deployment name</li>
+<li>Fabric <strong>capacity ID</strong> and <strong>workspace name/ID</strong></li>
+</ul>
+<h2 id="success-criteria">Success criteria<a class="anchor" href="#success-criteria" aria-hidden="true">#</a></h2>
+<p>You&#39;re ready to advance when:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Every team member can <code>az login</code> and select the target subscription</li>
+<li><input disabled="" type="checkbox"> Roles confirmed: Contributor (+ someone with role-assignment rights), Cost Management Reader</li>
+<li><input disabled="" type="checkbox"> Foundry model quota confirmed for <code>gpt-4o</code>/<code>gpt-4o-mini</code> in your chosen region</li>
+<li><input disabled="" type="checkbox"> A Fabric capacity is active and you know its ID/name</li>
+<li><input disabled="" type="checkbox"> A team <strong>Fabric workspace</strong> exists, assigned to the capacity, reachable by all members</li>
+<li><input disabled="" type="checkbox"> Local tooling installed and verified (<code>az version</code>, <code>azd version</code>, <code>python --version</code>, <code>docker --version</code>)</li>
+<li><input disabled="" type="checkbox"> Repo cloned; team has located the four <code>resources/</code> components</li>
+<li><input disabled="" type="checkbox"> Your &quot;coordinates&quot; (subscription, region, capacity, workspace) are written down</li>
+</ul>
+<blockquote>
+<p>🧭 <strong>Checkpoint:</strong> show your coach that everyone can reach both the Azure portal <strong>and</strong> the Fabric
+workspace, and read back your coordinates.</p>
+</blockquote>
+<h2 id="hints">Hints<a class="anchor" href="#hints" aria-hidden="true">#</a></h2>
+<details>
+<summary>Registering resource providers</summary>
+
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">for p in Microsoft.App Microsoft.DocumentDB Microsoft.ApiManagement \
+         Microsoft.CognitiveServices Microsoft.OperationalInsights Microsoft.Storage; do
+  az provider register --namespace &quot;$p&quot;
+done
+# Check status
+az provider show -n Microsoft.App --query registrationState -o tsv</code></pre>
+</details>
+
+<details>
+<summary>Checking your roles & subscription</summary>
+
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">az account show -o table
+az role assignment list --assignee &quot;$(az account show --query user.name -o tsv)&quot; \
+  --all --query &quot;[].roleDefinitionName&quot; -o tsv | sort -u</code></pre>
+</details>
+
+<details>
+<summary>Starting the Fabric trial / creating a workspace</summary>
+
+<ul>
+<li>Trial: <a href="https://app.fabric.microsoft.com" target="_blank" rel="noopener">app.fabric.microsoft.com</a> → <strong>Account manager</strong> (top-right)
+→ <strong>Start trial</strong>. You become the capacity admin and can share it.</li>
+<li>Workspace: <strong>Workspaces → New workspace</strong> → under <strong>Advanced</strong>, set <strong>License mode</strong> to <strong>Trial</strong>
+(or <strong>Fabric capacity</strong> and pick your F-SKU).</li>
+<li>Docs: <a href="https://learn.microsoft.com/fabric/fundamentals/fabric-trial" target="_blank" rel="noopener">Try Microsoft Fabric for free</a>.</details></li>
+</ul>
+<details>
+<summary>Checking Foundry / OpenAI quota</summary>
+
+<p>In the <strong>Azure AI Foundry portal → Management → Quotas</strong>, filter to your region and confirm available
+TPM for <code>gpt-4o-mini</code> (recommended) or <code>gpt-4o</code>. ~30K TPM per team is plenty.</p>
+</details>
+
+<h2 id="resources">Resources<a class="anchor" href="#resources" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="../docs/prerequisites.html"><code>docs/prerequisites.md</code></a> — the detailed companion checklist</li>
+<li><a href="../docs/architecture.html"><code>docs/architecture.md</code></a> — the picture you&#39;re about to build</li>
+<li><a href="../resources/README.html"><code>resources/README.md</code></a> — tour of the provided assets</li>
+</ul>
+<hr>
+<p>➡️ Next: <strong><a href="challenge-01-agent-telemetry.html">Challenge 1 — Light Up the Agents</a></strong></p>
+
+        </article>
+        
+        
+        <nav class="pager" aria-label="Challenge navigation">
+          <a class="prev disabled"></a>
+          <a class="next" href="challenge-01-agent-telemetry.html"><div class="dir">Next →</div><div class="ttl">Light Up the Agents</div></a>
+        </nav>
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-00-mission-setup.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

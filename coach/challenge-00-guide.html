@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coach Guide — Challenge 0: Mission Briefing &amp; Environment Setup · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Coach Guide — Challenge 0: Mission Briefing &amp; Environment Setup">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#snapshot">Snapshot</a></li>
+          <li><a class="h2" href="#coaching-objectives">Coaching objectives</a></li>
+          <li><a class="h2" href="#the-reference-path">The reference path</a></li>
+          <li><a class="h2" href="#checkpoint-verification">Checkpoint verification</a></li>
+          <li><a class="h2" href="#common-pitfalls-fixes">Common pitfalls &amp; fixes</a></li>
+          <li><a class="h2" href="#talking-points-mini-briefing">Talking points (mini-briefing)</a></li>
+          <li><a class="h2" href="#if-they-finish-early">If they finish early</a></li>
+          <li><a class="h2" href="#reference-assets">Reference assets</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../coach/README.html">Coach</a> <span class="sep">/</span> <span>Coach Guide — Challenge 0: Mission Briefing &amp; Environment Setup</span></div><div class="meta-row"><span class="chip cat-coach">Coach</span></div>
+        <article class="article prose">
+<h1 id="coach-guide-—-challenge-0-mission-briefing-environment-setup">Coach Guide — Challenge 0: Mission Briefing &amp; Environment Setup</h1>
+<blockquote>
+<p>Attendee challenge: <a href="../challenges/challenge-00-mission-setup.html"><code>challenges/challenge-00-mission-setup.md</code></a></p>
+</blockquote>
+<h2 id="snapshot">Snapshot<a class="anchor" href="#snapshot" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Est. time</strong></td>
+<td>1–1.5 h</td>
+</tr>
+<tr>
+<td><strong>Difficulty</strong></td>
+<td>⭐ (100) — but the highest-risk for delays</td>
+</tr>
+<tr>
+<td><strong>They build</strong></td>
+<td>Working access to Azure + Fabric, tooling, a team workspace</td>
+</tr>
+<tr>
+<td><strong>Key services</strong></td>
+<td>Azure RBAC, Azure AI Foundry quota, Microsoft Fabric capacity/workspace</td>
+</tr>
+</tbody></table></div>
+<h2 id="coaching-objectives">Coaching objectives<a class="anchor" href="#coaching-objectives" aria-hidden="true">#</a></h2>
+<p>This challenge is about <strong>removing blockers before they cost you Day 2</strong>. Your goal is that every
+team member can reach <strong>both</strong> Azure and Fabric, and that the team has captured their &quot;coordinates.&quot;
+Treat it as a readiness gate, not a learning exercise.</p>
+<p><strong>What good looks like:</strong> every member runs <code>az login</code> and opens the team&#39;s Fabric workspace; the
+team can recite their subscription, region, capacity, and workspace from their notes.</p>
+<h2 id="the-reference-path">The reference path<a class="anchor" href="#the-reference-path" aria-hidden="true">#</a></h2>
+<p>Most of this is verification. Drive it briskly.</p>
+<ol>
+<li><p><strong>Azure access</strong></p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">az login
+az account set --subscription &quot;&lt;sub-id&gt;&quot;
+az account show -o table</code></pre>
+<p>Confirm roles include <strong>Contributor</strong>; at least one member needs role-assignment rights
+(<strong>User Access Administrator</strong>/Owner) for Challenges 1–2 Bicep.</p>
+</li>
+<li><p><strong>Resource providers</strong> (prevents first-deploy stalls)</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">for p in Microsoft.App Microsoft.DocumentDB Microsoft.ApiManagement \
+         Microsoft.CognitiveServices Microsoft.OperationalInsights Microsoft.Storage; do
+  az provider register --namespace &quot;$p&quot;
+done</code></pre>
+</li>
+<li><p><strong>Foundry quota</strong> — in the <strong>Azure AI Foundry portal → Quotas</strong>, confirm <code>gpt-4o-mini</code> (or
+<code>gpt-4o</code>) TPM in the chosen region. Lock in one region for the whole team.</p>
+</li>
+<li><p><strong>Fabric capacity + workspace</strong></p>
+<ul>
+<li>Trial: <a href="https://app.fabric.microsoft.com" target="_blank" rel="noopener">app.fabric.microsoft.com</a> → Account manager → <strong>Start
+trial</strong>. The starter becomes capacity admin.</li>
+<li>Create a workspace per team; set License mode to <strong>Trial</strong> (or <strong>Fabric capacity</strong> + F-SKU).</li>
+<li>Share the capacity by assigning each team&#39;s workspace to it.</li>
+</ul>
+</li>
+<li><p><strong>Tooling</strong> — verify on each machine:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">az version &amp;&amp; azd version &amp;&amp; python --version &amp;&amp; node --version &amp;&amp; docker --version &amp;&amp; git --version</code></pre>
+</li>
+<li><p><strong>Clone + tour</strong> <code>resources/</code>.</p>
+</li>
+</ol>
+<h2 id="checkpoint-verification">Checkpoint verification<a class="anchor" href="#checkpoint-verification" aria-hidden="true">#</a></h2>
+<p>Ask the team to:</p>
+<ul>
+<li>Run <code>az account show</code> on two different members&#39; machines.</li>
+<li>Open the <strong>team Fabric workspace</strong> in a browser.</li>
+<li>Read back their <strong>coordinates</strong> (sub IDs, region, capacity ID, workspace name).</li>
+</ul>
+<p>✅ Pass when all members have Azure + Fabric access and the coordinates are written down.</p>
+<h2 id="common-pitfalls-fixes">Common pitfalls &amp; fixes<a class="anchor" href="#common-pitfalls-fixes" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Pitfall</th>
+<th>Fix</th>
+</tr>
+</thead><tbody><tr>
+<td>No <strong>User Access Administrator</strong> → Challenge 1 role assignments will fail</td>
+<td>Identify it now. Ask an admin to grant it, or plan to pre-create the managed identity &amp; assignments for that team</td>
+</tr>
+<tr>
+<td><strong>Foundry access not enabled</strong> on the subscription</td>
+<td>This can take time — escalate immediately; have a backup subscription that already has Foundry</td>
+</tr>
+<tr>
+<td>Region has the model but <strong>not Fabric</strong> (or vice versa)</td>
+<td>Standardize on East US 2 / West US 3 / Sweden Central</td>
+</tr>
+<tr>
+<td>Fabric <strong>tenant setting</strong> disabled (can&#39;t create workspaces / Mirroring)</td>
+<td>Get the Fabric admin to enable it (see prerequisites) — this is a tenant-admin action, plan ahead</td>
+</tr>
+<tr>
+<td>Trial <strong>F64 option not offered</strong></td>
+<td>F4 is fine for the RVAS; or use a paid F2+; eligibility for F64 varies</td>
+</tr>
+<tr>
+<td>Corporate <strong>egress restrictions</strong> block PyPI/npm/MCR or <code>*.fabric.microsoft.com</code></td>
+<td>Use Azure Cloud Shell for CLI; raise a firewall exception</td>
+</tr>
+</tbody></table></div>
+<h2 id="talking-points-mini-briefing">Talking points (mini-briefing)<a class="anchor" href="#talking-points-mini-briefing" aria-hidden="true">#</a></h2>
+<ul>
+<li>This is the customer&#39;s <strong>own environment</strong> — what they build here is reusable Monday morning.</li>
+<li>Preview the destination: show <a href="../docs/architecture.html"><code>docs/architecture.md</code></a> and the three
+business questions (reliability, cost, performance). Put them on the board.</li>
+<li>Emphasize <strong>same-tenant</strong> alignment of subscription + Fabric to avoid identity pain later.</li>
+</ul>
+<h2 id="if-they-finish-early">If they finish early<a class="anchor" href="#if-they-finish-early" aria-hidden="true">#</a></h2>
+<ul>
+<li>Have them <strong>pre-read</strong> Challenge 1 and 2 and split ownership.</li>
+<li>Set up a shared <strong>naming convention</strong> and a scratchpad for coordinates.</li>
+<li>Skim the <a href="../resources/observability-sdk/README.html"><code>observability-sdk</code></a> README to prime Challenge 1.</li>
+</ul>
+<h2 id="reference-assets">Reference assets<a class="anchor" href="#reference-assets" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="../docs/prerequisites.html"><code>docs/prerequisites.md</code></a>, <a href="../docs/architecture.html"><code>docs/architecture.md</code></a></li>
+<li><a href="../resources/README.html"><code>resources/README.md</code></a></li>
+</ul>
+
+        </article>
+        
+        
+        <nav class="pager" aria-label="Challenge navigation">
+          <a class="prev disabled"></a>
+          <a class="next" href="challenge-01-guide.html"><div class="dir">Next →</div><div class="ttl">Coach Guide — Challenge 1: Light Up the Agents</div></a>
+        </nav>
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/coach/challenge-00-guide.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

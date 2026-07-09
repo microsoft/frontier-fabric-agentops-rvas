@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coach Guide — Challenge 4: Refine the Signal · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Coach Guide — Challenge 4: Refine the Signal">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#snapshot">Snapshot</a></li>
+          <li><a class="h2" href="#coaching-objectives">Coaching objectives</a></li>
+          <li><a class="h2" href="#the-reference-path">The reference path</a></li>
+          <li><a class="h3" href="#notebook-map">Notebook map</a></li>
+          <li><a class="h3" href="#manual-run-vs-pipeline-run">Manual run vs pipeline run</a></li>
+          <li><a class="h3" href="#expected-gold-tables">Expected Gold tables</a></li>
+          <li><a class="h2" href="#sample-correlation-query">Sample correlation query</a></li>
+          <li><a class="h2" href="#checkpoint-verification">Checkpoint verification</a></li>
+          <li><a class="h2" href="#common-pitfalls-fixes">Common pitfalls &amp; fixes</a></li>
+          <li><a class="h2" href="#talking-points-mini-briefing">Talking points (mini-briefing)</a></li>
+          <li><a class="h2" href="#if-they-finish-early">If they finish early</a></li>
+          <li><a class="h2" href="#reference-assets">Reference assets</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../coach/README.html">Coach</a> <span class="sep">/</span> <span>Coach Guide — Challenge 4: Refine the Signal</span></div><div class="meta-row"><span class="chip cat-coach">Coach</span></div>
+        <article class="article prose">
+<h1 id="coach-guide-—-challenge-4-refine-the-signal">Coach Guide — Challenge 4: Refine the Signal</h1>
+<blockquote>
+<p>Attendee challenge: <a href="../challenges/challenge-04-medallion-pipeline.html"><code>challenges/challenge-04-medallion-pipeline.md</code></a></p>
+</blockquote>
+<h2 id="snapshot">Snapshot<a class="anchor" href="#snapshot" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th></th>
+<th></th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Est. time</strong></td>
+<td>2–2.5 h</td>
+</tr>
+<tr>
+<td><strong>Difficulty</strong></td>
+<td>⭐⭐⭐ (300)</td>
+</tr>
+<tr>
+<td><strong>They build</strong></td>
+<td>Bronze → Silver → Gold medallion pipeline with correlated Gold data products</td>
+</tr>
+<tr>
+<td><strong>Key services</strong></td>
+<td>Fabric Lakehouse/Spark notebooks, Delta, Data pipelines</td>
+</tr>
+</tbody></table></div>
+<h2 id="coaching-objectives">Coaching objectives<a class="anchor" href="#coaching-objectives" aria-hidden="true">#</a></h2>
+<p>This is the data-engineering core of the RVAS. Keep teams focused on <strong>correlation</strong>, not just
+&quot;notebooks ran.&quot; The Control Tower becomes valuable when cost, telemetry, resource metadata, and agent
+activity can be joined into one operational story.</p>
+<p>Make sure they can explain the medallion rationale:</p>
+<ul>
+<li><strong>Bronze = fidelity and reprocessability</strong> — raw inputs plus lineage.</li>
+<li><strong>Silver = trust and standardization</strong> — FOCUS cost, parsed telemetry, flattened metadata.</li>
+<li><strong>Gold = speed and business meaning</strong> — aggregates and dimensions ready for Direct Lake.</li>
+</ul>
+<p><strong>What good looks like:</strong> Load E2E Pipeline is green; every expected Gold table has rows; the team shows
+one query joining cost with agent activity or telemetry and can describe the join path.</p>
+<h2 id="the-reference-path">The reference path<a class="anchor" href="#the-reference-path" aria-hidden="true">#</a></h2>
+<p>Run from the Fabric workspace created in Challenge 3. If the setup script was used, the notebooks and
+pipelines are already imported from <a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/</code></a>.</p>
+<h3 id="notebook-map">Notebook map<a class="anchor" href="#notebook-map" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table><thead><tr>
+<th>Order</th>
+<th>Notebook</th>
+<th>Layer</th>
+<th>What to look for</th>
+</tr>
+</thead><tbody><tr>
+<td>1</td>
+<td><code>01_bronze_ingestion.ipynb</code></td>
+<td>Bronze</td>
+<td>Raw shortcut files become <code>bronze_*</code> Delta tables with lineage and quality checks</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>04_cosmos_mirroring_transform.ipynb</code></td>
+<td>Agent feed</td>
+<td>Mirrored conversations/interactions are shaped for agent analytics and late-arriving records</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>02_silver_transformation.ipynb</code></td>
+<td>Silver</td>
+<td>FOCUS cost normalization, 5-minute metrics, parsed logs, flattened metadata</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>03_gold_aggregation.ipynb</code></td>
+<td>Gold</td>
+<td>Aggregated Gold data products for cost, operations, capacity, inventory, and dimensions</td>
+</tr>
+</tbody></table></div>
+<p>The attendee guide frames the main path as Bronze → Silver → Gold. In the reference assets, the Cosmos
+mirroring transform can run after Bronze and contributes the agent analytics product; coach teams to
+verify it is included before they declare Gold complete.</p>
+<h3 id="manual-run-vs-pipeline-run">Manual run vs pipeline run<a class="anchor" href="#manual-run-vs-pipeline-run" aria-hidden="true">#</a></h3>
+<p>For debugging, run notebooks manually in dependency order and inspect output row counts after each one.
+For the checkpoint, require the <strong>Load E2E Pipeline</strong>:</p>
+<ul>
+<li>Pipeline file: <a href="../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fpipelines%2Fpipeline_load_e2e.json"><code>pipeline_load_e2e.json</code></a></li>
+<li>Activities: Bronze Ingestion → Silver Transformation → Gold Aggregation, plus Cosmos Mirroring
+Transform after Bronze.</li>
+<li>Parameters: <code>FromMonth</code> defaults to <code>-3</code>; <code>ToMonth</code> defaults to <code>0</code>.</li>
+<li>Policy: notebook activities have retries and dependency conditions.</li>
+</ul>
+<p>Point out the incremental operating path:</p>
+<ul>
+<li>Pipeline file: <a href="../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fpipelines%2Fpipeline_daily_refresh.json"><code>pipeline_daily_refresh.json</code></a></li>
+<li>Trigger: daily at 06:00 UTC.</li>
+<li>Scope: calls the Load E2E Pipeline with a rolling one-month window.</li>
+</ul>
+<h3 id="expected-gold-tables">Expected Gold tables<a class="anchor" href="#expected-gold-tables" aria-hidden="true">#</a></h3>
+<p>Match the table list in <a href="../docs/architecture.html#the-gold-data-products"><code>docs/architecture.md</code></a>:</p>
+<ul>
+<li><code>gold_cost_summary</code></li>
+<li><code>gold_operational_metrics</code></li>
+<li><code>gold_agent_analytics</code></li>
+<li><code>gold_capacity_usage</code></li>
+<li><code>gold_resource_inventory</code> (SCD Type 2)</li>
+<li><code>dim_date</code></li>
+<li><code>dim_resource</code></li>
+</ul>
+<p>If a team has only single-source Gold tables, push them to the correlation proof before passing the
+checkpoint.</p>
+<h2 id="sample-correlation-query">Sample correlation query<a class="anchor" href="#sample-correlation-query" aria-hidden="true">#</a></h2>
+<p>Use this as a coaching pattern, not a hard contract. Teams may need to adapt the tag expression to how
+their <code>metadata</code> export represents tags. The agent namespace should follow the architecture pattern:
+<code>&lt;organization&gt;.&lt;domain&gt;.&lt;agent-name&gt;.&lt;version&gt;</code>.</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-sql">WITH current_resources AS (
+  SELECT resource_id, resource_group, region, tags
+  FROM gold_resource_inventory
+  WHERE is_current = true
+), agent_usage AS (
+  SELECT agent_id, interaction_date, total_tokens, conversation_count, avg_response_time_ms
+  FROM gold_agent_analytics
+)
+SELECT
+  a.agent_id AS agent_namespace,
+  c.cost_year,
+  c.cost_month,
+  c.service_name,
+  SUM(c.monthly_cost) AS monthly_cost,
+  SUM(a.total_tokens) AS total_tokens,
+  SUM(a.conversation_count) AS conversations,
+  AVG(a.avg_response_time_ms) AS avg_response_time_ms
+FROM gold_cost_summary c
+JOIN current_resources r
+  ON c.region = r.region
+JOIN agent_usage a
+  ON r.tags LIKE CONCAT(&#39;%&#39;, a.agent_id, &#39;%&#39;)
+GROUP BY a.agent_id, c.cost_year, c.cost_month, c.service_name
+ORDER BY monthly_cost DESC;</code></pre>
+<p>A second acceptable proof is operational: join <code>gold_operational_metrics</code> and <code>gold_cost_summary</code> by
+service/time to show error rate or P95 latency beside cost.</p>
+<h2 id="checkpoint-verification">Checkpoint verification<a class="anchor" href="#checkpoint-verification" aria-hidden="true">#</a></h2>
+<p>Ask the team to show:</p>
+<ol>
+<li><strong>Bronze proof</strong> — <code>bronze_*</code> tables exist and include lineage columns / quality-check output.</li>
+<li><strong>Silver proof</strong> — cost is normalized, metrics are at the intended grain, logs are parsed, metadata
+tags are flattened enough for joins.</li>
+<li><strong>Gold proof</strong> — all expected Gold data products exist and have non-zero row counts where source data
+exists.</li>
+<li><strong>Pipeline proof</strong> — recent <strong>Load E2E Pipeline</strong> run succeeded end-to-end; dependencies and retries
+are visible in the run details.</li>
+<li><strong>Correlation proof</strong> — one query or visual joins cost with agent activity, resource tags, or
+operational telemetry.</li>
+<li><strong>Rationale proof</strong> — one team member explains Bronze/Silver/Gold without reading the doc.</li>
+</ol>
+<p>✅ Pass when Gold is populated, the pipeline is green, and the correlation proof is real.</p>
+<h2 id="common-pitfalls-fixes">Common pitfalls &amp; fixes<a class="anchor" href="#common-pitfalls-fixes" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table><thead><tr>
+<th>Pitfall</th>
+<th>Fix</th>
+</tr>
+</thead><tbody><tr>
+<td>Notebooks are not attached to the Lakehouse</td>
+<td>Attach the <code>Observability</code> Lakehouse before running; relative <code>Files/</code> and <code>Tables/</code> paths depend on it</td>
+</tr>
+<tr>
+<td>Shortcut path confusion: <code>Files/</code> vs <code>Tables/</code></td>
+<td>Raw shortcut inputs live under <code>Files/</code>; Delta outputs are written under <code>Tables/</code></td>
+</tr>
+<tr>
+<td>Schema drift in raw Parquet breaks Bronze or Silver</td>
+<td>Inspect the new columns, update explicit casts/mappings, and keep Bronze raw for replay</td>
+</tr>
+<tr>
+<td>Mirrored tables are late-arriving or empty</td>
+<td>Check Mirroring status, generate new agent traffic, rerun the Cosmos transform after records arrive</td>
+</tr>
+<tr>
+<td>Pipeline dependency ordering changed</td>
+<td>Restore Bronze before Silver, Silver before Gold, and include Cosmos transform after Bronze</td>
+</tr>
+<tr>
+<td>FOCUS normalization edge cases</td>
+<td>Validate currency, amortization, service names, and missing cost fields before Gold aggregation</td>
+</tr>
+<tr>
+<td>F2 capacity runs slow or hits Spark pressure</td>
+<td>Reduce the date window, run notebooks sequentially, and avoid unnecessary full refreshes</td>
+</tr>
+<tr>
+<td>Gold query scans too much data</td>
+<td>Filter by date/service first; partition or optimize high-traffic Gold tables if time allows</td>
+</tr>
+</tbody></table></div>
+<h2 id="talking-points-mini-briefing">Talking points (mini-briefing)<a class="anchor" href="#talking-points-mini-briefing" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Bronze protects optionality.</strong> When a schema or business rule changes, you can replay from raw
+Delta rather than rebuild the landing zone.</li>
+<li><strong>Silver is where trust is earned.</strong> Standardized FOCUS costs and conformed telemetry make cross-source
+joins defensible.</li>
+<li><strong>Gold is a product, not a dump.</strong> It should be fast, named for business questions, and shaped for
+Direct Lake consumption.</li>
+<li><strong>Correlation is the Control Tower moment.</strong> A dashboard that shows cost, traces, and agents in
+separate panels is still fragmented; joined insight is what leadership asked for.</li>
+<li><strong>Automation matters.</strong> Pipelines, retries, alerts, and refresh windows are what turn notebooks into
+an operating platform.</li>
+</ul>
+<h2 id="if-they-finish-early">If they finish early<a class="anchor" href="#if-they-finish-early" aria-hidden="true">#</a></h2>
+<ul>
+<li>Add a data-quality assertion that fails the pipeline when a key Gold table has zero rows.</li>
+<li>Partition or Z-order a high-use Gold table and compare query time before/after.</li>
+<li>Add a new Gold metric, such as cost per conversation or tokens per dollar, using existing Gold tables.</li>
+<li>Add a small validation notebook activity after Gold and before semantic-model refresh.</li>
+<li>Sketch how Challenge 5 visuals will map to each Gold data product.</li>
+</ul>
+<h2 id="reference-assets">Reference assets<a class="anchor" href="#reference-assets" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/README.md</code></a> — notebooks, pipelines, and semantic model sections</li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fnotebooks%2F01_bronze_ingestion.ipynb"><code>resources/fabric-control-tower/fabric/notebooks/01_bronze_ingestion.ipynb</code></a></li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fnotebooks%2F02_silver_transformation.ipynb"><code>resources/fabric-control-tower/fabric/notebooks/02_silver_transformation.ipynb</code></a></li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fnotebooks%2F03_gold_aggregation.ipynb"><code>resources/fabric-control-tower/fabric/notebooks/03_gold_aggregation.ipynb</code></a></li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fnotebooks%2F04_cosmos_mirroring_transform.ipynb"><code>resources/fabric-control-tower/fabric/notebooks/04_cosmos_mirroring_transform.ipynb</code></a></li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fpipelines%2Fpipeline_load_e2e.json"><code>resources/fabric-control-tower/fabric/pipelines/pipeline_load_e2e.json</code></a></li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fpipelines%2Fpipeline_daily_refresh.json"><code>resources/fabric-control-tower/fabric/pipelines/pipeline_daily_refresh.json</code></a></li>
+<li><a href="../docs/architecture.html"><code>docs/architecture.md</code></a> — Gold products and agent namespace pattern</li>
+</ul>
+
+        </article>
+        
+        
+        <nav class="pager" aria-label="Challenge navigation">
+          <a class="prev" href="challenge-03-guide.html"><div class="dir">← Previous</div><div class="ttl">Coach Guide — Challenge 3: Connect Fabric to the Enterprise</div></a>
+          <a class="next" href="challenge-05-guide.html"><div class="dir">Next →</div><div class="ttl">Coach Guide — Challenge 5: Stand Up the Control Tower</div></a>
+        </nav>
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/coach/challenge-04-guide.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>

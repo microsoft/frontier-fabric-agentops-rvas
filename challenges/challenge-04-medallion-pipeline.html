@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refine the Signal · Frontier Fabric AgentOps RVAS</title>
+  <meta name="description" content="Refine the Signal">
+  <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="../index.html" aria-label="RVAP · Home">
+        <img src="../assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <div class="nav-links">
+        <a class="nav-link hide-sm" href="../challenges/README.html">Challenges</a>
+        <a class="nav-link solid" href="../builder.html">Compose delivery ↗</a>
+        <a class="nav-link hide-sm" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="doc-wrap">
+    <div class="doc-shell">
+      
+      <aside class="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="h2" href="#objectives">Objectives</a></li>
+          <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
+          <li><a class="h2" href="#the-refinement-path">The refinement path</a></li>
+          <li><a class="h2" href="#your-mission">Your mission</a></li>
+          <li><a class="h3" href="#1-land-the-raw-signal-in-bronze">1. Land the raw signal in Bronze</a></li>
+          <li><a class="h3" href="#2-standardize-and-trust-it-in-silver">2. Standardize and trust it in Silver</a></li>
+          <li><a class="h3" href="#3-build-the-gold-data-products">3. Build the Gold data products</a></li>
+          <li><a class="h3" href="#4-orchestrate-the-load">4. Orchestrate the load</a></li>
+          <li><a class="h3" href="#5-prove-the-signal-is-correlated">5. Prove the signal is correlated</a></li>
+          <li><a class="h2" href="#success-criteria">Success criteria</a></li>
+          <li><a class="h2" href="#hints">Hints</a></li>
+          <li><a class="h2" href="#resources">Resources</a></li>
+        </ul>
+      </aside>
+      <main class="doc-main">
+        <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <a href="../challenges/README.html">Challenges</a> <span class="sep">/</span> <span>Refine the Signal</span></div>
+        <div class="meta-row">
+          <span class="chip cat-challenges">CH 04</span>
+          <span class="chip"><span class="k">Est.</span> 2–2.5 h</span>
+          <span class="chip"><span class="k">Level</span> 300</span>
+          <span class="chip">Data engineer</span><span class="chip">Fabric engineer</span><span class="chip">FinOps practitioner</span>
+        </div>
+        <article class="article prose">
+<h1 id="challenge-4-—-refine-the-signal">Challenge 4 — Refine the Signal</h1>
+<hr>
+<blockquote>
+<p><strong>Mission log.</strong>
+The Control Tower can see the enterprise now: cost exports, telemetry files, resource metadata, and
+mirrored agent conversations are all inside Fabric&#39;s reach. But raw signal is still noisy signal.
+Leadership does not need another data swamp — they need trusted products that correlate <strong>cost,
+reliability, and agent activity</strong>.</p>
+</blockquote>
+<p>In this challenge you build the data-engineering heart of the Control Tower: a <strong>Bronze → Silver →
+Gold</strong> medallion pipeline over the OneLake shortcuts and mirrored Cosmos data from Challenge 3. The
+win is not just populated tables. The win is correlation — proving that Fabric can connect the cost of
+running agents to the services, telemetry, resources, and conversations that created that spend.</p>
+<h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
+<p>By the end of this challenge you will have:</p>
+<ul>
+<li>Ingested raw shortcut-backed files and mirrored Cosmos tables into Bronze Delta tables with lineage.</li>
+<li>Standardized the raw signal into trusted Silver tables, including FOCUS-normalized cost data.</li>
+<li>Built Gold data products for reliability, cost, performance, capacity, inventory, and agent analytics.</li>
+<li>Orchestrated the medallion flow with the <strong>Load E2E Pipeline</strong>.</li>
+<li>Demonstrated at least one <strong>correlated</strong> insight that joins cost with agent or telemetry context.</li>
+</ul>
+<h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
+<ul>
+<li>✅ Challenge 3 complete — the Fabric Lakehouse has OneLake shortcuts and Cosmos DB Mirroring.</li>
+<li>Shortcuts under the Lakehouse <code>Files/</code> area for <code>costs</code>, <code>metrics</code>, <code>logs</code>, and <code>metadata</code>.</li>
+<li>Mirrored Cosmos tables for the agent conversation data selected in Challenge 3.</li>
+<li>The imported notebooks and pipelines from
+<a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/</code></a>.</li>
+<li>A teammate who can run Fabric notebooks and data pipelines in the workspace.</li>
+</ul>
+<h2 id="the-refinement-path">The refinement path<a class="anchor" href="#the-refinement-path" aria-hidden="true">#</a></h2>
+<p>The architecture now moves from connected data to usable data products:</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-text">OneLake shortcuts + mirrored Cosmos tables
+          │
+          ▼
+Bronze — raw Delta with lineage and quality checks
+          │
+          ▼
+Silver — cleansed, conformed, standardized FOCUS + telemetry
+          │
+          ▼
+Gold — correlated data products for the Control Tower
+          │
+          ▼
+Challenge 5 — Direct Lake semantic model and dashboards</code></pre>
+<p>Keep the purpose of each layer crisp:</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Layer</th>
+<th>What it protects</th>
+<th>What it enables</th>
+</tr>
+</thead><tbody><tr>
+<td><strong>Bronze</strong></td>
+<td>Full-fidelity raw records, replay, lineage</td>
+<td>Reprocessing when schemas or rules change</td>
+</tr>
+<tr>
+<td><strong>Silver</strong></td>
+<td>Trusted, typed, standardized data</td>
+<td>Consistent joins across cost, metrics, logs, and metadata</td>
+</tr>
+<tr>
+<td><strong>Gold</strong></td>
+<td>Business-ready aggregates and dimensions</td>
+<td>Fast Direct Lake dashboards and operational decisions</td>
+</tr>
+</tbody></table></div>
+<h2 id="your-mission">Your mission<a class="anchor" href="#your-mission" aria-hidden="true">#</a></h2>
+<h3 id="1-land-the-raw-signal-in-bronze">1. Land the raw signal in Bronze<a class="anchor" href="#1-land-the-raw-signal-in-bronze" aria-hidden="true">#</a></h3>
+<p>Use the Bronze ingestion path to turn the Challenge 3 inputs into raw Delta tables.</p>
+<ul>
+<li>Read raw Parquet from the shortcut-backed <code>Files/</code> paths for cost, metrics, logs, and metadata.</li>
+<li>Bring mirrored Cosmos conversation data into the same processing flow.</li>
+<li>Preserve lineage columns such as source file and ingestion timestamp so the team can explain where a
+row came from.</li>
+<li>Run the data-quality checks: row counts, required-key checks, and schema-drift detection.</li>
+<li>Use the reference notebooks as the implementation map:<ul>
+<li><code>01_bronze_ingestion.ipynb</code> — shortcut-backed telemetry and metadata files.</li>
+<li><code>04_cosmos_mirroring_transform.ipynb</code> — mirrored conversation records and late-arriving data.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-standardize-and-trust-it-in-silver">2. Standardize and trust it in Silver<a class="anchor" href="#2-standardize-and-trust-it-in-silver" aria-hidden="true">#</a></h3>
+<p>Use the Silver transformation path to make the raw signal joinable.</p>
+<ul>
+<li>Normalize cost data to the <a href="https://focus.finops.org/" target="_blank" rel="noopener">FOCUS</a> shape used by the Control Tower.</li>
+<li>Pivot platform metrics to a 5-minute grain so trends can line up with operational events.</li>
+<li>Parse logs into useful severity, category, operation, and correlation fields.</li>
+<li>Flatten resource metadata and tags so cost and telemetry can be attributed to services, teams, and
+agent namespaces.</li>
+<li>Confirm the Silver outputs are typed, deduplicated, and clean enough to become Gold inputs.</li>
+</ul>
+<p>The reference path for this layer is <code>02_silver_transformation.ipynb</code>.</p>
+<h3 id="3-build-the-gold-data-products">3. Build the Gold data products<a class="anchor" href="#3-build-the-gold-data-products" aria-hidden="true">#</a></h3>
+<p>Gold is where the Control Tower starts answering business questions. Build the analytics-ready tables
+listed in the reference architecture:</p>
+<div class="table-wrap"><table><thead><tr>
+<th>Gold table</th>
+<th>Why it matters</th>
+</tr>
+</thead><tbody><tr>
+<td><code>gold_cost_summary</code></td>
+<td>Daily/monthly cost by service, resource group, tag, and time window</td>
+</tr>
+<tr>
+<td><code>gold_operational_metrics</code></td>
+<td>Error rates, latency percentiles, and availability by service</td>
+</tr>
+<tr>
+<td><code>gold_capacity_usage</code></td>
+<td>Utilization signals for capacity planning</td>
+</tr>
+<tr>
+<td><code>gold_resource_inventory</code></td>
+<td>SCD Type 2 resource inventory and governance history</td>
+</tr>
+<tr>
+<td><code>gold_agent_analytics</code></td>
+<td>Conversations, tokens, response time, and satisfaction by agent</td>
+</tr>
+<tr>
+<td><code>dim_date</code>, <code>dim_resource</code></td>
+<td>Conformed dimensions for time intelligence and drill-down</td>
+</tr>
+</tbody></table></div>
+<p>Use <code>03_gold_aggregation.ipynb</code> for the Gold aggregation path, with
+<code>04_cosmos_mirroring_transform.ipynb</code> feeding the agent analytics product.</p>
+<h3 id="4-orchestrate-the-load">4. Orchestrate the load<a class="anchor" href="#4-orchestrate-the-load" aria-hidden="true">#</a></h3>
+<p>Run the <strong>Load E2E Pipeline</strong> instead of treating this as four disconnected notebooks.</p>
+<ul>
+<li>Confirm the pipeline orders the work as Bronze → Silver → Gold, with the mirrored-agent transform
+included.</li>
+<li>Use the pipeline parameters to process the intended date/month window.</li>
+<li>Watch dependency ordering, retries, and failure notifications.</li>
+<li>Confirm the final semantic-model refresh activity is ready for Challenge 5.</li>
+<li>Note the <strong>Daily Refresh Pipeline</strong> as the incremental path after the initial load is green.</li>
+</ul>
+<h3 id="5-prove-the-signal-is-correlated">5. Prove the signal is correlated<a class="anchor" href="#5-prove-the-signal-is-correlated" aria-hidden="true">#</a></h3>
+<p>This is the checkpoint that matters most. Show one result that joins multiple domains, for example:</p>
+<ul>
+<li>Cost attributed to an agent namespace such as <code>&lt;organization&gt;.&lt;domain&gt;.&lt;agent-name&gt;.&lt;version&gt;</code>.</li>
+<li>Error rate or P95 latency compared with monthly cost for the same service.</li>
+<li>Token volume and response time beside the resource tags or service that owns the workload.</li>
+</ul>
+<p>If the result only shows one source at a time, it is still a dashboard ingredient — not a Control Tower
+insight yet.</p>
+<h2 id="success-criteria">Success criteria<a class="anchor" href="#success-criteria" aria-hidden="true">#</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> Bronze Delta tables exist for the shortcut-backed telemetry/cost/metadata inputs.</li>
+<li><input disabled="" type="checkbox"> Mirrored Cosmos conversation data is represented in the medallion flow.</li>
+<li><input disabled="" type="checkbox"> Silver tables are cleansed, deduplicated, and standardized, including FOCUS-normalized cost.</li>
+<li><input disabled="" type="checkbox"> Gold tables are populated: <code>gold_cost_summary</code>, <code>gold_operational_metrics</code>,
+<code>gold_capacity_usage</code>, <code>gold_resource_inventory</code>, <code>gold_agent_analytics</code>, <code>dim_date</code>, and
+<code>dim_resource</code>.</li>
+<li><input disabled="" type="checkbox"> The <strong>Load E2E Pipeline</strong> runs green end-to-end with dependency ordering and retries intact.</li>
+<li><input disabled="" type="checkbox"> Your team can show one correlated result joining cost with agent activity or telemetry.</li>
+<li><input disabled="" type="checkbox"> Your team can explain why Bronze, Silver, and Gold are separate layers.</li>
+</ul>
+<blockquote>
+<p>🧭 <strong>Checkpoint:</strong> show your coach the successful pipeline run, row counts for each Gold data product,
+and one correlated query or visual that joins cost with agent or telemetry context.</p>
+</blockquote>
+<h2 id="hints">Hints<a class="anchor" href="#hints" aria-hidden="true">#</a></h2>
+<details>
+<summary>Which notebook does what?</summary>
+
+<div class="table-wrap"><table><thead><tr>
+<th>Notebook</th>
+<th>Layer</th>
+<th>Purpose</th>
+</tr>
+</thead><tbody><tr>
+<td><code>01_bronze_ingestion.ipynb</code></td>
+<td>Bronze</td>
+<td>Loads raw shortcut-backed files into Delta with lineage and quality checks</td>
+</tr>
+<tr>
+<td><code>02_silver_transformation.ipynb</code></td>
+<td>Silver</td>
+<td>Cleanses, normalizes FOCUS cost, pivots metrics, parses logs, flattens metadata</td>
+</tr>
+<tr>
+<td><code>03_gold_aggregation.ipynb</code></td>
+<td>Gold</td>
+<td>Builds cost, operational, capacity, inventory, date, and resource products</td>
+</tr>
+<tr>
+<td><code>04_cosmos_mirroring_transform.ipynb</code></td>
+<td>Bronze/Gold feed</td>
+<td>Processes mirrored Cosmos conversation data into agent analytics</td>
+</tr>
+</tbody></table></div>
+<p>Run them manually in that order if you are debugging. Use the <strong>Load E2E Pipeline</strong> once each notebook
+works on its own.</p>
+</details>
+
+<details>
+<summary>Sample correlation query idea</summary>
+
+<p>Adapt the tag predicate to the tags your Challenge 2 metadata exported. The pattern is the point: cost,
+resource metadata, and agent activity meet in Gold.</p>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-sql">WITH current_resources AS (
+  SELECT resource_id, resource_group, region, tags
+  FROM gold_resource_inventory
+  WHERE is_current = true
+), agent_usage AS (
+  SELECT agent_id, interaction_date, total_tokens, conversation_count, avg_response_time_ms
+  FROM gold_agent_analytics
+)
+SELECT
+  a.agent_id AS agent_namespace,
+  c.cost_year,
+  c.cost_month,
+  c.service_name,
+  SUM(c.monthly_cost) AS monthly_cost,
+  SUM(a.total_tokens) AS total_tokens,
+  SUM(a.conversation_count) AS conversations,
+  AVG(a.avg_response_time_ms) AS avg_response_time_ms
+FROM gold_cost_summary c
+JOIN current_resources r
+  ON c.region = r.region
+JOIN agent_usage a
+  ON r.tags LIKE CONCAT(&#39;%&#39;, a.agent_id, &#39;%&#39;)
+GROUP BY a.agent_id, c.cost_year, c.cost_month, c.service_name
+ORDER BY monthly_cost DESC;</code></pre>
+</details>
+
+<details>
+<summary>What to check when a Gold table is empty</summary>
+
+<p>Work backwards. Is the Gold notebook reading the expected Silver table? Did the Silver table receive
+rows from Bronze? Can Bronze read the <code>Files/</code> shortcut or mirrored table? Most empty-Gold failures are
+upstream path, schema, or date-window issues — not aggregation math.</p>
+</details>
+
+<details>
+<summary>Why the Daily Refresh Pipeline matters</summary>
+
+<p>The Load E2E Pipeline is the first full build. The Daily Refresh Pipeline is the operating model: it
+runs the E2E load on a rolling window so new cost, metrics, logs, metadata, and mirrored conversations
+continue to land without a manual notebook click.</p>
+</details>
+
+<h2 id="resources">Resources<a class="anchor" href="#resources" aria-hidden="true">#</a></h2>
+<ul>
+<li><a href="../docs/architecture.html"><code>docs/architecture.md</code></a> — medallion layers, Gold data products, agent namespace pattern</li>
+<li><a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/README.md</code></a> — notebooks, pipelines, and semantic model</li>
+<li><a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/fabric/notebooks/</code></a> — medallion notebooks</li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fpipelines%2Fpipeline_load_e2e.json"><code>resources/fabric-control-tower/fabric/pipelines/pipeline_load_e2e.json</code></a> — Load E2E Pipeline</li>
+<li><a href="../code.html?path=resources%2Ffabric-control-tower%2Ffabric%2Fpipelines%2Fpipeline_daily_refresh.json"><code>resources/fabric-control-tower/fabric/pipelines/pipeline_daily_refresh.json</code></a> — Daily Refresh Pipeline</li>
+</ul>
+<hr>
+<p>⬅️ Previous: <strong><a href="challenge-03-onelake-foundation.html">Challenge 3 — Connect Fabric to the Enterprise</a></strong><br>➡️ Next: <strong><a href="challenge-05-control-tower-dashboards.html">Challenge 5 — Stand Up the Control Tower</a></strong></p>
+
+        </article>
+        
+        
+        <nav class="pager" aria-label="Challenge navigation">
+          <a class="prev" href="challenge-03-onelake-foundation.html"><div class="dir">← Previous</div><div class="ttl">Connect Fabric to the Enterprise</div></a>
+          <a class="next" href="challenge-05-control-tower-dashboards.html"><div class="dir">Next →</div><div class="ttl">Stand Up the Control Tower</div></a>
+        </nav>
+        <div class="source-bar">
+          <a href="../index.html">← Back to all content</a>
+          <a href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-04-medallion-pipeline.md" target="_blank" rel="noopener">View source on GitHub ↗</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
+      </div>
+      <a class="footer-cta" href="../builder.html">↗ Compose your delivery</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <script>
+    // syntax highlight (skip mermaid)
+    if (window.hljs) document.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+    // copy buttons
+    document.querySelectorAll('.code-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const code = btn.parentElement.querySelector('code');
+        navigator.clipboard.writeText(code.innerText).then(() => {
+          const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1400);
+        });
+      });
+    });
+    // TOC scroll-spy
+    (function () {
+      const links = [...document.querySelectorAll('.toc a')];
+      if (!links.length) return;
+      const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = map.get(e.target.id); if (a) a.classList.add('active');
+          }
+        });
+      }, { rootMargin: '0px 0px -75% 0px', threshold: 0 });
+      document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
+    })();
+  </script>
+</body>
+</html>
