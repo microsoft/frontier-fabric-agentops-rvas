@@ -13,41 +13,55 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://microsoft.github.io/frontier-fabric-agentops-rvas/">
 
+  <link rel="icon" type="image/png" href="assets/logos/favicon.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg:           #07090d;
-      --surface:      #0d1117;
-      --surface-2:    #111820;
-      --surface-3:    #161e28;
-      --border:       rgba(255,255,255,0.07);
-      --border-md:    rgba(255,255,255,0.12);
-      --border-lg:    rgba(255,255,255,0.18);
+      /* ── RVAP surfaces (light) ── */
+      --bg:           #F5F8FE;   /* page surface — very light blue-white */
+      --surface:      #FFFFFF;   /* card / panel fill */
+      --surface-2:    #FAFBFD;   /* hover surface */
+      --surface-3:    #F0F4FB;
+      --border:       #E3E6ED;   /* light neutral divider */
+      --border-md:    #D4DBE8;
+      --border-lg:    #C4CDDE;
 
-      --accent:       #00d4aa;
-      --accent-dim:   rgba(0,212,170,0.12);
+      /* ── RVAP core palette (brand kit slide 5) ── */
+      --rvap-blue:    #1A77E3;   /* primary */
+      --ms-blue:      #0078D4;   /* Build */
+      --deep-navy:    #032254;   /* headings, hero, emphasis */
+      --teal:         #14868A;   /* Scale */
+      --purple:       #504092;   /* Innovate */
 
-      /* category palette */
-      --challenges:       #00d4aa;
-      --challenges-dim:   rgba(0,212,170,0.12);
-      --resources:        #4da6ff;
-      --resources-dim:    rgba(77,166,255,0.12);
-      --docs:             #f5a623;
-      --docs-dim:         rgba(245,166,35,0.12);
-      --coach:            #ff6b6b;
-      --coach-dim:        rgba(255,107,107,0.12);
+      --accent:       #1A77E3;   /* primary accent → RVAP Blue */
+      --accent-dim:   rgba(26,119,227,0.10);
 
-      --text:         #e4edf6;
-      --text-2:       #8b9eb5;
-      --text-2b:      #6d8398;
-      --text-3:       #4a5f74;
+      /* category palette → mapped into the RVAP palette */
+      --challenges:       #1A77E3;   /* RVAP Blue  */
+      --challenges-dim:   rgba(26,119,227,0.10);
+      --resources:        #0078D4;   /* Build · MS Blue */
+      --resources-dim:    rgba(0,120,212,0.10);
+      --docs:             #14868A;   /* Scale · Teal */
+      --docs-dim:         rgba(20,134,138,0.10);
+      --coach:            #504092;   /* Innovate · Purple */
+      --coach-dim:        rgba(80,64,146,0.10);
 
-      --ff-display:   'Syne', sans-serif;
-      --ff-body:      'DM Sans', sans-serif;
-      --ff-mono:      'Fira Code', monospace;
+      --text:         #032254;   /* deep navy — primary/heading text */
+      --text-2:       #47494E;   /* charcoal — body copy */
+      --text-2b:      #6B7280;   /* muted labels */
+      --text-3:       #98A2B3;   /* faint captions / placeholders */
+
+      --ff-display:   "Aptos Display", "Outfit", "Segoe UI", system-ui, sans-serif;
+      --ff-body:      "Aptos", "Inter", "Segoe UI", system-ui, sans-serif;
+      --ff-mono:      "Cascadia Code", "JetBrains Mono", "Fira Code", monospace;
+
+      /* Hero gradient + shared shadow */
+      --hero-grad:    linear-gradient(135deg, #032254 0%, #0F3A7A 55%, #1A77E3 100%);
+      --shadow-card:  0 1px 3px rgba(3,34,84,0.08), 0 8px 22px rgba(3,34,84,0.07);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -55,7 +69,7 @@
 
     body {
       background: var(--bg);
-      color: var(--text);
+      color: var(--text-2);
       font-family: var(--ff-body);
       font-size: 15px;
       line-height: 1.6;
@@ -68,7 +82,7 @@
       content: '';
       position: fixed;
       inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.045) 1px, transparent 1px);
+      background-image: radial-gradient(circle, rgba(3,34,84,0.045) 1px, transparent 1px);
       background-size: 28px 28px;
       pointer-events: none;
       z-index: 0;
@@ -84,13 +98,13 @@
     }
     .orb-1 {
       width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(0,212,170,0.07) 0%, transparent 70%);
-      top: -200px; right: -150px;
+      background: radial-gradient(circle, rgba(26,119,227,0.10) 0%, transparent 70%);
+      top: -220px; right: -160px;
       animation: float1 14s ease-in-out infinite;
     }
     .orb-2 {
       width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(77,166,255,0.06) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(20,134,138,0.08) 0%, transparent 70%);
       bottom: 5%; left: -100px;
       animation: float2 18s ease-in-out infinite;
     }
@@ -106,15 +120,60 @@
       padding: 0 48px;
     }
 
-    /* ════════════════════════════════════════════ HEADER ════════════════════════════════════════════ */
-    header { padding-top: 56px; padding-bottom: 52px; }
+    /* ════════════════════════════════════════════ NAV ════════════════════════════════════════════ */
+    .site-nav {
+      position: relative;
+      z-index: 3;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      gap: 16px;
+    }
+    .nav-brand { display: inline-flex; align-items: center; text-decoration: none; }
+    .nav-logo { height: 28px; width: auto; display: block; }
+    .nav-repo {
+      font-family: var(--ff-mono);
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      color: var(--deep-navy);
+      text-decoration: none;
+      padding: 8px 15px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      white-space: nowrap;
+      transition: all 0.18s ease;
+    }
+    .nav-repo:hover { border-color: var(--rvap-blue); color: var(--rvap-blue); }
+
+    /* ════════════════════════════════════════════ HERO ════════════════════════════════════════════ */
+    .hero {
+      position: relative;
+      z-index: 1;
+      background: var(--hero-grad);
+      color: #fff;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 26px 26px;
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; padding-top: 68px; padding-bottom: 74px; }
 
     .eyebrow {
       font-family: var(--ff-mono);
       font-size: 11px;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: rgba(255,255,255,0.72);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -123,7 +182,7 @@
     .eyebrow-line {
       display: inline-block;
       width: 28px; height: 1px;
-      background: var(--accent);
+      background: rgba(255,255,255,0.5);
     }
 
     h1 {
@@ -134,8 +193,8 @@
       letter-spacing: -0.025em;
       margin-bottom: 30px;
     }
-    h1 .w1 { color: var(--text); display: block; }
-    h1 .w2 { color: var(--accent); display: block; }
+    h1 .w1 { color: #fff; display: block; }
+    h1 .w2 { color: #9CC4F4; display: block; }
 
     .hero-grid {
       display: grid;
@@ -146,11 +205,11 @@
 
     .hero-desc {
       font-size: 16px;
-      color: var(--text-2);
+      color: rgba(255,255,255,0.85);
       line-height: 1.75;
       max-width: 560px;
     }
-    .hero-desc strong { color: var(--text); font-weight: 500; }
+    .hero-desc strong { color: #fff; font-weight: 600; }
 
     .hero-cta-row {
       display: flex;
@@ -164,30 +223,31 @@
       gap: 8px;
       padding: 12px 22px;
       border-radius: 8px;
-      font-family: var(--ff-mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-family: var(--ff-body);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
       text-decoration: none;
       cursor: pointer;
       transition: all 0.18s ease;
     }
-    .btn-primary { background: var(--accent); color: var(--bg); border: 1px solid var(--accent); }
-    .btn-primary:hover { background: transparent; color: var(--accent); }
-    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border-lg); }
-    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary { background: #fff; color: var(--deep-navy); border: 1px solid #fff; }
+    .btn-primary:hover { background: rgba(255,255,255,0.86); color: var(--deep-navy); }
+    .btn-ghost { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.55); }
+    .btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,0.12); color: #fff; }
 
-    /* Stats panel */
+    /* Stats panel (glass on gradient) */
     .stats {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      border: 1px solid var(--border-md);
+      border: 1px solid rgba(255,255,255,0.22);
       border-radius: 16px;
       overflow: hidden;
-      background: var(--surface);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.10);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 24px 60px rgba(3,34,84,0.28);
     }
-    .stat + .stat { border-left: 1px solid var(--border); }
+    .stat + .stat { border-left: 1px solid rgba(255,255,255,0.16); }
     .stat { padding: 22px 18px 20px; text-align: center; }
     .stat-num {
       display: block;
@@ -195,15 +255,15 @@
       font-size: 42px;
       font-weight: 800;
       line-height: 1;
-      color: var(--text);
+      color: #fff;
     }
     .stat-lbl {
       display: block;
       font-family: var(--ff-mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--text-3);
+      color: rgba(255,255,255,0.9);
       margin-top: 8px;
     }
     .stat-dot {
@@ -224,9 +284,8 @@
       position: sticky;
       top: 0;
       z-index: 5;
-      border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
-      background: rgba(7,9,13,0.8);
+      background: rgba(255,255,255,0.86);
       backdrop-filter: blur(16px);
     }
     .filter-inner {
@@ -255,21 +314,21 @@
       gap: 7px;
       white-space: nowrap;
     }
-    .tab:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
+    .tab:hover { color: var(--deep-navy); background: var(--bg); border-color: var(--border); }
 
-    .tab.active[data-filter="all"]        { background: var(--text);       color: var(--bg);  border-color: transparent; }
-    .tab.active[data-filter="challenges"] { background: var(--challenges); color: var(--bg);  border-color: transparent; }
-    .tab.active[data-filter="resources"]  { background: var(--resources);  color: #fff;       border-color: transparent; }
-    .tab.active[data-filter="docs"]       { background: var(--docs);       color: var(--bg);  border-color: transparent; }
-    .tab.active[data-filter="coach"]      { background: var(--coach);      color: #fff;       border-color: transparent; }
+    .tab.active[data-filter="all"]        { background: var(--deep-navy);  color: #fff; border-color: transparent; }
+    .tab.active[data-filter="challenges"] { background: var(--challenges); color: #fff; border-color: transparent; }
+    .tab.active[data-filter="resources"]  { background: var(--resources);  color: #fff; border-color: transparent; }
+    .tab.active[data-filter="docs"]       { background: var(--docs);       color: #fff; border-color: transparent; }
+    .tab.active[data-filter="coach"]      { background: var(--coach);      color: #fff; border-color: transparent; }
 
     .tab-n {
       font-size: 10px;
       padding: 2px 7px;
       border-radius: 4px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(3,34,84,0.07);
     }
-    .tab.active .tab-n { background: rgba(0,0,0,0.18); }
+    .tab.active .tab-n { background: rgba(255,255,255,0.24); }
 
     .search-wrap { margin-left: auto; }
     .search {
@@ -285,7 +344,7 @@
       transition: all 0.18s ease;
     }
     .search::placeholder { color: var(--text-3); }
-    .search:focus { border-color: var(--border-md); background: var(--surface-2); }
+    .search:focus { border-color: var(--rvap-blue); box-shadow: 0 0 0 3px rgba(26,119,227,0.12); background: var(--surface); }
 
     /* ════════════════════════════════════════════ MAIN ════════════════════════════════════════════ */
     main { position: relative; z-index: 1; padding: 40px 0 96px; }
@@ -319,6 +378,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
+      box-shadow: var(--shadow-card);
       text-decoration: none;
       color: inherit;
       cursor: pointer;
@@ -339,13 +399,13 @@
     .card[data-cat="docs"]::before       { background: var(--docs); }
     .card[data-cat="coach"]::before      { background: var(--coach); }
 
-    .card:hover { background: var(--surface-2); transform: translateY(-4px); }
+    .card:hover { background: var(--surface); transform: translateY(-4px); }
     .card:hover::before { top: 12%; bottom: 12%; }
 
-    .card[data-cat="challenges"]:hover { box-shadow: 0 16px 48px rgba(0,0,0,.4), 0 0 0 1px rgba(0,212,170,.22);  border-color: rgba(0,212,170,.2); }
-    .card[data-cat="resources"]:hover  { box-shadow: 0 16px 48px rgba(0,0,0,.4), 0 0 0 1px rgba(77,166,255,.22); border-color: rgba(77,166,255,.2); }
-    .card[data-cat="docs"]:hover       { box-shadow: 0 16px 48px rgba(0,0,0,.4), 0 0 0 1px rgba(245,166,35,.22); border-color: rgba(245,166,35,.2); }
-    .card[data-cat="coach"]:hover      { box-shadow: 0 16px 48px rgba(0,0,0,.4), 0 0 0 1px rgba(255,107,107,.22); border-color: rgba(255,107,107,.2); }
+    .card[data-cat="challenges"]:hover { box-shadow: 0 16px 40px rgba(3,34,84,.16), 0 0 0 1px rgba(26,119,227,.32);  border-color: rgba(26,119,227,.3); }
+    .card[data-cat="resources"]:hover  { box-shadow: 0 16px 40px rgba(3,34,84,.16), 0 0 0 1px rgba(0,120,212,.32);   border-color: rgba(0,120,212,.3); }
+    .card[data-cat="docs"]:hover       { box-shadow: 0 16px 40px rgba(3,34,84,.16), 0 0 0 1px rgba(20,134,138,.32);  border-color: rgba(20,134,138,.3); }
+    .card[data-cat="coach"]:hover      { box-shadow: 0 16px 40px rgba(3,34,84,.16), 0 0 0 1px rgba(80,64,146,.32);   border-color: rgba(80,64,146,.3); }
 
     .card-head { display: flex; align-items: center; gap: 8px; }
 
@@ -356,7 +416,7 @@
       text-transform: uppercase;
       padding: 3px 9px;
       border-radius: 5px;
-      font-weight: 500;
+      font-weight: 600;
     }
     .card[data-cat="challenges"] .badge { background: var(--challenges-dim); color: var(--challenges); }
     .card[data-cat="resources"]  .badge { background: var(--resources-dim);  color: var(--resources); }
@@ -370,7 +430,7 @@
       transition: color 0.18s ease, transform 0.18s ease;
       line-height: 1;
     }
-    .card:hover .card-arrow { color: var(--text); transform: translate(3px,-3px); }
+    .card:hover .card-arrow { color: var(--rvap-blue); transform: translate(3px,-3px); }
 
     .card-title {
       font-family: var(--ff-display);
@@ -396,7 +456,7 @@
       font-size: 10px;
       padding: 2px 8px;
       border-radius: 4px;
-      background: rgba(255,255,255,0.04);
+      background: var(--bg);
       color: var(--text-2b);
       border: 1px solid var(--border);
     }
@@ -427,7 +487,7 @@
     }
 
     /* ════════════════════════════════════════════ FOOTER ════════════════════════════════════════════ */
-    footer { position: relative; z-index: 1; border-top: 1px solid var(--border); }
+    footer { position: relative; z-index: 1; background: var(--deep-navy); color: rgba(255,255,255,0.72); }
     .footer-inner {
       max-width: 1380px;
       margin: 0 auto;
@@ -437,31 +497,30 @@
       justify-content: space-between;
       gap: 24px;
     }
-    .footer-brand { font-family: var(--ff-display); font-weight: 700; font-size: 18px; }
-    .footer-brand em { color: var(--accent); font-style: normal; }
+    .footer-brand { font-family: var(--ff-display); font-weight: 700; font-size: 18px; color: #fff; }
+    .footer-brand em { color: #6BA5EA; font-style: normal; }
     .footer-sub {
       font-size: 13px;
-      color: var(--text-2b);
-      margin-top: 3px;
-      font-family: var(--ff-mono);
-      letter-spacing: 0.05em;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+      font-family: var(--ff-body);
+      letter-spacing: 0.01em;
     }
     .footer-cta {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 11px 22px;
-      border: 1px solid var(--accent);
-      color: var(--accent);
+      border: 1px solid rgba(255,255,255,0.55);
+      color: #fff;
       text-decoration: none;
       border-radius: 8px;
-      font-family: var(--ff-mono);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-family: var(--ff-body);
+      font-size: 13px;
+      font-weight: 600;
       transition: all 0.18s ease;
     }
-    .footer-cta:hover { background: var(--accent); color: var(--bg); }
+    .footer-cta:hover { background: #fff; color: var(--deep-navy); border-color: #fff; }
 
     /* ════════════════════════════════════════════ RESPONSIVE ════════════════════════════════════════════ */
     @media (max-width: 1100px) {
@@ -483,41 +542,53 @@
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <!-- ═══ HEADER ═══ -->
-  <header class="container">
-    <div class="eyebrow">
-      <span class="eyebrow-line"></span>
-      Frontier · Microsoft Fabric RVAS
+  <!-- ═══ NAV ═══ -->
+  <nav class="site-nav">
+    <div class="nav-inner container">
+      <a class="nav-brand" href="./" aria-label="RVAP · Real Value Acceleration Program — Home">
+        <img src="assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+      </a>
+      <a class="nav-repo" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">View on GitHub ↗</a>
     </div>
-    <h1>
-      <span class="w1">AgentOps</span>
-      <span class="w2">Control Tower</span>
-    </h1>
-    <div class="hero-grid">
-      <div>
-        <p class="hero-desc">
-          A hands-on, challenge-based RVAS (Real Value Acceleration Solutions) where your team builds a Fabric-based control tower that
-          <strong>ingests and correlates telemetry from Azure services and Foundry-built agents</strong> —
-          delivering end-to-end monitoring, analytics, and dashboards for <strong>reliability, cost, and
-          performance</strong> across the AI-agent estate. Built on the customer's own Azure and Fabric.
-        </p>
-        <div class="hero-cta-row">
-          <a class="btn btn-primary" href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-00-mission-setup.md" target="_blank" rel="noopener">Start Challenge 00 ↗</a>
-          <a class="btn btn-ghost" href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/docs/architecture.md" target="_blank" rel="noopener">Reference architecture ↗</a>
-        </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <header class="hero">
+    <div class="hero-inner container">
+      <div class="eyebrow">
+        <span class="eyebrow-line"></span>
+        RVAS · Real Value Acceleration Solution · Microsoft Fabric
       </div>
-      <div class="stats">
-        <div class="stat">
-          <span class="stat-num" id="s-challenges">0</span>
-          <span class="stat-lbl"><span class="stat-dot"></span>Challenges</span>
+      <h1>
+        <span class="w1">AgentOps</span>
+        <span class="w2">Control Tower</span>
+      </h1>
+      <div class="hero-grid">
+        <div>
+          <p class="hero-desc">
+            A hands-on, challenge-based RVAS (Real Value Acceleration Solution) where your team builds a Fabric-based control tower that
+            <strong>ingests and correlates telemetry from Azure services and Foundry-built agents</strong> —
+            delivering end-to-end monitoring, analytics, and dashboards for <strong>reliability, cost, and
+            performance</strong> across the AI-agent estate. Built on the customer's own Azure and Fabric.
+          </p>
+          <div class="hero-cta-row">
+            <a class="btn btn-primary" href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/challenges/challenge-00-mission-setup.md" target="_blank" rel="noopener">Start Challenge 00 ↗</a>
+            <a class="btn btn-ghost" href="https://github.com/microsoft/frontier-fabric-agentops-rvas/blob/main/docs/architecture.md" target="_blank" rel="noopener">Reference architecture ↗</a>
+          </div>
         </div>
-        <div class="stat">
-          <span class="stat-num" id="s-resources">0</span>
-          <span class="stat-lbl"><span class="stat-dot"></span>Resources</span>
-        </div>
-        <div class="stat">
-          <span class="stat-num" id="s-docs">0</span>
-          <span class="stat-lbl"><span class="stat-dot"></span>Docs</span>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-num" id="s-challenges">0</span>
+            <span class="stat-lbl"><span class="stat-dot"></span>Challenges</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" id="s-resources">0</span>
+            <span class="stat-lbl"><span class="stat-dot"></span>Resources</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" id="s-docs">0</span>
+            <span class="stat-lbl"><span class="stat-dot"></span>Docs</span>
+          </div>
         </div>
       </div>
     </div>
@@ -532,7 +603,7 @@
       <button class="tab" data-filter="docs">Docs <span class="tab-n" id="tn-docs">0</span></button>
       <button class="tab" data-filter="coach">Coach <span class="tab-n" id="tn-coach">0</span></button>
       <div class="search-wrap">
-        <input class="search" id="searchInput" type="text" placeholder="search the RVAS…" autocomplete="off">
+        <input class="search" id="searchInput" type="text" placeholder="Search the RVAS…" autocomplete="off">
       </div>
     </div>
   </div>
@@ -553,7 +624,7 @@
     <div class="footer-inner">
       <div>
         <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
-        <div class="footer-sub">// build an agentops control tower on microsoft fabric</div>
+        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
       </div>
       <a class="footer-cta" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">
         ↗ Open the repo
