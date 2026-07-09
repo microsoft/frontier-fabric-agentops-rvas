@@ -239,23 +239,32 @@ function renderPage(o) {
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="${rp}assets/css/site.css">
   ${scripts.join('\n  ')}
+  <link rel="stylesheet" href="${rp}assets/css/brand.css">
+  <link rel="stylesheet" href="${rp}assets/css/shell.css">
 </head>
 <body>
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <nav class="site-nav">
-    <div class="nav-inner container">
-      <a class="nav-brand" href="${rp}index.html" aria-label="RVAP · Home">
-        <img src="${rp}assets/logos/logo-wordmark.png" alt="RVAP" class="nav-logo">
+  <header class="nav" role="banner">
+    <div class="nav-inner">
+      <a class="brand" href="${rp}index.html" aria-label="RVAS — Frontier Fabric AgentOps">
+        <img src="${rp}assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="32">
       </a>
-      <div class="nav-links">
-        <a class="nav-link hide-sm" href="${rp}challenges/README.html">Challenges</a>
-        <a class="nav-link solid" href="${rp}builder.html">Compose delivery ↗</a>
-        <a class="nav-link hide-sm" href="${REPO_URL}" target="_blank" rel="noopener">GitHub ↗</a>
+      <nav class="nav-links" id="navLinks" aria-label="Primary">
+        <a href="${rp}index.html">Home</a>
+        <a href="${rp}builder.html">Builder</a>
+        <a href="${rp}code.html">Code</a>
+        <a class="cta" href="${rp}builder.html">Compose your delivery →</a>
+        <a class="gh" href="${REPO_URL}" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="icon-btn nav-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
       </div>
     </div>
-  </nav>
+  </header>
 
   <div class="doc-wrap">
     <div class="${shellClass}">
@@ -275,13 +284,18 @@ ${o.body}
     </div>
   </div>
 
-  <footer>
+  <footer class="footer" role="contentinfo">
     <div class="footer-inner">
-      <div>
-        <div class="footer-brand">Frontier <em>·</em> Fabric AgentOps RVAS</div>
-        <div class="footer-sub">Build an AgentOps Control Tower on Microsoft Fabric — Build. Innovate. Scale real value.</div>
-      </div>
-      <a class="footer-cta" href="${rp}builder.html">↗ Compose your delivery</a>
+      <a class="brand" href="${rp}index.html" aria-label="RVAS — Frontier Fabric AgentOps">
+        <img src="${rp}assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
+      </a>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="${rp}index.html">Home</a>
+        <a href="${rp}builder.html">Builder</a>
+        <a href="${rp}code.html">Code</a>
+        <a href="${rp}builder.html">Compose your delivery</a>
+      </nav>
     </div>
   </footer>
 
@@ -321,6 +335,7 @@ ${o.body}
       document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach(h => obs.observe(h));
     })();
   </script>
+  <script src="${rp}assets/js/shell.js"></script>
 </body>
 </html>
 `;

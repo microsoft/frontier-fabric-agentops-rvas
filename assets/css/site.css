@@ -87,42 +87,7 @@ body::before {
 /* ── Layout ── */
 .container { position: relative; z-index: 1; max-width: 1380px; margin: 0 auto; padding: 0 48px; }
 
-/* ── Nav ── */
-.site-nav { position: relative; z-index: 3; background: var(--surface); border-bottom: 1px solid var(--border); }
-.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
-.nav-brand { display: inline-flex; align-items: center; text-decoration: none; }
-.nav-logo { height: 28px; width: auto; display: block; }
-.nav-links { display: flex; align-items: center; gap: 10px; }
-.nav-link {
-  font-family: var(--ff-mono);
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  color: var(--deep-navy);
-  text-decoration: none;
-  padding: 8px 15px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  white-space: nowrap;
-  transition: all 0.18s ease;
-}
-.nav-link:hover { border-color: var(--rvap-blue); color: var(--rvap-blue); }
-.nav-link.solid { background: var(--rvap-blue); color: #fff; border-color: var(--rvap-blue); }
-.nav-link.solid:hover { background: var(--ms-blue); border-color: var(--ms-blue); color: #fff; }
-
-/* ── Buttons ── */
-.btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 12px 22px; border-radius: 8px;
-  font-family: var(--ff-body); font-size: 13px; font-weight: 600; letter-spacing: 0.01em;
-  text-decoration: none; cursor: pointer; transition: all 0.18s ease;
-  border: 1px solid transparent;
-}
-.btn-primary { background: var(--rvap-blue); color: #fff; border-color: var(--rvap-blue); }
-.btn-primary:hover { background: var(--ms-blue); border-color: var(--ms-blue); }
-.btn-ghost { background: transparent; color: var(--deep-navy); border-color: var(--border-md); }
-.btn-ghost:hover { border-color: var(--rvap-blue); color: var(--rvap-blue); }
-.btn-sm { padding: 8px 14px; font-size: 12px; }
-.btn[disabled] { opacity: 0.45; pointer-events: none; }
+/* Navigation, shared buttons, and footer are provided by shell.css. */
 
 /* ════════════════════════════════════════ DOC SHELL ════════════════════════════════════════ */
 .doc-wrap { position: relative; z-index: 1; }
@@ -315,21 +280,7 @@ body::before {
 .filetree .ic { color: var(--text-3); width: 15px; text-align: center; }
 .filetree .dir { color: var(--deep-navy); font-weight: 600; }
 
-/* ── Footer ── */
-footer { position: relative; z-index: 1; background: var(--deep-navy); color: rgba(255,255,255,0.72); margin-top: 40px; }
-.footer-inner {
-  max-width: 1380px; margin: 0 auto; padding: 40px 48px;
-  display: flex; align-items: center; justify-content: space-between; gap: 24px;
-}
-.footer-brand { font-family: var(--ff-display); font-weight: 700; font-size: 18px; color: #fff; }
-.footer-brand em { color: #6BA5EA; font-style: normal; }
-.footer-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; font-family: var(--ff-body); letter-spacing: 0.01em; }
-.footer-cta {
-  display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px;
-  border: 1px solid rgba(255,255,255,0.55); color: #fff; text-decoration: none;
-  border-radius: 8px; font-family: var(--ff-body); font-size: 13px; font-weight: 600; transition: all 0.18s ease;
-}
-.footer-cta:hover { background: #fff; color: var(--deep-navy); border-color: #fff; }
+/* Footer is provided by shell.css. */
 
 /* ── Responsive ── */
 @media (max-width: 940px) {
@@ -342,12 +293,12 @@ footer { position: relative; z-index: 1; background: var(--deep-navy); color: rg
   .prose h1 { font-size: 27px; }
   .pager { grid-template-columns: 1fr; }
   .footer-inner { flex-direction: column; text-align: center; }
-  .nav-link.hide-sm { display: none; }
+  
 }
 
 /* ════════════════════════════════════════ PRINT ════════════════════════════════════════ */
 @media print {
-  body::before, .orb, .site-nav, footer, .toc, .source-bar, .code-copy, .no-print { display: none !important; }
+  body::before, .orb, .nav, .footer, .toc, .source-bar, .code-copy, .no-print { display: none !important; }
   .doc-shell { display: block; max-width: none; padding: 0; }
   .article { border: none; box-shadow: none; padding: 0; }
   .prose pre { background: #f4f6fb; border: 1px solid #ccc; }
