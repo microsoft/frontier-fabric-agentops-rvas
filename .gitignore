@@ -126,3 +126,7 @@ junit.xml
 # Build artifacts
 *.zip
 *.tar.gz
+
+# One-slider delivery deck (generated artifact — regenerated from files/slide/build-rvas.js, not tracked)
+docs/*.pptx
+docs/*-One-Slider.png
