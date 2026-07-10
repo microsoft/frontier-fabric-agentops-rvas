@@ -3,7 +3,8 @@
    Frontier Fabric AgentOps RVAS — static site builder
    Renders every Markdown file in the repo into a branded, self-contained HTML
    page (next to its source) so visitors never leave GitHub Pages. Also emits
-   builder-data.json for the delivery composer (builder.html).
+   builder-data.json for the delivery composer (builder.html) and code-index.json
+   for the in-site code viewer's landing page (code.html).
 
    Usage:  npm run build      (from repo root)
    ══════════════════════════════════════════════════════════════════════════ */
@@ -62,6 +63,51 @@ function listFilesFlat(dir) {
     }
   })(dir);
   return out.sort();
+}
+
+// Grouped manifest of viewable reference-implementation source files, consumed by
+// code.html when opened with no ?path= (its landing view). Uses the same filter as
+// the per-component README file trees so the two stay in sync. Component labels and
+// descriptions are reused from site-data.json when present.
+function buildCodeIndex() {
+  const labels = {};
+  try {
+    const sd = JSON.parse(fs.readFileSync(path.join(ROOT, 'site-data.json'), 'utf8'));
+    for (const it of (sd.items || [])) {
+      const m = String(it.url || '').match(/^resources\/([^/]+)\//);
+      if (m && !labels[m[1]]) labels[m[1]] = { label: it.name, desc: it.description || '', tags: it.tags || [] };
+    }
+  } catch { /* fall back to derived labels */ }
+
+  const titleCase = (s) => s.replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  const resRoot = path.join(ROOT, 'resources');
+  const groups = [];
+  if (fs.existsSync(resRoot)) {
+    const comps = fs.readdirSync(resRoot, { withFileTypes: true })
+      .filter((e) => e.isDirectory() && !e.name.startsWith('.'))
+      .map((e) => e.name).sort();
+    for (const comp of comps) {
+      const files = listFilesFlat(path.join(resRoot, comp)).filter((f) => {
+        if (/README\.md$/i.test(f)) return false;
+        if (/\.html$/i.test(f) && fs.existsSync(path.join(ROOT, f.replace(/\.html$/i, '.md')))) return false;
+        return true;
+      }).map((f) => ({ path: f, name: f.split('/').slice(2).join('/') }));
+      if (!files.length) continue;
+      const meta = labels[comp] || {};
+      groups.push({
+        id: comp,
+        label: meta.label || titleCase(comp),
+        desc: meta.desc || '',
+        tags: meta.tags || [],
+        readme: `resources/${comp}/README.html`,
+        count: files.length,
+        files,
+      });
+    }
+  }
+  const total = groups.reduce((n, g) => n + g.count, 0);
+  fs.writeFileSync(path.join(ROOT, 'code-index.json'), JSON.stringify({ total, groups }, null, 2) + '\n');
+  return { groups: groups.length, total };
 }
 
 const categoryOf = (rel) => {
@@ -490,8 +536,11 @@ function build() {
     }));
   fs.writeFileSync(path.join(ROOT, 'builder-data.json'), JSON.stringify({ challenges: builder }, null, 2) + '\n');
 
+  const codeIndex = buildCodeIndex();
+
   console.log(`✓ Rendered ${rendered} pages`);
   console.log(`✓ builder-data.json: ${builder.length} challenges`);
+  console.log(`✓ code-index.json: ${codeIndex.total} files · ${codeIndex.groups} components`);
 }
 
 build();

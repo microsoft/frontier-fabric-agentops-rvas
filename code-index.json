@@ -1,0 +1,310 @@
+{
+  "total": 62,
+  "groups": [
+    {
+      "id": "agent-workload",
+      "label": "Agent Workload",
+      "desc": "Full-stack Foundry agent app — frontend, backend API, and agent orchestration you light up in Challenge 1.",
+      "tags": [
+        "Container Apps",
+        "APIM",
+        "Cosmos DB",
+        "Foundry"
+      ],
+      "readme": "resources/agent-workload/README.html",
+      "count": 24,
+      "files": [
+        {
+          "path": "resources/agent-workload/.github/workflows/deploy.yml",
+          "name": ".github/workflows/deploy.yml"
+        },
+        {
+          "path": "resources/agent-workload/.gitignore",
+          "name": ".gitignore"
+        },
+        {
+          "path": "resources/agent-workload/azure.yaml",
+          "name": "azure.yaml"
+        },
+        {
+          "path": "resources/agent-workload/infra/main.bicep",
+          "name": "infra/main.bicep"
+        },
+        {
+          "path": "resources/agent-workload/infra/main.parameters.json",
+          "name": "infra/main.parameters.json"
+        },
+        {
+          "path": "resources/agent-workload/infra/modules/api-management.bicep",
+          "name": "infra/modules/api-management.bicep"
+        },
+        {
+          "path": "resources/agent-workload/infra/modules/container-apps.bicep",
+          "name": "infra/modules/container-apps.bicep"
+        },
+        {
+          "path": "resources/agent-workload/infra/modules/cosmos-db.bicep",
+          "name": "infra/modules/cosmos-db.bicep"
+        },
+        {
+          "path": "resources/agent-workload/infra/modules/monitoring.bicep",
+          "name": "infra/modules/monitoring.bicep"
+        },
+        {
+          "path": "resources/agent-workload/src/agent/Dockerfile",
+          "name": "src/agent/Dockerfile"
+        },
+        {
+          "path": "resources/agent-workload/src/agent/app.py",
+          "name": "src/agent/app.py"
+        },
+        {
+          "path": "resources/agent-workload/src/agent/requirements.txt",
+          "name": "src/agent/requirements.txt"
+        },
+        {
+          "path": "resources/agent-workload/src/backend/Dockerfile",
+          "name": "src/backend/Dockerfile"
+        },
+        {
+          "path": "resources/agent-workload/src/backend/app.py",
+          "name": "src/backend/app.py"
+        },
+        {
+          "path": "resources/agent-workload/src/backend/requirements.txt",
+          "name": "src/backend/requirements.txt"
+        },
+        {
+          "path": "resources/agent-workload/src/frontend/Dockerfile",
+          "name": "src/frontend/Dockerfile"
+        },
+        {
+          "path": "resources/agent-workload/src/frontend/next.config.js",
+          "name": "src/frontend/next.config.js"
+        },
+        {
+          "path": "resources/agent-workload/src/frontend/package.json",
+          "name": "src/frontend/package.json"
+        },
+        {
+          "path": "resources/agent-workload/src/frontend/public/.gitkeep",
+          "name": "src/frontend/public/.gitkeep"
+        },
+        {
+          "path": "resources/agent-workload/src/frontend/src/app/globals.css",
+          "name": "src/frontend/src/app/globals.css"
+        },
+        {
+          "path": "resources/agent-workload/src/frontend/src/app/layout.tsx",
+          "name": "src/frontend/src/app/layout.tsx"
+        },
+        {
+          "path": "resources/agent-workload/src/frontend/src/app/page.tsx",
+          "name": "src/frontend/src/app/page.tsx"
+        },
+        {
+          "path": "resources/agent-workload/src/frontend/src/app/providers.tsx",
+          "name": "src/frontend/src/app/providers.tsx"
+        },
+        {
+          "path": "resources/agent-workload/src/frontend/tsconfig.json",
+          "name": "src/frontend/tsconfig.json"
+        }
+      ]
+    },
+    {
+      "id": "fabric-control-tower",
+      "label": "Fabric Control Tower",
+      "desc": "Workspace setup, medallion notebooks, pipelines, and the Direct Lake semantic model that powers the dashboards.",
+      "tags": [
+        "Lakehouse",
+        "PySpark",
+        "Power BI"
+      ],
+      "readme": "resources/fabric-control-tower/README.html",
+      "count": 15,
+      "files": [
+        {
+          "path": "resources/fabric-control-tower/.github/workflows/deploy.yml",
+          "name": ".github/workflows/deploy.yml"
+        },
+        {
+          "path": "resources/fabric-control-tower/.gitignore",
+          "name": ".gitignore"
+        },
+        {
+          "path": "resources/fabric-control-tower/azure.yaml",
+          "name": "azure.yaml"
+        },
+        {
+          "path": "resources/fabric-control-tower/fabric/notebooks/01_bronze_ingestion.ipynb",
+          "name": "fabric/notebooks/01_bronze_ingestion.ipynb"
+        },
+        {
+          "path": "resources/fabric-control-tower/fabric/notebooks/02_silver_transformation.ipynb",
+          "name": "fabric/notebooks/02_silver_transformation.ipynb"
+        },
+        {
+          "path": "resources/fabric-control-tower/fabric/notebooks/03_gold_aggregation.ipynb",
+          "name": "fabric/notebooks/03_gold_aggregation.ipynb"
+        },
+        {
+          "path": "resources/fabric-control-tower/fabric/notebooks/04_cosmos_mirroring_transform.ipynb",
+          "name": "fabric/notebooks/04_cosmos_mirroring_transform.ipynb"
+        },
+        {
+          "path": "resources/fabric-control-tower/fabric/pipelines/pipeline_daily_refresh.json",
+          "name": "fabric/pipelines/pipeline_daily_refresh.json"
+        },
+        {
+          "path": "resources/fabric-control-tower/fabric/pipelines/pipeline_load_e2e.json",
+          "name": "fabric/pipelines/pipeline_load_e2e.json"
+        },
+        {
+          "path": "resources/fabric-control-tower/infra/main.bicep",
+          "name": "infra/main.bicep"
+        },
+        {
+          "path": "resources/fabric-control-tower/infra/main.parameters.json",
+          "name": "infra/main.parameters.json"
+        },
+        {
+          "path": "resources/fabric-control-tower/src/setup/requirements.txt",
+          "name": "src/setup/requirements.txt"
+        },
+        {
+          "path": "resources/fabric-control-tower/src/setup/semantic_model.json",
+          "name": "src/setup/semantic_model.json"
+        },
+        {
+          "path": "resources/fabric-control-tower/src/setup/setup_cosmos_mirroring.py",
+          "name": "src/setup/setup_cosmos_mirroring.py"
+        },
+        {
+          "path": "resources/fabric-control-tower/src/setup/setup_fabric_workspace.py",
+          "name": "src/setup/setup_fabric_workspace.py"
+        }
+      ]
+    },
+    {
+      "id": "observability-ingestion",
+      "label": "Observability Ingestion",
+      "desc": "The landing zone that collects telemetry, cost, and metadata into an ADLS Gen2 data lake.",
+      "tags": [
+        "ADLS Gen2",
+        "Cost Mgmt",
+        "Resource Graph"
+      ],
+      "readme": "resources/observability-ingestion/README.html",
+      "count": 14,
+      "files": [
+        {
+          "path": "resources/observability-ingestion/.github/workflows/deploy.yml",
+          "name": ".github/workflows/deploy.yml"
+        },
+        {
+          "path": "resources/observability-ingestion/.github/workflows/scheduled-export.yml",
+          "name": ".github/workflows/scheduled-export.yml"
+        },
+        {
+          "path": "resources/observability-ingestion/.gitignore",
+          "name": ".gitignore"
+        },
+        {
+          "path": "resources/observability-ingestion/azure.yaml",
+          "name": "azure.yaml"
+        },
+        {
+          "path": "resources/observability-ingestion/infra/main.bicep",
+          "name": "infra/main.bicep"
+        },
+        {
+          "path": "resources/observability-ingestion/infra/main.parameters.json",
+          "name": "infra/main.parameters.json"
+        },
+        {
+          "path": "resources/observability-ingestion/infra/modules/cost-export.bicep",
+          "name": "infra/modules/cost-export.bicep"
+        },
+        {
+          "path": "resources/observability-ingestion/infra/modules/diagnostic-settings.bicep",
+          "name": "infra/modules/diagnostic-settings.bicep"
+        },
+        {
+          "path": "resources/observability-ingestion/infra/modules/monitoring.bicep",
+          "name": "infra/modules/monitoring.bicep"
+        },
+        {
+          "path": "resources/observability-ingestion/infra/modules/storage.bicep",
+          "name": "infra/modules/storage.bicep"
+        },
+        {
+          "path": "resources/observability-ingestion/src/scripts/requirements.txt",
+          "name": "src/scripts/requirements.txt"
+        },
+        {
+          "path": "resources/observability-ingestion/src/scripts/resource_graph_export.py",
+          "name": "src/scripts/resource_graph_export.py"
+        },
+        {
+          "path": "resources/observability-ingestion/src/scripts/setup_diagnostic_settings.py",
+          "name": "src/scripts/setup_diagnostic_settings.py"
+        },
+        {
+          "path": "resources/observability-ingestion/src/scripts/validate_exports.py",
+          "name": "src/scripts/validate_exports.py"
+        }
+      ]
+    },
+    {
+      "id": "observability-sdk",
+      "label": "Observability SDK",
+      "desc": "Shared Python library that enforces a consistent OpenTelemetry event schema across every agent.",
+      "tags": [
+        "Python",
+        "OpenTelemetry",
+        "App Insights"
+      ],
+      "readme": "resources/observability-sdk/README.html",
+      "count": 9,
+      "files": [
+        {
+          "path": "resources/observability-sdk/examples/billing_agent_example.py",
+          "name": "examples/billing_agent_example.py"
+        },
+        {
+          "path": "resources/observability-sdk/observability_sdk/__init__.py",
+          "name": "observability_sdk/__init__.py"
+        },
+        {
+          "path": "resources/observability-sdk/observability_sdk/alerts.py",
+          "name": "observability_sdk/alerts.py"
+        },
+        {
+          "path": "resources/observability-sdk/observability_sdk/azure_monitor.py",
+          "name": "observability_sdk/azure_monitor.py"
+        },
+        {
+          "path": "resources/observability-sdk/observability_sdk/decorators.py",
+          "name": "observability_sdk/decorators.py"
+        },
+        {
+          "path": "resources/observability-sdk/observability_sdk/events.py",
+          "name": "observability_sdk/events.py"
+        },
+        {
+          "path": "resources/observability-sdk/observability_sdk/metrics.py",
+          "name": "observability_sdk/metrics.py"
+        },
+        {
+          "path": "resources/observability-sdk/observability_sdk/tracker.py",
+          "name": "observability_sdk/tracker.py"
+        },
+        {
+          "path": "resources/observability-sdk/pyproject.toml",
+          "name": "pyproject.toml"
+        }
+      ]
+    }
+  ]
+}

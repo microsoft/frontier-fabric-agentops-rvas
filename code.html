@@ -39,6 +39,29 @@
     .nb-code pre code { padding: 14px 22px; }
     .loading, .errbox { text-align: center; padding: 60px 20px; color: var(--text-2b); font-family: var(--ff-mono); }
     .errbox a { color: var(--rvap-blue); }
+    /* landing index (no ?path=) */
+    .idx-intro { margin-bottom: 26px; }
+    .idx-intro h1 { color: var(--deep-navy); font-size: 30px; line-height: 1.15; margin: 0 0 8px; }
+    .idx-intro p { color: var(--text-2b); font-size: 15.5px; line-height: 1.6; max-width: 780px; margin: 0 0 16px; }
+    .idx-filter { width: 100%; max-width: 480px; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px;
+      font-family: var(--ff-mono); font-size: 13.5px; background: #fff; color: var(--deep-navy); }
+    .idx-filter:focus { outline: none; border-color: var(--rvap-blue); box-shadow: 0 0 0 3px rgba(26,119,227,0.15); }
+    .idx-empty { color: var(--text-2b); font-family: var(--ff-mono); font-size: 13px; padding: 20px 2px; }
+    .code-index { display: grid; gap: 20px; }
+    .idx-group { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+    .idx-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .idx-head h2 { color: var(--deep-navy); font-size: 18px; margin: 0 0 4px; }
+    .idx-head p { color: var(--text-2b); font-size: 13px; line-height: 1.5; margin: 0; max-width: 660px; }
+    .idx-readme { white-space: nowrap; color: var(--rvap-blue); font-weight: 600; font-size: 13px; text-decoration: none; }
+    .idx-readme:hover { text-decoration: underline; }
+    .idx-count { font-family: var(--ff-mono); font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: .08em; margin: 12px 0; }
+    .idx-files { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 6px; }
+    .idx-file a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; text-decoration: none;
+      color: var(--deep-navy); font-family: var(--ff-mono); font-size: 12.5px; border: 1px solid transparent; transition: background .12s, border-color .12s; }
+    .idx-file a:hover { background: #fff; border-color: var(--border); }
+    .idx-ic { flex: none; min-width: 42px; text-align: center; font-size: 9.5px; font-weight: 700; letter-spacing: .04em;
+      color: var(--rvap-blue); background: rgba(26,119,227,0.10); border-radius: 5px; padding: 3px 5px; }
+    .idx-name { word-break: break-all; }
   </style>
   <link rel="stylesheet" href="assets/css/brand.css">
   <link rel="stylesheet" href="assets/css/shell.css">
@@ -170,13 +193,91 @@
       return outer;
     }
 
+    function extChip(p) {
+      const base = p.split('/').pop().toLowerCase();
+      if (base === 'dockerfile') return 'DOCK';
+      if (base === 'makefile') return 'MAKE';
+      const ext = base.includes('.') ? base.split('.').pop().toUpperCase() : 'FILE';
+      return ext.length > 5 ? ext.slice(0, 5) : ext;
+    }
+
+    async function renderIndex(view) {
+      document.title = 'Code · Frontier Fabric AgentOps RVAS';
+      const crumb = document.getElementById('crumb');
+      crumb.innerHTML = '<a href="index.html">Home</a> <span class="sep">/</span> <span>Code</span>';
+      let data;
+      try {
+        const res = await fetch('./code-index.json', { cache: 'no-cache' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        data = await res.json();
+      } catch (err) {
+        view.innerHTML = '<div class="errbox">Pick a file from any component to view its source here.<br><br>' +
+          '<a href="resources/README.html">← Browse the resources</a></div>';
+        return;
+      }
+      const groups = (data && data.groups) || [];
+      const total = data.total || groups.reduce((n, g) => n + (g.count || 0), 0);
+
+      view.innerHTML = '';
+      const intro = document.createElement('div'); intro.className = 'idx-intro';
+      intro.innerHTML =
+        '<h1>Reference implementation source</h1>' +
+        '<p>Read every source file from the reference implementation &mdash; syntax-highlighted, in place, ' +
+        'no downloads. <b>' + total + ' files</b> across ' + groups.length + ' components. ' +
+        'Click any file to open it in the viewer.</p>' +
+        '<input type="search" id="idxFilter" class="idx-filter" placeholder="Filter files by name or path…" autocomplete="off" aria-label="Filter files">';
+      view.appendChild(intro);
+
+      const wrap = document.createElement('div'); wrap.className = 'code-index';
+      groups.forEach(g => {
+        const sec = document.createElement('section'); sec.className = 'idx-group'; sec.dataset.group = g.id;
+        const filesHtml = (g.files || []).map(f =>
+          '<li class="idx-file" data-path="' + esc(String(f.path).toLowerCase()) + '">' +
+            '<a href="code.html?path=' + encodeURIComponent(f.path) + '">' +
+              '<span class="idx-ic">' + esc(extChip(f.path)) + '</span>' +
+              '<span class="idx-name">' + esc(f.name) + '</span>' +
+            '</a></li>').join('');
+        sec.innerHTML =
+          '<div class="idx-head">' +
+            '<div><h2>' + esc(g.label) + '</h2>' + (g.desc ? '<p>' + esc(g.desc) + '</p>' : '') + '</div>' +
+            '<a class="idx-readme" href="' + esc(g.readme) + '">Overview →</a>' +
+          '</div>' +
+          '<div class="idx-count">' + g.count + ' files</div>' +
+          '<ul class="idx-files">' + filesHtml + '</ul>';
+        wrap.appendChild(sec);
+      });
+      view.appendChild(wrap);
+
+      const emptyMsg = document.createElement('div');
+      emptyMsg.className = 'idx-empty'; emptyMsg.hidden = true;
+      emptyMsg.textContent = 'No files match your filter.';
+      view.appendChild(emptyMsg);
+
+      const filter = document.getElementById('idxFilter');
+      filter.addEventListener('input', () => {
+        const q = filter.value.trim().toLowerCase();
+        let totalShown = 0;
+        wrap.querySelectorAll('.idx-group').forEach(sec => {
+          let shown = 0;
+          sec.querySelectorAll('.idx-file').forEach(li => {
+            const hit = !q || li.dataset.path.includes(q);
+            li.hidden = !hit;
+            if (hit) shown++;
+          });
+          sec.style.display = shown ? '' : 'none';
+          totalShown += shown;
+        });
+        emptyMsg.hidden = totalShown !== 0;
+      });
+    }
+
     async function load() {
       const params = new URLSearchParams(location.search);
       const raw = params.get('path');
       const p = safePath(raw);
       const view = document.getElementById('view');
       if (!p) {
-        view.innerHTML = '<div class="errbox">No file specified, or the path is invalid.<br><br><a href="resources/README.html">← Browse the resources</a></div>';
+        await renderIndex(view);
         return;
       }
       crumbFor(p);
