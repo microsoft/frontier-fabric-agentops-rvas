@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AgentOps Control Tower — Frontier Fabric RVAS</title>
-  <meta name="description" content="A hands-on Microsoft Fabric RVAS: build an AgentOps Control Tower that correlates telemetry from Azure services and Foundry agents for reliability, cost, and performance.">
+  <meta name="description"
+    content="A hands-on Microsoft Fabric RVAS: build an AgentOps Control Tower that correlates telemetry from Azure services and Foundry agents for reliability, cost, and performance.">
   <link rel="canonical" href="https://microsoft.github.io/frontier-fabric-agentops-rvas/">
 
   <!-- Open Graph -->
   <meta property="og:title" content="AgentOps Control Tower — Frontier Fabric RVAS">
-  <meta property="og:description" content="Build a Fabric-based control tower for AI-agent reliability, cost & performance — 7 challenges, on your own Azure and Fabric.">
+  <meta property="og:description"
+    content="Build a Fabric-based control tower for AI-agent reliability, cost & performance — 7 challenges, on your own Azure and Fabric.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://microsoft.github.io/frontier-fabric-agentops-rvas/">
 
@@ -17,56 +20,85 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="assets/css/site.css">
 
   <style>
     :root {
       /* ── RVAP surfaces (light) ── */
-      --bg:           #F5F8FE;   /* page surface — very light blue-white */
-      --surface:      #FFFFFF;   /* card / panel fill */
-      --surface-2:    #FAFBFD;   /* hover surface */
-      --surface-3:    #F0F4FB;
-      --border:       #E3E6ED;   /* light neutral divider */
-      --border-md:    #D4DBE8;
-      --border-lg:    #C4CDDE;
+      --bg: #F5F8FE;
+      /* page surface — very light blue-white */
+      --surface: #FFFFFF;
+      /* card / panel fill */
+      --surface-2: #FAFBFD;
+      /* hover surface */
+      --surface-3: #F0F4FB;
+      --border: #E3E6ED;
+      /* light neutral divider */
+      --border-md: #D4DBE8;
+      --border-lg: #C4CDDE;
 
       /* ── RVAP core palette (brand kit slide 5) ── */
-      --rvap-blue:    #1A77E3;   /* primary */
-      --ms-blue:      #0078D4;   /* Build */
-      --deep-navy:    #032254;   /* headings, hero, emphasis */
-      --teal:         #14868A;   /* Scale */
-      --purple:       #504092;   /* Innovate */
+      --rvap-blue: #1A77E3;
+      /* primary */
+      --ms-blue: #0078D4;
+      /* Build */
+      --deep-navy: #032254;
+      /* headings, hero, emphasis */
+      --teal: #14868A;
+      /* Scale */
+      --purple: #504092;
+      /* Innovate */
 
-      --accent:       #1A77E3;   /* primary accent → RVAP Blue */
-      --accent-dim:   rgba(26,119,227,0.10);
+      --accent: #1A77E3;
+      /* primary accent → RVAP Blue */
+      --accent-dim: rgba(26, 119, 227, 0.10);
 
       /* category palette → mapped into the RVAP palette */
-      --challenges:       #1A77E3;   /* RVAP Blue  */
-      --challenges-dim:   rgba(26,119,227,0.10);
-      --resources:        #0078D4;   /* Build · MS Blue */
-      --resources-dim:    rgba(0,120,212,0.10);
-      --docs:             #14868A;   /* Scale · Teal */
-      --docs-dim:         rgba(20,134,138,0.10);
-      --coach:            #504092;   /* Innovate · Purple */
-      --coach-dim:        rgba(80,64,146,0.10);
+      --challenges: #1A77E3;
+      /* RVAP Blue  */
+      --challenges-dim: rgba(26, 119, 227, 0.10);
+      --resources: #0078D4;
+      /* Build · MS Blue */
+      --resources-dim: rgba(0, 120, 212, 0.10);
+      --docs: #14868A;
+      /* Scale · Teal */
+      --docs-dim: rgba(20, 134, 138, 0.10);
+      --coach: #504092;
+      /* Innovate · Purple */
+      --coach-dim: rgba(80, 64, 146, 0.10);
 
-      --text:         #032254;   /* deep navy — primary/heading text */
-      --text-2:       #47494E;   /* charcoal — body copy */
-      --text-2b:      #6B7280;   /* muted labels */
-      --text-3:       #98A2B3;   /* faint captions / placeholders */
+      --text: #032254;
+      /* deep navy — primary/heading text */
+      --text-2: #47494E;
+      /* charcoal — body copy */
+      --text-2b: #6B7280;
+      /* muted labels */
+      --text-3: #98A2B3;
+      /* faint captions / placeholders */
 
-      --ff-display:   "Aptos Display", "Outfit", "Segoe UI", system-ui, sans-serif;
-      --ff-body:      "Aptos", "Inter", "Segoe UI", system-ui, sans-serif;
-      --ff-mono:      "Cascadia Code", "JetBrains Mono", "Fira Code", monospace;
+      --ff-display: "Aptos Display", "Outfit", "Segoe UI", system-ui, sans-serif;
+      --ff-body: "Aptos", "Inter", "Segoe UI", system-ui, sans-serif;
+      --ff-mono: "Cascadia Code", "JetBrains Mono", "Fira Code", monospace;
 
       /* Hero gradient + shared shadow */
-      --hero-grad:    linear-gradient(135deg, #032254 0%, #0F3A7A 55%, #1A77E3 100%);
-      --shadow-card:  0 1px 3px rgba(3,34,84,0.08), 0 8px 22px rgba(3,34,84,0.07);
+      --hero-grad: linear-gradient(135deg, #032254 0%, #0F3A7A 55%, #1A77E3 100%);
+      --shadow-card: 0 1px 3px rgba(3, 34, 84, 0.08), 0 8px 22px rgba(3, 34, 84, 0.07);
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       background: var(--bg);
@@ -83,7 +115,7 @@
       content: '';
       position: fixed;
       inset: 0;
-      background-image: radial-gradient(circle, rgba(3,34,84,0.045) 1px, transparent 1px);
+      background-image: radial-gradient(circle, rgba(3, 34, 84, 0.045) 1px, transparent 1px);
       background-size: 28px 28px;
       pointer-events: none;
       z-index: 0;
@@ -97,20 +129,48 @@
       pointer-events: none;
       z-index: 0;
     }
+
     .orb-1 {
-      width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(26,119,227,0.10) 0%, transparent 70%);
-      top: -220px; right: -160px;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(26, 119, 227, 0.10) 0%, transparent 70%);
+      top: -220px;
+      right: -160px;
       animation: float1 14s ease-in-out infinite;
     }
+
     .orb-2 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(20,134,138,0.08) 0%, transparent 70%);
-      bottom: 5%; left: -100px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(20, 134, 138, 0.08) 0%, transparent 70%);
+      bottom: 5%;
+      left: -100px;
       animation: float2 18s ease-in-out infinite;
     }
-    @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-40px,35px)} }
-    @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(35px,-25px)} }
+
+    @keyframes float1 {
+
+      0%,
+      100% {
+        transform: translate(0, 0)
+      }
+
+      50% {
+        transform: translate(-40px, 35px)
+      }
+    }
+
+    @keyframes float2 {
+
+      0%,
+      100% {
+        transform: translate(0, 0)
+      }
+
+      50% {
+        transform: translate(35px, -25px)
+      }
+    }
 
     /* ════════════════════════════════════════════ LAYOUT ════════════════════════════════════════════ */
     .container {
@@ -127,9 +187,10 @@
       top: 58px;
       z-index: 5;
       border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,0.86);
+      background: rgba(255, 255, 255, 0.86);
       backdrop-filter: blur(16px);
     }
+
     .filter-inner {
       max-width: 1380px;
       margin: 0 auto;
@@ -139,6 +200,7 @@
       gap: 6px;
       height: 60px;
     }
+
     .tab {
       font-family: var(--ff-mono);
       font-size: 11px;
@@ -156,23 +218,58 @@
       gap: 7px;
       white-space: nowrap;
     }
-    .tab:hover { color: var(--deep-navy); background: var(--bg); border-color: var(--border); }
 
-    .tab.active[data-filter="all"]        { background: var(--deep-navy);  color: #fff; border-color: transparent; }
-    .tab.active[data-filter="challenges"] { background: var(--challenges); color: #fff; border-color: transparent; }
-    .tab.active[data-filter="resources"]  { background: var(--resources);  color: #fff; border-color: transparent; }
-    .tab.active[data-filter="docs"]       { background: var(--docs);       color: #fff; border-color: transparent; }
-    .tab.active[data-filter="coach"]      { background: var(--coach);      color: #fff; border-color: transparent; }
+    .tab:hover {
+      color: var(--deep-navy);
+      background: var(--bg);
+      border-color: var(--border);
+    }
+
+    .tab.active[data-filter="all"] {
+      background: var(--deep-navy);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .tab.active[data-filter="challenges"] {
+      background: var(--challenges);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .tab.active[data-filter="resources"] {
+      background: var(--resources);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .tab.active[data-filter="docs"] {
+      background: var(--docs);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .tab.active[data-filter="coach"] {
+      background: var(--coach);
+      color: #fff;
+      border-color: transparent;
+    }
 
     .tab-n {
       font-size: 10px;
       padding: 2px 7px;
       border-radius: 4px;
-      background: rgba(3,34,84,0.07);
+      background: rgba(3, 34, 84, 0.07);
     }
-    .tab.active .tab-n { background: rgba(255,255,255,0.24); }
 
-    .search-wrap { margin-left: auto; }
+    .tab.active .tab-n {
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    .search-wrap {
+      margin-left: auto;
+    }
+
     .search {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -185,11 +282,23 @@
       width: 230px;
       transition: all 0.18s ease;
     }
-    .search::placeholder { color: var(--text-3); }
-    .search:focus { border-color: var(--rvap-blue); box-shadow: 0 0 0 3px rgba(26,119,227,0.12); background: var(--surface); }
+
+    .search::placeholder {
+      color: var(--text-3);
+    }
+
+    .search:focus {
+      border-color: var(--rvap-blue);
+      box-shadow: 0 0 0 3px rgba(26, 119, 227, 0.12);
+      background: var(--surface);
+    }
 
     /* ════════════════════════════════════════════ MAIN ════════════════════════════════════════════ */
-    main { position: relative; z-index: 1; padding: 40px 0 96px; }
+    main {
+      position: relative;
+      z-index: 1;
+      padding: 40px 0 96px;
+    }
 
     .section-label {
       font-family: var(--ff-mono);
@@ -202,7 +311,13 @@
       gap: 14px;
       margin: 44px 0 20px;
     }
-    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
 
     .grid {
       display: grid;
@@ -225,31 +340,72 @@
       color: inherit;
       cursor: pointer;
       transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
-      animation: cardIn 0.45s cubic-bezier(0.22,1,0.36,1) both;
+      animation: cardIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
       overflow: hidden;
     }
+
     .card::before {
       content: '';
       position: absolute;
-      left: 0; top: 18%; bottom: 18%;
+      left: 0;
+      top: 18%;
+      bottom: 18%;
       width: 3px;
       border-radius: 0 3px 3px 0;
       transition: top 0.22s ease, bottom 0.22s ease;
     }
-    .card[data-cat="challenges"]::before { background: var(--challenges); }
-    .card[data-cat="resources"]::before  { background: var(--resources); }
-    .card[data-cat="docs"]::before       { background: var(--docs); }
-    .card[data-cat="coach"]::before      { background: var(--coach); }
 
-    .card:hover { background: var(--surface); transform: translateY(-4px); }
-    .card:hover::before { top: 12%; bottom: 12%; }
+    .card[data-cat="challenges"]::before {
+      background: var(--challenges);
+    }
 
-    .card[data-cat="challenges"]:hover { box-shadow: 0 16px 40px rgba(3,34,84,.16), 0 0 0 1px rgba(26,119,227,.32);  border-color: rgba(26,119,227,.3); }
-    .card[data-cat="resources"]:hover  { box-shadow: 0 16px 40px rgba(3,34,84,.16), 0 0 0 1px rgba(0,120,212,.32);   border-color: rgba(0,120,212,.3); }
-    .card[data-cat="docs"]:hover       { box-shadow: 0 16px 40px rgba(3,34,84,.16), 0 0 0 1px rgba(20,134,138,.32);  border-color: rgba(20,134,138,.3); }
-    .card[data-cat="coach"]:hover      { box-shadow: 0 16px 40px rgba(3,34,84,.16), 0 0 0 1px rgba(80,64,146,.32);   border-color: rgba(80,64,146,.3); }
+    .card[data-cat="resources"]::before {
+      background: var(--resources);
+    }
 
-    .card-head { display: flex; align-items: center; gap: 8px; }
+    .card[data-cat="docs"]::before {
+      background: var(--docs);
+    }
+
+    .card[data-cat="coach"]::before {
+      background: var(--coach);
+    }
+
+    .card:hover {
+      background: var(--surface);
+      transform: translateY(-4px);
+    }
+
+    .card:hover::before {
+      top: 12%;
+      bottom: 12%;
+    }
+
+    .card[data-cat="challenges"]:hover {
+      box-shadow: 0 16px 40px rgba(3, 34, 84, .16), 0 0 0 1px rgba(26, 119, 227, .32);
+      border-color: rgba(26, 119, 227, .3);
+    }
+
+    .card[data-cat="resources"]:hover {
+      box-shadow: 0 16px 40px rgba(3, 34, 84, .16), 0 0 0 1px rgba(0, 120, 212, .32);
+      border-color: rgba(0, 120, 212, .3);
+    }
+
+    .card[data-cat="docs"]:hover {
+      box-shadow: 0 16px 40px rgba(3, 34, 84, .16), 0 0 0 1px rgba(20, 134, 138, .32);
+      border-color: rgba(20, 134, 138, .3);
+    }
+
+    .card[data-cat="coach"]:hover {
+      box-shadow: 0 16px 40px rgba(3, 34, 84, .16), 0 0 0 1px rgba(80, 64, 146, .32);
+      border-color: rgba(80, 64, 146, .3);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
     .badge {
       font-family: var(--ff-mono);
@@ -260,10 +416,26 @@
       border-radius: 5px;
       font-weight: 600;
     }
-    .card[data-cat="challenges"] .badge { background: var(--challenges-dim); color: var(--challenges); }
-    .card[data-cat="resources"]  .badge { background: var(--resources-dim);  color: var(--resources); }
-    .card[data-cat="docs"]       .badge { background: var(--docs-dim);       color: var(--docs); }
-    .card[data-cat="coach"]      .badge { background: var(--coach-dim);      color: var(--coach); }
+
+    .card[data-cat="challenges"] .badge {
+      background: var(--challenges-dim);
+      color: var(--challenges);
+    }
+
+    .card[data-cat="resources"] .badge {
+      background: var(--resources-dim);
+      color: var(--resources);
+    }
+
+    .card[data-cat="docs"] .badge {
+      background: var(--docs-dim);
+      color: var(--docs);
+    }
+
+    .card[data-cat="coach"] .badge {
+      background: var(--coach-dim);
+      color: var(--coach);
+    }
 
     .card-arrow {
       margin-left: auto;
@@ -272,7 +444,11 @@
       transition: color 0.18s ease, transform 0.18s ease;
       line-height: 1;
     }
-    .card:hover .card-arrow { color: var(--rvap-blue); transform: translate(3px,-3px); }
+
+    .card:hover .card-arrow {
+      color: var(--rvap-blue);
+      transform: translate(3px, -3px);
+    }
 
     .card-title {
       font-family: var(--ff-display);
@@ -281,6 +457,7 @@
       color: var(--text);
       line-height: 1.3;
     }
+
     .card-desc {
       font-size: 13px;
       color: var(--text-2);
@@ -292,7 +469,13 @@
       flex: 1;
     }
 
-    .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 2px;
+    }
+
     .tag {
       font-family: var(--ff-mono);
       font-size: 10px;
@@ -304,23 +487,67 @@
     }
 
     @keyframes cardIn {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .card:nth-child(1)  { animation-delay:  0ms }
-    .card:nth-child(2)  { animation-delay: 40ms }
-    .card:nth-child(3)  { animation-delay: 80ms }
-    .card:nth-child(4)  { animation-delay:120ms }
-    .card:nth-child(5)  { animation-delay:160ms }
-    .card:nth-child(6)  { animation-delay:200ms }
-    .card:nth-child(7)  { animation-delay:240ms }
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
 
-    .card.hidden, .section-label.hidden, .grid.hidden { display: none !important; }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card:nth-child(1) {
+      animation-delay: 0ms
+    }
+
+    .card:nth-child(2) {
+      animation-delay: 40ms
+    }
+
+    .card:nth-child(3) {
+      animation-delay: 80ms
+    }
+
+    .card:nth-child(4) {
+      animation-delay: 120ms
+    }
+
+    .card:nth-child(5) {
+      animation-delay: 160ms
+    }
+
+    .card:nth-child(6) {
+      animation-delay: 200ms
+    }
+
+    .card:nth-child(7) {
+      animation-delay: 240ms
+    }
+
+    .card.hidden,
+    .section-label.hidden,
+    .grid.hidden {
+      display: none !important;
+    }
 
     /* Empty state */
-    .empty-state { display: none; padding: 80px 0; text-align: center; }
-    .empty-state.visible { display: block; }
-    .empty-icon { font-size: 40px; margin-bottom: 16px; }
+    .empty-state {
+      display: none;
+      padding: 80px 0;
+      text-align: center;
+    }
+
+    .empty-state.visible {
+      display: block;
+    }
+
+    .empty-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+    }
+
     .empty-msg {
       font-family: var(--ff-mono);
       font-size: 13px;
@@ -330,20 +557,50 @@
 
     /* ════════════════════════════════════════════ RESPONSIVE ════════════════════════════════════════════ */
     @media (max-width: 1100px) {
-      .grid { grid-template-columns: repeat(2,1fr); }
-      .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
     }
+
     @media (max-width: 700px) {
-      .container, .filter-inner { padding-left: 22px; padding-right: 22px; }
-      .grid { grid-template-columns: 1fr; }
-      .filter-inner { flex-wrap: wrap; height: auto; padding-top: 12px; padding-bottom: 12px; row-gap: 8px; }
-      .search-wrap { margin-left: 0; width: 100%; }
-      .search { width: 100%; }
+
+      .container,
+      .filter-inner {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-inner {
+        flex-wrap: wrap;
+        height: auto;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        row-gap: 8px;
+      }
+
+      .search-wrap {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      .search {
+        width: 100%;
+      }
     }
   </style>
   <link rel="stylesheet" href="assets/css/brand.css">
   <link rel="stylesheet" href="assets/css/shell.css">
 </head>
+
 <body>
 
   <div class="orb orb-1"></div>
@@ -360,11 +617,16 @@
         <a href="builder.html">Builder</a>
         <a href="code.html">Code</a>
         <a class="cta" href="builder.html">Compose your delivery →</a>
-        <a class="gh" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank" rel="noopener">GitHub ↗</a>
+        <a class="gh" href="https://github.com/microsoft/frontier-fabric-agentops-rvas" target="_blank"
+          rel="noopener">GitHub ↗</a>
       </nav>
       <div class="nav-actions">
-        <button class="icon-btn nav-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="navLinks">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        <button class="icon-btn nav-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false"
+          aria-controls="navLinks">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <path d="M3 6h18M3 12h18M3 18h18" />
+          </svg>
         </button>
       </div>
     </div>
@@ -372,48 +634,58 @@
 
   <!-- ═══ HERO ═══ -->
   <section class="hero" aria-labelledby="heroHeading">
-      <svg class="hero-compass" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-        <circle cx="200" cy="200" r="180" stroke="currentColor" stroke-width="0.6" stroke-opacity="0.15" stroke-dasharray="4 8"/>
-        <circle cx="200" cy="200" r="140" stroke="currentColor" stroke-width="0.4" stroke-opacity="0.10"/>
-        <circle cx="200" cy="200" r="80"  stroke="currentColor" stroke-width="0.4" stroke-opacity="0.12"/>
-        <path d="M200 60 A140 140 0 0 1 340 200" stroke="#38bdf8" stroke-width="2" stroke-opacity="0.5" stroke-linecap="round"/>
-        <path d="M340 200 A140 140 0 0 1 200 340" stroke="#f87171" stroke-width="2" stroke-opacity="0.5" stroke-linecap="round"/>
-        <path d="M200 340 A140 140 0 0 1 60 200"  stroke="#a78bfa" stroke-width="2" stroke-opacity="0.5" stroke-linecap="round"/>
-        <path d="M60 200 A140 140 0 0 1 200 60"   stroke="#fb923c" stroke-width="2" stroke-opacity="0.5" stroke-linecap="round"/>
-        <line x1="200" y1="20"  x2="200" y2="380" stroke="currentColor" stroke-width="0.5" stroke-opacity="0.10"/>
-        <line x1="20"  y1="200" x2="380" y2="200" stroke="currentColor" stroke-width="0.5" stroke-opacity="0.10"/>
-        <circle cx="200" cy="200" r="5" fill="#1A77E3" fill-opacity="0.8"/>
-        <circle cx="200" cy="200" r="12" stroke="#1A77E3" stroke-width="1" stroke-opacity="0.3"/>
-        <circle cx="200" cy="60"  r="5" fill="#38bdf8" fill-opacity="0.7"/>
-        <circle cx="340" cy="200" r="5" fill="#f87171" fill-opacity="0.7"/>
-        <circle cx="200" cy="340" r="5" fill="#a78bfa" fill-opacity="0.7"/>
-        <circle cx="60"  cy="200" r="5" fill="#fb923c" fill-opacity="0.7"/>
-      </svg>
+    <svg class="hero-compass" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+      focusable="false">
+      <circle cx="200" cy="200" r="180" stroke="currentColor" stroke-width="0.6" stroke-opacity="0.15"
+        stroke-dasharray="4 8" />
+      <circle cx="200" cy="200" r="140" stroke="currentColor" stroke-width="0.4" stroke-opacity="0.10" />
+      <circle cx="200" cy="200" r="80" stroke="currentColor" stroke-width="0.4" stroke-opacity="0.12" />
+      <path d="M200 60 A140 140 0 0 1 340 200" stroke="#38bdf8" stroke-width="2" stroke-opacity="0.5"
+        stroke-linecap="round" />
+      <path d="M340 200 A140 140 0 0 1 200 340" stroke="#f87171" stroke-width="2" stroke-opacity="0.5"
+        stroke-linecap="round" />
+      <path d="M200 340 A140 140 0 0 1 60 200" stroke="#a78bfa" stroke-width="2" stroke-opacity="0.5"
+        stroke-linecap="round" />
+      <path d="M60 200 A140 140 0 0 1 200 60" stroke="#fb923c" stroke-width="2" stroke-opacity="0.5"
+        stroke-linecap="round" />
+      <line x1="200" y1="20" x2="200" y2="380" stroke="currentColor" stroke-width="0.5" stroke-opacity="0.10" />
+      <line x1="20" y1="200" x2="380" y2="200" stroke="currentColor" stroke-width="0.5" stroke-opacity="0.10" />
+      <circle cx="200" cy="200" r="5" fill="#1A77E3" fill-opacity="0.8" />
+      <circle cx="200" cy="200" r="12" stroke="#1A77E3" stroke-width="1" stroke-opacity="0.3" />
+      <circle cx="200" cy="60" r="5" fill="#38bdf8" fill-opacity="0.7" />
+      <circle cx="340" cy="200" r="5" fill="#f87171" fill-opacity="0.7" />
+      <circle cx="200" cy="340" r="5" fill="#a78bfa" fill-opacity="0.7" />
+      <circle cx="60" cy="200" r="5" fill="#fb923c" fill-opacity="0.7" />
+    </svg>
 
-      <div class="wrap hero-grid">
-        <div>
-          <span class="eyebrow">RVAS · Real Value Acceleration Solution · Microsoft Fabric</span>
-          <h1 id="heroHeading">AgentOps<br><span class="accent">Control Tower</span></h1>
-          <p class="lede">
-            A hands-on, challenge-based RVAS (Real Value Acceleration Solution) where your team builds a Fabric-based control tower that
-            <strong>ingests and correlates telemetry from Azure services and Foundry-built agents</strong>,
-            delivering end-to-end monitoring, analytics, and dashboards for <strong>reliability, cost, and
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">RVAS — Fabric AgentOps Control Tower</span>
+        <h1 id="heroHeading">AgentOps<br><span class="accent">Control Tower</span></h1>
+        <p class="lede">
+          A hands-on, challenge-based RVAS (Real Value Acceleration Solution) where your team builds a Fabric-based
+          control tower that
+          <strong>ingests and correlates telemetry from Azure services and Foundry-built agents</strong>,
+          delivering end-to-end monitoring, analytics, and dashboards for <strong>reliability, cost, and
             performance</strong> across the AI-agent estate. Built on the customer's own Azure and Fabric.
-          </p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="challenges/challenge-00-mission-setup.html">Start Challenge 00 →</a>
-            <a class="btn btn-ghost" href="builder.html">Compose your delivery →</a>
-            <a class="btn btn-ghost" href="docs/architecture.html">Reference architecture →</a>
-          </div>
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="challenges/challenge-00-mission-setup.html">Start Challenge 00 →</a>
+          <a class="btn btn-ghost" href="builder.html">Compose your delivery →</a>
+          <a class="btn btn-ghost" href="docs/architecture.html">Reference architecture →</a>
+        </div>
 
-          <div class="stats" aria-label="Session statistics">
-            <div class="stat"><span class="stat-num" id="s-challenges">—</span><span class="stat-lbl"><span class="stat-dot"></span>Challenges</span></div>
-            <div class="stat"><span class="stat-num" id="s-resources">—</span><span class="stat-lbl"><span class="stat-dot"></span>Resources</span></div>
-            <div class="stat"><span class="stat-num" id="s-docs">—</span><span class="stat-lbl"><span class="stat-dot"></span>Docs</span></div>
-          </div>
+        <div class="stats" aria-label="Session statistics">
+          <div class="stat"><span class="stat-num" id="s-challenges">—</span><span class="stat-lbl"><span
+                class="stat-dot"></span>Challenges</span></div>
+          <div class="stat"><span class="stat-num" id="s-resources">—</span><span class="stat-lbl"><span
+                class="stat-dot"></span>Resources</span></div>
+          <div class="stat"><span class="stat-num" id="s-docs">—</span><span class="stat-lbl"><span
+                class="stat-dot"></span>Docs</span></div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
   <!-- ═══ FILTER BAR ═══ -->
   <div class="filter-bar">
@@ -461,7 +733,7 @@
     const CAT_LABEL = { challenges: 'Challenge', resources: 'Resource', docs: 'Doc', coach: 'Coach' };
 
     function esc(s) {
-      return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
     // ── Build a single card element ──────────────────────────────────────
@@ -545,20 +817,20 @@
 
     // ── Filter + Search ─────────────────────────────────────────────────
     function initFilterSearch() {
-      const tabs  = document.querySelectorAll('.tab');
+      const tabs = document.querySelectorAll('.tab');
       const empty = document.getElementById('emptyState');
-      let   active = 'all';
+      let active = 'all';
 
       function applyFilter() {
-        const q     = document.getElementById('searchInput').value.toLowerCase().trim();
+        const q = document.getElementById('searchInput').value.toLowerCase().trim();
         const cards = document.querySelectorAll('.card');
         const grids = document.querySelectorAll('.grid');
 
         cards.forEach(card => {
-          const cats  = card.dataset.cats || card.dataset.cat;
-          const text  = card.innerText.toLowerCase();
+          const cats = card.dataset.cats || card.dataset.cat;
+          const text = card.innerText.toLowerCase();
           const byTab = active === 'all' || cats.split(' ').includes(active);
-          const byQ   = !q || text.includes(q);
+          const byQ = !q || text.includes(q);
           card.classList.toggle('hidden', !(byTab && byQ));
         });
 
@@ -600,4 +872,5 @@
   </script>
   <script src="assets/js/shell.js"></script>
 </body>
+
 </html>
