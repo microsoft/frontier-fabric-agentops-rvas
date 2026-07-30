@@ -7,7 +7,7 @@ param environmentName string
 param location string = resourceGroup().location
 
 @description('Azure OpenAI model deployment name.')
-param openAiModelName string = 'gpt-4o'
+param openAiModelName string = 'gpt-5.4'
 
 var tags = {
   environment: environmentName
@@ -68,14 +68,14 @@ resource openAiDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024
   parent: cognitiveAccount
   name: openAiModelName
   sku: {
-    name: 'Standard'
+    name: 'GlobalStandard'
     capacity: 30
   }
   properties: {
     model: {
       format: 'OpenAI'
       name: openAiModelName
-      version: '2024-08-06'
+      version: '2026-03-05'
     }
   }
 }
@@ -95,7 +95,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enableRbacAuthorization: true
     enableSoftDelete: true
     softDeleteRetentionInDays: 7
-    enablePurgeProtection: false
+    //enablePurgeProtection: true
     publicNetworkAccess: 'Enabled'
   }
 }
@@ -168,26 +168,6 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
   }
 }
 
-// ACR Pull – allows managed identity to pull container images
-// Use deterministic name matching the container-apps module to avoid BCP120
-var containerRegistryName = replace('${environmentName}acr', '-', '')
-var acrPullRoleDefinitionId = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
-
-resource containerRegistryRef 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: containerRegistryName
-}
-
-resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(containerRegistryName, managedIdentity.id, acrPullRoleDefinitionId)
-  scope: containerRegistryRef
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleDefinitionId)
-    principalId: managedIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
-  }
-  dependsOn: [containerApps]
-}
-
 // Cognitive Services OpenAI User – allows managed identity to call OpenAI
 var cognitiveServicesOpenAiUserRoleId = '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
 
@@ -205,6 +185,7 @@ resource openAiRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-0
 
 output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.containerRegistryName
 output AZURE_CONTAINER_REGISTRY_LOGIN_SERVER string = containerApps.outputs.containerRegistryLoginServer
+output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.containerRegistryLoginServer
 output AZURE_COSMOS_DB_ENDPOINT string = cosmosDb.outputs.cosmosDbEndpoint
 output AZURE_KEY_VAULT_NAME string = keyVault.name
 output AZURE_OPENAI_ENDPOINT string = cognitiveAccount.properties.endpoint

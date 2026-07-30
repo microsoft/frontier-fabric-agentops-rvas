@@ -59,7 +59,7 @@ def simulate_llm_summarise(tracker: AgentTracker, data: dict) -> str:
             tokens_in=tokens_in,
             tokens_out=tokens_out,
             cost_estimated=cost,
-            model="gpt-4o-mini",
+            model="gpt-5-mini",
         )
         return f"Invoice {data['invoice_id']}: {data['amount']} {data['currency']}"
 

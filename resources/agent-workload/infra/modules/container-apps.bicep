@@ -51,6 +51,19 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' =
   }
 }
 
+// ACR Pull – grant before the apps so image pulls can authenticate at create time
+var acrPullRoleDefinitionId = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
+
+resource acrPullRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(containerRegistry.id, managedIdentityId, acrPullRoleDefinitionId)
+  scope: containerRegistry
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleDefinitionId)
+    principalId: managedIdentityPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: '${environmentName}-cae'
   location: location
@@ -71,6 +84,7 @@ resource frontendApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: '${environmentName}-frontend'
   location: location
   tags: union(tags, { 'azd-service-name': 'frontend' })
+  dependsOn: [acrPullRoleAssignment]
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
@@ -133,6 +147,7 @@ resource backendApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: '${environmentName}-backend'
   location: location
   tags: union(tags, { 'azd-service-name': 'backend' })
+  dependsOn: [acrPullRoleAssignment]
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
@@ -207,6 +222,7 @@ resource agentApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: '${environmentName}-agent'
   location: location
   tags: union(tags, { 'azd-service-name': 'agent' })
+  dependsOn: [acrPullRoleAssignment]
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {

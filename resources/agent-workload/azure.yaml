@@ -8,6 +8,8 @@ services:
     host: containerapp
     docker:
       path: Dockerfile
+      buildArgs:
+        - NEXT_PUBLIC_API_URL=https://${BACKEND_FQDN}
   backend:
     project: ./src/backend
     language: py
@@ -20,3 +22,23 @@ services:
     host: containerapp
     docker:
       path: Dockerfile
+# On a fresh deploy the frontend image is built before BACKEND_FQDN is known, so
+# rebuild it here (server-side ACR build) once the real backend URL is available.
+hooks:
+  postdeploy:
+    windows:
+      shell: pwsh
+      run: |
+        az acr build -r $env:AZURE_CONTAINER_REGISTRY_NAME `
+          -t "agentops-agent-workload/frontend-$($env:AZURE_ENV_NAME):latest" `
+          --build-arg NEXT_PUBLIC_API_URL="https://$($env:BACKEND_FQDN)" ./src/frontend
+        az containerapp update -n "$($env:AZURE_ENV_NAME)-frontend" -g $env:AZURE_RESOURCE_GROUP `
+          --image "$($env:AZURE_CONTAINER_REGISTRY_NAME).azurecr.io/agentops-agent-workload/frontend-$($env:AZURE_ENV_NAME):latest"
+    posix:
+      shell: sh
+      run: |
+        az acr build -r "$AZURE_CONTAINER_REGISTRY_NAME" \
+          -t "agentops-agent-workload/frontend-$AZURE_ENV_NAME:latest" \
+          --build-arg NEXT_PUBLIC_API_URL="https://$BACKEND_FQDN" ./src/frontend
+        az containerapp update -n "$AZURE_ENV_NAME-frontend" -g "$AZURE_RESOURCE_GROUP" \
+          --image "$AZURE_CONTAINER_REGISTRY_NAME.azurecr.io/agentops-agent-workload/frontend-$AZURE_ENV_NAME:latest"

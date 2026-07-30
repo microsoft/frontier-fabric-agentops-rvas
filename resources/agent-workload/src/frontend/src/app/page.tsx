@@ -31,10 +31,11 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function createConversation(): Promise<string> {
+  async function createConversation(title: string): Promise<string> {
     const response = await fetch(`${apiUrl}/api/conversations`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title }),
     });
     if (!response.ok) {
       throw new Error("Failed to create conversation");
@@ -60,7 +61,7 @@ export default function ChatPage() {
     try {
       let currentConversationId = conversationId;
       if (!currentConversationId) {
-        currentConversationId = await createConversation();
+        currentConversationId = await createConversation(trimmed);
         setConversationId(currentConversationId);
       }
 
@@ -80,7 +81,10 @@ export default function ChatPage() {
       const data = await response.json();
       const assistantMessage: Message = {
         role: "assistant",
-        content: data.content || data.message || JSON.stringify(data),
+        content:
+          data.assistantMessage?.content ??
+          data.content ??
+          "No response from agent.",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, assistantMessage]);

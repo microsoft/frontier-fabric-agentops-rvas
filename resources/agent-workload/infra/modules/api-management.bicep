@@ -54,13 +54,17 @@ resource frontendApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2023-0
   name: 'policy'
   properties: {
     format: 'xml'
-    value: '<policies><inbound><base /><set-backend-service base-url="https://${frontendFqdn}" /><cors allow-credentials="true"><allowed-origins><origin>*</origin></allowed-origins><allowed-methods preflight-result-max-age="300"><method>GET</method><method>POST</method><method>PUT</method><method>DELETE</method><method>OPTIONS</method></allowed-methods><allowed-headers><header>*</header></allowed-headers></cors></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
+    value: '<policies><inbound><base /><set-backend-service base-url="https://${frontendFqdn}" /><cors><allowed-origins><origin>*</origin></allowed-origins><allowed-methods preflight-result-max-age="300"><method>GET</method><method>POST</method><method>PUT</method><method>DELETE</method><method>OPTIONS</method></allowed-methods><allowed-headers><header>*</header></allowed-headers></cors></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
+    // To allow credentials, replace the wildcard origin with the explicit frontend FQDN:
+    // value: '<policies><inbound><base /><set-backend-service base-url="https://${frontendFqdn}" /><cors allow-credentials="true"><allowed-origins><origin>https://${frontendFqdn}</origin></allowed-origins><allowed-methods preflight-result-max-age="300"><method>GET</method><method>POST</method><method>PUT</method><method>DELETE</method><method>OPTIONS</method></allowed-methods><allowed-headers><header>*</header></allowed-headers></cors></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
   }
 }
 
 resource frontendGetAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = {
   parent: frontendApi
   name: 'frontend-get-all'
+  // APIM config store uses optimistic concurrency; child resources must deploy serially
+  dependsOn: [ frontendApiPolicy ]
   properties: {
     displayName: 'Proxy all GET requests'
     method: 'GET'
@@ -71,6 +75,7 @@ resource frontendGetAll 'Microsoft.ApiManagement/service/apis/operations@2023-09
 resource frontendPostAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = {
   parent: frontendApi
   name: 'frontend-post-all'
+  dependsOn: [ frontendGetAll ]
   properties: {
     displayName: 'Proxy all POST requests'
     method: 'POST'
@@ -83,6 +88,7 @@ resource frontendPostAll 'Microsoft.ApiManagement/service/apis/operations@2023-0
 resource backendApi 'Microsoft.ApiManagement/service/apis@2023-09-01-preview' = {
   parent: apimService
   name: 'backend-api'
+  dependsOn: [ frontendPostAll ]
   properties: {
     displayName: 'Backend API'
     path: 'api'
@@ -100,13 +106,16 @@ resource backendApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2023-09
   name: 'policy'
   properties: {
     format: 'xml'
-    value: '<policies><inbound><base /><set-backend-service base-url="https://${backendFqdn}" /><cors allow-credentials="true"><allowed-origins><origin>*</origin></allowed-origins><allowed-methods preflight-result-max-age="300"><method>GET</method><method>POST</method><method>PUT</method><method>DELETE</method><method>OPTIONS</method></allowed-methods><allowed-headers><header>*</header></allowed-headers></cors></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
+    value: '<policies><inbound><base /><set-backend-service base-url="https://${backendFqdn}" /><cors><allowed-origins><origin>*</origin></allowed-origins><allowed-methods preflight-result-max-age="300"><method>GET</method><method>POST</method><method>PUT</method><method>DELETE</method><method>OPTIONS</method></allowed-methods><allowed-headers><header>*</header></allowed-headers></cors></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
+    // To allow credentials, replace the wildcard origin with the explicit frontend FQDN:
+    // value: '<policies><inbound><base /><set-backend-service base-url="https://${backendFqdn}" /><cors allow-credentials="true"><allowed-origins><origin>https://${frontendFqdn}</origin></allowed-origins><allowed-methods preflight-result-max-age="300"><method>GET</method><method>POST</method><method>PUT</method><method>DELETE</method><method>OPTIONS</method></allowed-methods><allowed-headers><header>*</header></allowed-headers></cors></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
   }
 }
 
 resource backendGetAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = {
   parent: backendApi
   name: 'backend-get-all'
+  dependsOn: [ backendApiPolicy ]
   properties: {
     displayName: 'Proxy all GET requests'
     method: 'GET'
@@ -117,6 +126,7 @@ resource backendGetAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-
 resource backendPostAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = {
   parent: backendApi
   name: 'backend-post-all'
+  dependsOn: [ backendGetAll ]
   properties: {
     displayName: 'Proxy all POST requests'
     method: 'POST'
@@ -127,6 +137,7 @@ resource backendPostAll 'Microsoft.ApiManagement/service/apis/operations@2023-09
 resource backendPutAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = {
   parent: backendApi
   name: 'backend-put-all'
+  dependsOn: [ backendPostAll ]
   properties: {
     displayName: 'Proxy all PUT requests'
     method: 'PUT'
@@ -137,6 +148,7 @@ resource backendPutAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-
 resource backendDeleteAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = {
   parent: backendApi
   name: 'backend-delete-all'
+  dependsOn: [ backendPutAll ]
   properties: {
     displayName: 'Proxy all DELETE requests'
     method: 'DELETE'
@@ -149,6 +161,7 @@ resource backendDeleteAll 'Microsoft.ApiManagement/service/apis/operations@2023-
 resource agentApi 'Microsoft.ApiManagement/service/apis@2023-09-01-preview' = {
   parent: apimService
   name: 'agent-api'
+  dependsOn: [ backendDeleteAll ]
   properties: {
     displayName: 'Agent API'
     path: 'agent'
@@ -166,13 +179,16 @@ resource agentApiPolicy 'Microsoft.ApiManagement/service/apis/policies@2023-09-0
   name: 'policy'
   properties: {
     format: 'xml'
-    value: '<policies><inbound><base /><set-backend-service base-url="https://${agentFqdn}" /><cors allow-credentials="true"><allowed-origins><origin>*</origin></allowed-origins><allowed-methods preflight-result-max-age="300"><method>GET</method><method>POST</method><method>PUT</method><method>DELETE</method><method>OPTIONS</method></allowed-methods><allowed-headers><header>*</header></allowed-headers></cors></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
+    value: '<policies><inbound><base /><set-backend-service base-url="https://${agentFqdn}" /><cors><allowed-origins><origin>*</origin></allowed-origins><allowed-methods preflight-result-max-age="300"><method>GET</method><method>POST</method><method>PUT</method><method>DELETE</method><method>OPTIONS</method></allowed-methods><allowed-headers><header>*</header></allowed-headers></cors></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
+    // To allow credentials, replace the wildcard origin with the explicit frontend FQDN:
+    // value: '<policies><inbound><base /><set-backend-service base-url="https://${agentFqdn}" /><cors allow-credentials="true"><allowed-origins><origin>https://${frontendFqdn}</origin></allowed-origins><allowed-methods preflight-result-max-age="300"><method>GET</method><method>POST</method><method>PUT</method><method>DELETE</method><method>OPTIONS</method></allowed-methods><allowed-headers><header>*</header></allowed-headers></cors></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>'
   }
 }
 
 resource agentGetAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = {
   parent: agentApi
   name: 'agent-get-all'
+  dependsOn: [ agentApiPolicy ]
   properties: {
     displayName: 'Proxy all GET requests'
     method: 'GET'
@@ -183,6 +199,7 @@ resource agentGetAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01
 resource agentPostAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = {
   parent: agentApi
   name: 'agent-post-all'
+  dependsOn: [ agentGetAll ]
   properties: {
     displayName: 'Proxy all POST requests'
     method: 'POST'
@@ -193,6 +210,7 @@ resource agentPostAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-0
 resource agentPutAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = {
   parent: agentApi
   name: 'agent-put-all'
+  dependsOn: [ agentPostAll ]
   properties: {
     displayName: 'Proxy all PUT requests'
     method: 'PUT'
@@ -203,6 +221,7 @@ resource agentPutAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01
 resource agentDeleteAll 'Microsoft.ApiManagement/service/apis/operations@2023-09-01-preview' = {
   parent: agentApi
   name: 'agent-delete-all'
+  dependsOn: [ agentPutAll ]
   properties: {
     displayName: 'Proxy all DELETE requests'
     method: 'DELETE'
