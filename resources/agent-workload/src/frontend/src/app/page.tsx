@@ -9,6 +9,7 @@ import {
   Spinner,
   Subtitle1,
   Body1,
+  Switch,
 } from "@fluentui/react-components";
 import { SendRegular } from "@fluentui/react-icons";
 
@@ -18,6 +19,8 @@ interface Message {
   timestamp: Date;
 }
 
+type ChatMode = "model" | "agent";
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ChatPage() {
@@ -25,11 +28,20 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<ChatMode>("model");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  function handleModeChange(nextMode: ChatMode) {
+    if (nextMode === mode) return;
+    // Start a fresh conversation when switching chat modes
+    setMode(nextMode);
+    setConversationId(null);
+    setMessages([]);
+  }
 
   async function createConversation(title: string): Promise<string> {
     const response = await fetch(`${apiUrl}/api/conversations`, {
@@ -70,7 +82,7 @@ export default function ChatPage() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: trimmed }),
+          body: JSON.stringify({ content: trimmed, mode }),
         }
       );
 
@@ -111,11 +123,24 @@ export default function ChatPage() {
     <div style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
-        <Subtitle1 style={styles.headerTitle}>
-          Agents Runtime – Chat
-        </Subtitle1>
+        <div style={styles.headerRow}>
+          <Subtitle1 style={styles.headerTitle}>
+            Agents Runtime – Chat
+          </Subtitle1>
+          <Switch
+            checked={mode === "agent"}
+            onChange={(_e, data) =>
+              handleModeChange(data.checked ? "agent" : "model")
+            }
+            disabled={loading}
+            label={mode === "agent" ? "Foundry agent" : "Model"}
+            labelPosition="before"
+          />
+        </div>
         <Text size={200} style={styles.headerSubtitle}>
-          Azure AI Agents Runtime Demo with full observability
+          {mode === "agent"
+            ? "Chatting with the Azure AI Foundry agent"
+            : "Chatting directly with the deployed model"}
         </Text>
       </div>
 
@@ -216,6 +241,11 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "16px 24px",
     backgroundColor: "#ffffff",
     borderBottom: "1px solid #e0e0e0",
+  },
+  headerRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   headerTitle: {
     color: "#0078d4",

@@ -6,14 +6,21 @@ param environmentName string
 @description('Azure region for all resources.')
 param location string = resourceGroup().location
 
-@description('Azure OpenAI model deployment name.')
+@description('Azure AI Foundry model deployment name.')
 param openAiModelName string = 'gpt-5.4'
+
+@description('Object ID of the user/principal running the deployment. Granted Foundry Owner on the Foundry resource.')
+param principalId string = ''
 
 var tags = {
   environment: environmentName
   project: 'observability-platform'
   'azd-env-name': environmentName
 }
+
+var foundryProjectName = '${environmentName}-project'
+var foundryAgentName = '${environmentName}-agent'
+var aiProjectEndpoint = 'https://${environmentName}-foundry.services.ai.azure.com/api/projects/${foundryProjectName}'
 
 // ── User-Assigned Managed Identity ────────────────────────────────────────────
 
@@ -45,18 +52,22 @@ module cosmosDb 'modules/cosmos-db.bicep' = {
   }
 }
 
-// ── Azure AI Services (OpenAI) ────────────────────────────────────────────────
+// ── Azure AI Foundry (AI Services) ────────────────────────────────────────────
 
-resource cognitiveAccount 'Microsoft.CognitiveServices/accounts@2024-04-01-preview' = {
-  name: '${environmentName}-openai'
+resource cognitiveAccount 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
+  name: '${environmentName}-foundry'
   location: location
   tags: tags
-  kind: 'OpenAI'
+  kind: 'AIServices'
+  identity: {
+    type: 'SystemAssigned'
+  }
   sku: {
     name: 'S0'
   }
   properties: {
-    customSubDomainName: '${environmentName}-openai'
+    allowProjectManagement: true
+    customSubDomainName: '${environmentName}-foundry'
     publicNetworkAccess: 'Enabled'
     networkAcls: {
       defaultAction: 'Allow'
@@ -64,7 +75,7 @@ resource cognitiveAccount 'Microsoft.CognitiveServices/accounts@2024-04-01-previ
   }
 }
 
-resource openAiDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-04-01-preview' = {
+resource openAiDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = {
   parent: cognitiveAccount
   name: openAiModelName
   sku: {
@@ -77,6 +88,40 @@ resource openAiDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024
       name: openAiModelName
       version: '2026-03-05'
     }
+  }
+}
+
+// Attach the Foundry resource to Application Insights for agent tracing/observability
+resource foundryAppInsightsConnection 'Microsoft.CognitiveServices/accounts/connections@2025-06-01' = {
+  parent: cognitiveAccount
+  name: 'appinsights-connection'
+  properties: {
+    category: 'AppInsights'
+    target: monitoring.outputs.applicationInsightsId
+    authType: 'ApiKey'
+    isSharedToAll: true
+    credentials: {
+      key: monitoring.outputs.applicationInsightsConnectionString
+    }
+    metadata: {
+      ApiType: 'Azure'
+      ResourceId: monitoring.outputs.applicationInsightsId
+    }
+  }
+}
+
+// Foundry project – hosts the Agent Service where the agent runs on the deployed model
+resource foundryProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = {
+  parent: cognitiveAccount
+  name: foundryProjectName
+  location: location
+  tags: tags
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    displayName: '${environmentName} agent project'
+    description: 'Foundry project hosting the observability demo agent.'
   }
 }
 
@@ -113,6 +158,8 @@ module containerApps 'modules/container-apps.bicep' = {
     cosmosDbEndpoint: cosmosDb.outputs.cosmosDbEndpoint
     openAiEndpoint: cognitiveAccount.properties.endpoint
     openAiDeploymentName: openAiModelName
+    aiProjectEndpoint: aiProjectEndpoint
+    foundryAgentName: foundryAgentName
     managedIdentityId: managedIdentity.id
     managedIdentityClientId: managedIdentity.properties.clientId
     managedIdentityPrincipalId: managedIdentity.properties.principalId
@@ -168,7 +215,7 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
   }
 }
 
-// Cognitive Services OpenAI User – allows managed identity to call OpenAI
+// Cognitive Services OpenAI User – allows managed identity to call the Foundry-hosted model
 var cognitiveServicesOpenAiUserRoleId = '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
 
 resource openAiRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
@@ -181,6 +228,45 @@ resource openAiRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-0
   }
 }
 
+// Cognitive Services User – grants the agents data action (AIServices/agents/*) used by the Responses API
+var cognitiveServicesUserRoleId = 'a97b65f3-24c7-4388-baec-2e87135dc908'
+
+resource cognitiveServicesUserRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(cognitiveAccount.id, managedIdentity.id, cognitiveServicesUserRoleId)
+  scope: cognitiveAccount
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', cognitiveServicesUserRoleId)
+    principalId: managedIdentity.properties.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Azure AI Developer – allows managed identity to create and run agents in the Foundry project
+var azureAiDeveloperRoleId = '64702f94-c441-49e6-a78b-ef80e0188fee'
+
+resource aiDeveloperRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(foundryProject.id, managedIdentity.id, azureAiDeveloperRoleId)
+  scope: foundryProject
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', azureAiDeveloperRoleId)
+    principalId: managedIdentity.properties.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Foundry Owner – grants the deploying user full ownership of the Foundry resource
+var foundryOwnerRoleId = 'c883944f-8b7b-4483-af10-35834be79c4a'
+
+resource foundryOwnerRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(principalId)) {
+  name: guid(cognitiveAccount.id, principalId, foundryOwnerRoleId)
+  scope: cognitiveAccount
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', foundryOwnerRoleId)
+    principalId: principalId
+    principalType: 'User'
+  }
+}
+
 // ── Outputs ───────────────────────────────────────────────────────────────────
 
 output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.containerRegistryName
@@ -190,6 +276,8 @@ output AZURE_COSMOS_DB_ENDPOINT string = cosmosDb.outputs.cosmosDbEndpoint
 output AZURE_KEY_VAULT_NAME string = keyVault.name
 output AZURE_OPENAI_ENDPOINT string = cognitiveAccount.properties.endpoint
 output AZURE_OPENAI_DEPLOYMENT string = openAiModelName
+output AZURE_AI_PROJECT_ENDPOINT string = aiProjectEndpoint
+output AZURE_AI_AGENT_NAME string = foundryAgentName
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.applicationInsightsConnectionString
 output APPLICATIONINSIGHTS_NAME string = monitoring.outputs.applicationInsightsName
 output AZURE_APIM_GATEWAY_URL string = apiManagement.outputs.apimGatewayUrl

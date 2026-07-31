@@ -25,6 +25,19 @@ services:
 # On a fresh deploy the frontend image is built before BACKEND_FQDN is known, so
 # rebuild it here (server-side ACR build) once the real backend URL is available.
 hooks:
+  # Create the Foundry agent during deployment (after infra is provisioned), so the
+  # agent exists in the project before any chat traffic and is never created at runtime.
+  postprovision:
+    windows:
+      shell: pwsh
+      run: |
+        python -m pip install --quiet --disable-pip-version-check -r ./scripts/requirements.txt
+        python ./scripts/create_agent.py
+    posix:
+      shell: sh
+      run: |
+        python3 -m pip install --quiet --disable-pip-version-check -r ./scripts/requirements.txt
+        python3 ./scripts/create_agent.py
   postdeploy:
     windows:
       shell: pwsh

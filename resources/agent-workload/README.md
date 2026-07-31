@@ -21,7 +21,7 @@ The **Agents Runtime** is the core execution block of the observability platform
 
 | Component | Role |
 |---|---|
-| **Azure AI Foundry** | Provides the AI model endpoint (GPT-4o / GPT-4o-mini) for agent inference via managed deployments. |
+| **Azure AI Foundry** | Foundry (`AIServices`) resource with project management enabled. Hosts the model deployment (GPT-4o / GPT-4o-mini) and a **Foundry project** running the Agent Service, and is connected to Application Insights for agent tracing. |
 | **Azure Container Apps** | Hosts three microservices — frontend, backend, and agent — in a shared managed environment with built-in autoscaling. |
 | **Azure API Management** | Unified API gateway with PTU-aware load balancing, rate limiting, and centralized analytics. |
 | **Azure Cosmos DB** | Stores conversations, individual interactions, and agent configuration using a serverless throughput model. |
@@ -109,7 +109,7 @@ After deployment completes, `azd` prints the service URLs:
 |---|---|
 | **Technology** | Next.js 14 (React, TypeScript) |
 | **Port** | 3000 |
-| **Purpose** | Modern chat interface for user interactions with the AI agent. Renders streaming responses, manages conversation state, and provides a clean UX for the RVAS. |
+| **Purpose** | Modern chat interface for user interactions with the AI agent. Includes a **Model/Agent switch** to toggle between direct model chat and the Foundry agent, renders streaming responses, manages conversation state, and provides a clean UX for the RVAS. |
 
 ### Backend — `src/backend`
 
@@ -125,7 +125,7 @@ After deployment completes, `azd` prints the service URLs:
 |---|---|
 | **Technology** | FastAPI (Python 3.12) |
 | **Port** | 8001 |
-| **Purpose** | AI agent runtime that receives user messages, constructs prompts with conversation context, invokes the Azure AI Foundry model endpoint, and returns completions. Supports both synchronous and streaming responses. |
+| **Purpose** | AI agent runtime that receives user messages, constructs prompts with conversation context, and returns completions. Supports two chat modes: **model** (direct calls to the deployed model) and **agent** (the Azure AI Foundry agent, created on the same deployed model). Supports both synchronous and streaming responses. |
 
 ---
 
@@ -192,9 +192,12 @@ Content-Type: application/json
 
 {
   "role": "user",
-  "content": "Explain observability in distributed systems."
+  "content": "Explain observability in distributed systems.",
+  "mode": "agent"
 }
 ```
+
+> `mode` is optional (`"model"` by default) and is forwarded to the agent service to select model or Foundry-agent chat.
 
 **Response** `200 OK`
 
@@ -236,10 +239,13 @@ Content-Type: application/json
     { "role": "system", "content": "You are a helpful assistant." },
     { "role": "user", "content": "What is Azure Container Apps?" }
   ],
+  "mode": "agent",
   "temperature": 0.7,
   "max_tokens": 1024
 }
 ```
+
+> `mode` selects the runtime: `"model"` (default) calls the deployed model directly, `"agent"` routes through the Azure AI Foundry agent.
 
 **Response** `200 OK`
 
@@ -317,11 +323,14 @@ GET /api/health
 
 | Variable | Description | Required |
 |---|---|---|
-| `AZURE_OPENAI_ENDPOINT` | Azure AI Foundry / OpenAI endpoint URL | Yes |
+| `AZURE_OPENAI_ENDPOINT` | Azure AI Foundry endpoint URL | Yes |
 | `AZURE_OPENAI_DEPLOYMENT` | Model deployment name (e.g., `gpt-4o`) | Yes |
 | `AZURE_OPENAI_API_VERSION` | API version (default: `2024-06-01`) | No |
+| `AZURE_AI_PROJECT_ENDPOINT` | Foundry project endpoint for the Agent Service (enables `agent` mode) | Yes |
+| `AZURE_AI_AGENT_NAME` | Name of the Foundry agent to create/reuse | No |
+| `AZURE_AI_AGENT_MODEL` | Model deployment the Foundry agent runs on (defaults to `AZURE_OPENAI_DEPLOYMENT`) | No |
 | `APPLICATIONINSIGHTS_CONNECTION_STRING` | Application Insights connection string for telemetry | Yes |
-| `AZURE_CLIENT_ID` | Managed identity client ID for Azure OpenAI authentication | Yes |
+| `AZURE_CLIENT_ID` | Managed identity client ID for Foundry authentication | Yes |
 | `PORT` | Server port (default: `8001`) | No |
 
 ### Frontend Service
@@ -360,8 +369,10 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
 # Set required environment variables
-export AZURE_OPENAI_ENDPOINT="https://<your-resource>.openai.azure.com/"
+export AZURE_OPENAI_ENDPOINT="https://<your-resource>.cognitiveservices.azure.com/"
 export AZURE_OPENAI_DEPLOYMENT="gpt-4o"
+export AZURE_AI_PROJECT_ENDPOINT="https://<your-resource>.services.ai.azure.com/api/projects/<project>"
+export AZURE_AI_AGENT_NAME="observability-agent"
 export APPLICATIONINSIGHTS_CONNECTION_STRING="<your-connection-string>"
 
 uvicorn app:app --reload --port 8001
@@ -394,7 +405,7 @@ All three services emit telemetry through the **Azure Monitor OpenTelemetry SDK*
 Every inbound HTTP request generates a trace that flows through the entire call chain:
 
 ```
-Frontend → APIM → Backend → Agent → Azure OpenAI
+Frontend → APIM → Backend → Agent → Azure AI Foundry (model or agent)
 ```
 
 Each span in the trace includes:
@@ -409,7 +420,7 @@ Each span in the trace includes:
 The Application Map automatically discovers service dependencies and displays:
 - Request rates and failure rates between services
 - Average response times per dependency
-- Cosmos DB and Azure OpenAI as external dependencies
+- Cosmos DB and Azure AI Foundry as external dependencies
 
 **View the map:** Azure Portal → Application Insights → Application map.
 
@@ -484,8 +495,8 @@ The infrastructure is defined in Bicep modules under `infra/`:
 | `cosmosDb.bicep` | Cosmos DB account (serverless), `agentsdb` database, `conversations` and `interactions` containers with partition keys |
 | `apiManagement.bicep` | APIM instance, API definitions, policies for rate limiting and PTU load balancing, named values |
 | `monitoring.bicep` | Log Analytics workspace, Application Insights instance, diagnostic settings for all resources |
-| `aiFoundry.bicep` | Azure AI Services account, model deployment (GPT-4o), managed identity role assignment |
-| `security.bicep` | User-assigned managed identities, role assignments (Cosmos DB Data Contributor, Cognitive Services OpenAI User) |
+| `main.bicep` (Foundry) | Azure AI Foundry (`AIServices`) account, model deployment (GPT-4o), Foundry project for the Agent Service, and an Application Insights connection for agent tracing |
+| `main.bicep` (security) | User-assigned managed identity, role assignments (Cosmos DB Data Contributor, Cognitive Services OpenAI User, Azure AI Developer on the project) |
 
 ---
 

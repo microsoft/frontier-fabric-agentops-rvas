@@ -22,6 +22,12 @@ param openAiEndpoint string
 @description('Azure OpenAI model deployment name.')
 param openAiDeploymentName string
 
+@description('Azure AI Foundry project endpoint for the Agent Service.')
+param aiProjectEndpoint string
+
+@description('Name of the Foundry agent to create/use.')
+param foundryAgentName string
+
 @description('Resource ID of the user-assigned managed identity.')
 param managedIdentityId string
 
@@ -262,6 +268,18 @@ resource agentApp 'Microsoft.App/containerApps@2024-03-01' = {
             }
             {
               name: 'AZURE_OPENAI_DEPLOYMENT'
+              value: openAiDeploymentName
+            }
+            {
+              name: 'AZURE_AI_PROJECT_ENDPOINT'
+              value: aiProjectEndpoint
+            }
+            {
+              name: 'AZURE_AI_AGENT_NAME'
+              value: foundryAgentName
+            }
+            {
+              name: 'AZURE_AI_AGENT_MODEL'
               value: openAiDeploymentName
             }
             {

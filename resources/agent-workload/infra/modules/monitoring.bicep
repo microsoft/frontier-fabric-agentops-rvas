@@ -51,3 +51,6 @@ output applicationInsightsInstrumentationKey string = applicationInsights.proper
 
 @description('Application Insights resource name.')
 output applicationInsightsName string = applicationInsights.name
+
+@description('Resource ID of the Application Insights component.')
+output applicationInsightsId string = applicationInsights.id

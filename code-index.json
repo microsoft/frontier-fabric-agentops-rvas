@@ -1,5 +1,5 @@
 {
-  "total": 62,
+  "total": 73,
   "groups": [
     {
       "id": "agent-workload",
@@ -12,8 +12,48 @@
         "Foundry"
       ],
       "readme": "resources/agent-workload/README.html",
-      "count": 24,
+      "count": 35,
       "files": [
+        {
+          "path": "resources/agent-workload/.azure/.env.lock",
+          "name": ".azure/.env.lock"
+        },
+        {
+          "path": "resources/agent-workload/.azure/.gitignore",
+          "name": ".azure/.gitignore"
+        },
+        {
+          "path": "resources/agent-workload/.azure/.state-change",
+          "name": ".azure/.state-change"
+        },
+        {
+          "path": "resources/agent-workload/.azure/config.json",
+          "name": ".azure/config.json"
+        },
+        {
+          "path": "resources/agent-workload/.azure/fctv3/.env",
+          "name": ".azure/fctv3/.env"
+        },
+        {
+          "path": "resources/agent-workload/.azure/fctv3/.env.lock",
+          "name": ".azure/fctv3/.env.lock"
+        },
+        {
+          "path": "resources/agent-workload/.azure/fctv3/config.json",
+          "name": ".azure/fctv3/config.json"
+        },
+        {
+          "path": "resources/agent-workload/.azure/fctv4/.env",
+          "name": ".azure/fctv4/.env"
+        },
+        {
+          "path": "resources/agent-workload/.azure/fctv4/.env.lock",
+          "name": ".azure/fctv4/.env.lock"
+        },
+        {
+          "path": "resources/agent-workload/.azure/fctv4/config.json",
+          "name": ".azure/fctv4/config.json"
+        },
         {
           "path": "resources/agent-workload/.github/workflows/deploy.yml",
           "name": ".github/workflows/deploy.yml"
@@ -73,6 +113,10 @@
         {
           "path": "resources/agent-workload/src/backend/requirements.txt",
           "name": "src/backend/requirements.txt"
+        },
+        {
+          "path": "resources/agent-workload/src/frontend/.npmrc",
+          "name": "src/frontend/.npmrc"
         },
         {
           "path": "resources/agent-workload/src/frontend/Dockerfile",

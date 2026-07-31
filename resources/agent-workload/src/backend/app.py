@@ -36,6 +36,7 @@ class CreateConversationRequest(BaseModel):
 class SendMessageRequest(BaseModel):
     content: str
     role: str = "user"
+    mode: str = "model"
 
 
 class Message(BaseModel):
@@ -172,6 +173,7 @@ async def send_message(conversation_id: str, request: SendMessageRequest):
             json={
                 "messages": [{"role": "user", "content": request.content}],
                 "session_id": conversation_id,
+                "mode": request.mode,
             },
         )
         agent_response.raise_for_status()

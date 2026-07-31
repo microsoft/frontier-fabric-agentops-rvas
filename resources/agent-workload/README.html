@@ -99,7 +99,7 @@ conversation data the Control Tower later correlates.</p>
 </tr>
 </thead><tbody><tr>
 <td><strong>Azure AI Foundry</strong></td>
-<td>Provides the AI model endpoint (GPT-4o / GPT-4o-mini) for agent inference via managed deployments.</td>
+<td>Foundry (<code>AIServices</code>) resource with project management enabled. Hosts the model deployment (GPT-4o / GPT-4o-mini) and a <strong>Foundry project</strong> running the Agent Service, and is connected to Application Insights for agent tracing.</td>
 </tr>
 <tr>
 <td><strong>Azure Container Apps</strong></td>
@@ -219,7 +219,7 @@ azd up</code></pre>
 </tr>
 <tr>
 <td><strong>Purpose</strong></td>
-<td>Modern chat interface for user interactions with the AI agent. Renders streaming responses, manages conversation state, and provides a clean UX for the RVAS.</td>
+<td>Modern chat interface for user interactions with the AI agent. Includes a <strong>Model/Agent switch</strong> to toggle between direct model chat and the Foundry agent, renders streaming responses, manages conversation state, and provides a clean UX for the RVAS.</td>
 </tr>
 </tbody></table></div>
 <h3 id="backend-—-srcbackend">Backend — <code>src/backend</code><a class="anchor" href="#backend-—-srcbackend" aria-hidden="true">#</a></h3>
@@ -255,7 +255,7 @@ azd up</code></pre>
 </tr>
 <tr>
 <td><strong>Purpose</strong></td>
-<td>AI agent runtime that receives user messages, constructs prompts with conversation context, invokes the Azure AI Foundry model endpoint, and returns completions. Supports both synchronous and streaming responses.</td>
+<td>AI agent runtime that receives user messages, constructs prompts with conversation context, and returns completions. Supports two chat modes: <strong>model</strong> (direct calls to the deployed model) and <strong>agent</strong> (the Azure AI Foundry agent, created on the same deployed model). Supports both synchronous and streaming responses.</td>
 </tr>
 </tbody></table></div>
 <hr>
@@ -302,8 +302,12 @@ Content-Type: application/json
 
 {
   &quot;role&quot;: &quot;user&quot;,
-  &quot;content&quot;: &quot;Explain observability in distributed systems.&quot;
+  &quot;content&quot;: &quot;Explain observability in distributed systems.&quot;,
+  &quot;mode&quot;: &quot;agent&quot;
 }</code></pre>
+<blockquote>
+<p><code>mode</code> is optional (<code>&quot;model&quot;</code> by default) and is forwarded to the agent service to select model or Foundry-agent chat.</p>
+</blockquote>
 <p><strong>Response</strong> <code>200 OK</code></p>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-json">{
   &quot;role&quot;: &quot;assistant&quot;,
@@ -329,9 +333,13 @@ Content-Type: application/json
     { &quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a helpful assistant.&quot; },
     { &quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is Azure Container Apps?&quot; }
   ],
+  &quot;mode&quot;: &quot;agent&quot;,
   &quot;temperature&quot;: 0.7,
   &quot;max_tokens&quot;: 1024
 }</code></pre>
+<blockquote>
+<p><code>mode</code> selects the runtime: <code>&quot;model&quot;</code> (default) calls the deployed model directly, <code>&quot;agent&quot;</code> routes through the Azure AI Foundry agent.</p>
+</blockquote>
 <p><strong>Response</strong> <code>200 OK</code></p>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-json">{
   &quot;message&quot;: {
@@ -416,7 +424,7 @@ data: {&quot;type&quot;: &quot;done&quot;, &quot;usage&quot;: {&quot;prompt_toke
 </tr>
 </thead><tbody><tr>
 <td><code>AZURE_OPENAI_ENDPOINT</code></td>
-<td>Azure AI Foundry / OpenAI endpoint URL</td>
+<td>Azure AI Foundry endpoint URL</td>
 <td>Yes</td>
 </tr>
 <tr>
@@ -430,13 +438,28 @@ data: {&quot;type&quot;: &quot;done&quot;, &quot;usage&quot;: {&quot;prompt_toke
 <td>No</td>
 </tr>
 <tr>
+<td><code>AZURE_AI_PROJECT_ENDPOINT</code></td>
+<td>Foundry project endpoint for the Agent Service (enables <code>agent</code> mode)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>AZURE_AI_AGENT_NAME</code></td>
+<td>Name of the Foundry agent to create/reuse</td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>AZURE_AI_AGENT_MODEL</code></td>
+<td>Model deployment the Foundry agent runs on (defaults to <code>AZURE_OPENAI_DEPLOYMENT</code>)</td>
+<td>No</td>
+</tr>
+<tr>
 <td><code>APPLICATIONINSIGHTS_CONNECTION_STRING</code></td>
 <td>Application Insights connection string for telemetry</td>
 <td>Yes</td>
 </tr>
 <tr>
 <td><code>AZURE_CLIENT_ID</code></td>
-<td>Managed identity client ID for Azure OpenAI authentication</td>
+<td>Managed identity client ID for Foundry authentication</td>
 <td>Yes</td>
 </tr>
 <tr>
@@ -487,8 +510,10 @@ python -m venv .venv &amp;&amp; source .venv/bin/activate
 pip install -r requirements.txt
 
 # Set required environment variables
-export AZURE_OPENAI_ENDPOINT=&quot;https://&lt;your-resource&gt;.openai.azure.com/&quot;
+export AZURE_OPENAI_ENDPOINT=&quot;https://&lt;your-resource&gt;.cognitiveservices.azure.com/&quot;
 export AZURE_OPENAI_DEPLOYMENT=&quot;gpt-4o&quot;
+export AZURE_AI_PROJECT_ENDPOINT=&quot;https://&lt;your-resource&gt;.services.ai.azure.com/api/projects/&lt;project&gt;&quot;
+export AZURE_AI_AGENT_NAME=&quot;observability-agent&quot;
 export APPLICATIONINSIGHTS_CONNECTION_STRING=&quot;&lt;your-connection-string&gt;&quot;
 
 uvicorn app:app --reload --port 8001</code></pre>
@@ -507,7 +532,7 @@ npm run dev</code></pre>
 <p>All three services emit telemetry through the <strong>Azure Monitor OpenTelemetry SDK</strong>. Traces, metrics, and logs are collected automatically and correlated across service boundaries.</p>
 <h4 id="distributed-tracing">Distributed Tracing</h4>
 <p>Every inbound HTTP request generates a trace that flows through the entire call chain:</p>
-<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>Frontend → APIM → Backend → Agent → Azure OpenAI</code></pre>
+<pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>Frontend → APIM → Backend → Agent → Azure AI Foundry (model or agent)</code></pre>
 <p>Each span in the trace includes:</p>
 <ul>
 <li>HTTP method, URL, and status code</li>
@@ -520,7 +545,7 @@ npm run dev</code></pre>
 <ul>
 <li>Request rates and failure rates between services</li>
 <li>Average response times per dependency</li>
-<li>Cosmos DB and Azure OpenAI as external dependencies</li>
+<li>Cosmos DB and Azure AI Foundry as external dependencies</li>
 </ul>
 <p><strong>View the map:</strong> Azure Portal → Application Insights → Application map.</p>
 <h4 id="custom-metrics">Custom Metrics</h4>
@@ -606,12 +631,12 @@ customMetrics
 <td>Log Analytics workspace, Application Insights instance, diagnostic settings for all resources</td>
 </tr>
 <tr>
-<td><code>aiFoundry.bicep</code></td>
-<td>Azure AI Services account, model deployment (GPT-4o), managed identity role assignment</td>
+<td><code>main.bicep</code> (Foundry)</td>
+<td>Azure AI Foundry (<code>AIServices</code>) account, model deployment (GPT-4o), Foundry project for the Agent Service, and an Application Insights connection for agent tracing</td>
 </tr>
 <tr>
-<td><code>security.bicep</code></td>
-<td>User-assigned managed identities, role assignments (Cosmos DB Data Contributor, Cognitive Services OpenAI User)</td>
+<td><code>main.bicep</code> (security)</td>
+<td>User-assigned managed identity, role assignments (Cosmos DB Data Contributor, Cognitive Services OpenAI User, Azure AI Developer on the project)</td>
 </tr>
 </tbody></table></div>
 <hr>
@@ -655,8 +680,18 @@ SOFTWARE.</code></pre>
         </article>
         
         <div class="filetree">
-          <div class="filetree-head">📁 agent-workload — 24 files · click any file to view it here (syntax-highlighted)</div>
+          <div class="filetree-head">📁 agent-workload — 35 files · click any file to view it here (syntax-highlighted)</div>
           <ul>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.azure%2F.env.lock"><span class="ic">›</span>agent-workload/.azure/.env.lock</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.azure%2F.gitignore"><span class="ic">›</span>agent-workload/.azure/.gitignore</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.azure%2F.state-change"><span class="ic">›</span>agent-workload/.azure/.state-change</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.azure%2Fconfig.json"><span class="ic">›</span>agent-workload/.azure/config.json</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.azure%2Ffctv3%2F.env"><span class="ic">›</span>agent-workload/.azure/fctv3/.env</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.azure%2Ffctv3%2F.env.lock"><span class="ic">›</span>agent-workload/.azure/fctv3/.env.lock</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.azure%2Ffctv3%2Fconfig.json"><span class="ic">›</span>agent-workload/.azure/fctv3/config.json</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.azure%2Ffctv4%2F.env"><span class="ic">›</span>agent-workload/.azure/fctv4/.env</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.azure%2Ffctv4%2F.env.lock"><span class="ic">›</span>agent-workload/.azure/fctv4/.env.lock</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2F.azure%2Ffctv4%2Fconfig.json"><span class="ic">›</span>agent-workload/.azure/fctv4/config.json</a></li>
             <li><a href="../../code.html?path=resources%2Fagent-workload%2F.github%2Fworkflows%2Fdeploy.yml"><span class="ic">›</span>agent-workload/.github/workflows/deploy.yml</a></li>
             <li><a href="../../code.html?path=resources%2Fagent-workload%2F.gitignore"><span class="ic">›</span>agent-workload/.gitignore</a></li>
             <li><a href="../../code.html?path=resources%2Fagent-workload%2Fazure.yaml"><span class="ic">›</span>agent-workload/azure.yaml</a></li>
@@ -672,6 +707,7 @@ SOFTWARE.</code></pre>
             <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Fbackend%2FDockerfile"><span class="ic">›</span>agent-workload/src/backend/Dockerfile</a></li>
             <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Fbackend%2Fapp.py"><span class="ic">›</span>agent-workload/src/backend/app.py</a></li>
             <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Fbackend%2Frequirements.txt"><span class="ic">›</span>agent-workload/src/backend/requirements.txt</a></li>
+            <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2F.npmrc"><span class="ic">›</span>agent-workload/src/frontend/.npmrc</a></li>
             <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2FDockerfile"><span class="ic">›</span>agent-workload/src/frontend/Dockerfile</a></li>
             <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2Fnext.config.js"><span class="ic">›</span>agent-workload/src/frontend/next.config.js</a></li>
             <li><a href="../../code.html?path=resources%2Fagent-workload%2Fsrc%2Ffrontend%2Fpackage.json"><span class="ic">›</span>agent-workload/src/frontend/package.json</a></li>
