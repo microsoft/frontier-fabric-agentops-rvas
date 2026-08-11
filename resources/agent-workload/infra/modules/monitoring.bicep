@@ -7,6 +7,9 @@ param environmentName string
 @description('Tags to apply to all resources.')
 param tags object = {}
 
+@description('Resource ID of the observability storage account for App telemetry data export. Empty disables the export rule.')
+param dataExportStorageAccountId string = ''
+
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: '${environmentName}-log'
   location: location
@@ -18,10 +21,29 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09
     retentionInDays: 30
     features: {
       enableLogAccessUsingOnlyResourcePermissions: true
+      enableDataExport: true
     }
     workspaceCapping: {
       dailyQuotaGb: 1
     }
+  }
+}
+
+// Export App telemetry tables to the observability storage account (Fabric landing zone).
+resource appTelemetryExport 'Microsoft.OperationalInsights/workspaces/dataExports@2020-08-01' = if (!empty(dataExportStorageAccountId)) {
+  parent: logAnalyticsWorkspace
+  name: 'exportToStorage'
+  properties: {
+    destination: {
+      resourceId: dataExportStorageAccountId
+    }
+    tableNames: [
+      'AppRequests'
+      'AppDependencies'
+      'AppTraces'
+      'AppMetrics'
+    ]
+    enable: true
   }
 }
 

@@ -9,6 +9,7 @@ from azure.cosmos.aio import CosmosClient
 from azure.identity.aio import DefaultAzureCredential
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,7 @@ AZURE_CLIENT_ID = os.environ.get("AZURE_CLIENT_ID", "")
 if APPLICATIONINSIGHTS_CONNECTION_STRING:
     from azure.monitor.opentelemetry import configure_azure_monitor
 
+    os.environ.setdefault("OTEL_SERVICE_NAME", "backend")
     configure_azure_monitor(connection_string=APPLICATIONINSIGHTS_CONNECTION_STRING)
 
 
@@ -86,6 +88,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Explicitly instrument this app instance so inbound requests produce server spans.
+FastAPIInstrumentor.instrument_app(app)
 
 
 # ---------------------------------------------------------------------------

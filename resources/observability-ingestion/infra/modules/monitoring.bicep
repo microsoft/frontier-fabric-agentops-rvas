@@ -41,7 +41,6 @@ resource dataExportRule 'Microsoft.OperationalInsights/workspaces/dataExports@20
       'AppRequests'
       'AppDependencies'
       'AppTraces'
-      'AppExceptions'
       'AppMetrics'
     ]
     enable: true

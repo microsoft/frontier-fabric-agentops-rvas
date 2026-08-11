@@ -11,6 +11,9 @@ param location string = resourceGroup().location
 @description('Subscription ID used as the scope for Cost Management exports.')
 param exportScope string = subscription().subscriptionId
 
+@description('Object ID of the user or principal running the deployment. Granted Storage Blob Data Contributor so it can read/write blobs (e.g. running resource_graph_export.py). Populated automatically by azd via AZURE_PRINCIPAL_ID.')
+param deploymentUserPrincipalId string = ''
+
 var resourceToken = toLower(uniqueString(resourceGroup().id, environmentName))
 var storageAccountName = 'st${replace(resourceToken, '-', '')}obs'
 var workspaceName = 'law-${environmentName}-${resourceToken}'
@@ -51,6 +54,21 @@ resource storageBlobDataContributor 'Microsoft.Authorization/roleAssignments@202
   properties: {
     principalId: managedIdentity.properties.principalId
     principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
+    )
+  }
+}
+
+// ─── Storage Blob Data Contributor for the deploying user ────────────────────
+
+resource userStorageBlobDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(deploymentUserPrincipalId)) {
+  name: guid(resourceGroup().id, deploymentUserPrincipalId, 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+  scope: resourceGroup()
+  properties: {
+    principalId: deploymentUserPrincipalId
+    principalType: 'User'
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
       'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
@@ -108,7 +126,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enableRbacAuthorization: true
     enableSoftDelete: true
     softDeleteRetentionInDays: 7
-    enablePurgeProtection: false
+    //enablePurgeProtection: false
     networkAcls: {
       defaultAction: 'Allow'
       bypass: 'AzureServices'

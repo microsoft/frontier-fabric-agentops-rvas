@@ -1,0 +1,19 @@
+relationship rel_CostSummary_Calendar
+	fromColumn: CostSummary.period_start
+	toColumn: Calendar.Date
+
+relationship rel_OperationalMetrics_Calendar
+	fromColumn: OperationalMetrics.metric_date
+	toColumn: Calendar.Date
+
+relationship rel_CapacityUsage_Calendar
+	fromColumn: CapacityUsage.latest_snapshot
+	toColumn: Calendar.Date
+
+relationship rel_ResourceInventory_Calendar
+	fromColumn: ResourceInventory.snapshot_date
+	toColumn: Calendar.Date
+
+relationship rel_AgentAnalytics_Calendar
+	fromColumn: AgentAnalytics.interaction_date
+	toColumn: Calendar.Date

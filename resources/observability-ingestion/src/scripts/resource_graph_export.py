@@ -39,13 +39,13 @@ QUERIES = {
     ),
     "resource_counts_by_type": (
         "Resources "
-        "| summarize count=count() by type "
-        "| order by count desc"
+        "| summarize resourceCount=count() by type "
+        "| order by resourceCount desc"
     ),
     "resources_by_location": (
         "Resources "
-        "| summarize count=count() by location, type "
-        "| order by location asc, count desc"
+        "| summarize resourceCount=count() by location, type "
+        "| order by location asc, resourceCount desc"
     ),
 }
 

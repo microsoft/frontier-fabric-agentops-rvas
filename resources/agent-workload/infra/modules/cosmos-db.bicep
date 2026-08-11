@@ -36,6 +36,12 @@ resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' = {
     enableAutomaticFailover: false
     enableMultipleWriteLocations: false
     disableLocalAuth: false
+    backupPolicy: {
+      type: 'Continuous'
+      continuousModeProperties: {
+        tier: 'Continuous7Days'
+      }
+    }
   }
 }
 

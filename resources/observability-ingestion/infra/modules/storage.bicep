@@ -50,15 +50,11 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   }
 }
 
+// NOTE: Blob versioning and change feed are NOT supported on ADLS Gen2 (isHnsEnabled) accounts.
 resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
   parent: storageAccount
   name: 'default'
   properties: {
-    isVersioningEnabled: true
-    changeFeed: {
-      enabled: true
-      retentionInDays: 30
-    }
     deleteRetentionPolicy: {
       enabled: true
       days: 7
@@ -102,11 +98,6 @@ resource lifecyclePolicy 'Microsoft.Storage/storageAccounts/managementPolicies@2
                   daysAfterCreationGreaterThan: 90
                 }
               }
-              version: {
-                tierToCool: {
-                  daysAfterCreationGreaterThan: 90
-                }
-              }
             }
             filters: {
               blobTypes: [
@@ -127,11 +118,6 @@ resource lifecyclePolicy 'Microsoft.Storage/storageAccounts/managementPolicies@2
                 }
               }
               snapshot: {
-                tierToArchive: {
-                  daysAfterCreationGreaterThan: 365
-                }
-              }
-              version: {
                 tierToArchive: {
                   daysAfterCreationGreaterThan: 365
                 }

@@ -1,0 +1,114 @@
+table OperationalMetrics
+	lineageTag: tbl-operational-metrics
+
+	column service_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: service_name
+		lineageTag: om-service-name
+
+	column metric_date
+		dataType: dateTime
+		formatString: Long Date
+		summarizeBy: none
+		sourceColumn: metric_date
+		lineageTag: om-metric-date
+
+	column total_events
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: total_events
+		lineageTag: om-total-events
+
+	column error_count
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: error_count
+		lineageTag: om-error-count
+
+	column error_rate
+		dataType: decimal
+		formatString: 0.00%;-0.00%;0.00%
+		summarizeBy: none
+		sourceColumn: error_rate
+		lineageTag: om-error-rate
+
+	column latency_p50_ms
+		dataType: decimal
+		formatString: #,0.0
+		summarizeBy: none
+		sourceColumn: latency_p50_ms
+		lineageTag: om-p50
+
+	column latency_p90_ms
+		dataType: decimal
+		formatString: #,0.0
+		summarizeBy: none
+		sourceColumn: latency_p90_ms
+		lineageTag: om-p90
+
+	column latency_p99_ms
+		dataType: decimal
+		formatString: #,0.0
+		summarizeBy: none
+		sourceColumn: latency_p99_ms
+		lineageTag: om-p99
+
+	column success_count
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: success_count
+		lineageTag: om-success-count
+
+	column availability_pct
+		dataType: decimal
+		formatString: 0.0"%"
+		summarizeBy: none
+		sourceColumn: availability_pct
+		lineageTag: om-availability
+
+	measure TotalRequests = SUM(OperationalMetrics[total_events])
+		formatString: #,0
+		lineageTag: m-total-requests
+
+	measure TotalErrors = SUM(OperationalMetrics[error_count])
+		formatString: #,0
+		lineageTag: m-total-errors
+
+	measure ErrorRate = DIVIDE([TotalErrors], [TotalRequests])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: m-error-rate
+
+	measure P50Latency = AVERAGE(OperationalMetrics[latency_p50_ms])
+		formatString: #,0.0
+		lineageTag: m-p50-latency
+
+	measure P90Latency = AVERAGE(OperationalMetrics[latency_p90_ms])
+		formatString: #,0.0
+		lineageTag: m-p90-latency
+
+	measure P99Latency = AVERAGE(OperationalMetrics[latency_p99_ms])
+		formatString: #,0.0
+		lineageTag: m-p99-latency
+
+	measure P95Latency = AVERAGE(OperationalMetrics[latency_p90_ms]) + (AVERAGE(OperationalMetrics[latency_p99_ms]) - AVERAGE(OperationalMetrics[latency_p90_ms])) * DIVIDE(5, 9)
+		formatString: #,0.0
+		lineageTag: m-p95-latency
+
+	measure AvailabilityPct = AVERAGE(OperationalMetrics[availability_pct])
+		formatString: 0.0"%"
+		lineageTag: m-availability-pct
+
+	measure SuccessCount = SUM(OperationalMetrics[success_count])
+		formatString: #,0
+		lineageTag: m-success-count
+
+	partition OperationalMetrics = entity
+		mode: directLake
+		source
+			entityName: gold_operational_metrics
+			schemaName: dbo
+			expressionSource: 'DirectLake - Observability Analytics'

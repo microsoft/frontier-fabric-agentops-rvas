@@ -5,21 +5,20 @@
     "activities": [
       {
         "name": "Run E2E Load",
-        "type": "ExecutePipeline",
+        "type": "InvokePipeline",
         "dependsOn": [],
-        "policy": {
-          "timeout": "0.04:00:00"
-        },
         "typeProperties": {
-          "pipeline": {
-            "referenceName": "Load E2E Pipeline",
-            "type": "PipelineReference"
-          },
           "waitOnCompletion": true,
           "parameters": {
             "FromMonth": -1,
             "ToMonth": 0
-          }
+          },
+          "operationType": "InvokeFabricPipeline",
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "pipelineId": "Load E2E Pipeline"
+        },
+        "externalReferences": {
+          "connection": "00000000-0000-0000-0000-000000000000"
         }
       }
     ],

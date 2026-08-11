@@ -1,0 +1,114 @@
+table CostSummary
+	lineageTag: tbl-cost-summary
+
+	column cost_year
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: cost_year
+		lineageTag: cs-cost-year
+
+	column cost_month
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: cost_month
+		lineageTag: cs-cost-month
+
+	column service_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: service_name
+		lineageTag: cs-service-name
+
+	column capacity_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: capacity_name
+		lineageTag: cs-capacity-name
+
+	column region
+		dataType: string
+		summarizeBy: none
+		sourceColumn: region
+		lineageTag: cs-region
+
+	column monthly_cost
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		summarizeBy: sum
+		sourceColumn: monthly_cost
+		lineageTag: cs-monthly-cost
+
+	column monthly_line_items
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: monthly_line_items
+		lineageTag: cs-monthly-line-items
+
+	column period_start
+		dataType: dateTime
+		formatString: Long Date
+		summarizeBy: none
+		sourceColumn: period_start
+		lineageTag: cs-period-start
+
+	column period_end
+		dataType: dateTime
+		formatString: Long Date
+		summarizeBy: none
+		sourceColumn: period_end
+		lineageTag: cs-period-end
+
+	column ytd_cost
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		summarizeBy: sum
+		sourceColumn: ytd_cost
+		lineageTag: cs-ytd-cost
+
+	column ytd_line_items
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: ytd_line_items
+		lineageTag: cs-ytd-line-items
+
+	measure TotalCost = SUM(CostSummary[monthly_cost])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: m-total-cost
+
+	measure CostYTD = TOTALYTD([TotalCost], Calendar[Date])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: m-cost-ytd
+
+	measure CostMTD = TOTALMTD([TotalCost], Calendar[Date])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: m-cost-mtd
+
+	measure CostPriorMonth = CALCULATE([TotalCost], DATEADD(Calendar[Date], -1, MONTH))
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: m-cost-prior-month
+
+	measure 'CostMoM %' =
+			VAR CurrentPeriod = [TotalCost]
+			VAR PriorPeriod = [CostPriorMonth]
+			RETURN DIVIDE(CurrentPeriod - PriorPeriod, PriorPeriod)
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: m-cost-mom-pct
+
+	measure CostRolling30Day = CALCULATE([TotalCost], DATESINPERIOD(Calendar[Date], MAX(Calendar[Date]), -30, DAY))
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: m-cost-rolling-30
+
+	measure CostPerRequest = DIVIDE([TotalCost], [TotalRequests])
+		formatString: \$#,0.0000
+		lineageTag: m-cost-per-request
+
+	partition CostSummary = entity
+		mode: directLake
+		source
+			entityName: gold_cost_summary
+			schemaName: dbo
+			expressionSource: 'DirectLake - Observability Analytics'

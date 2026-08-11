@@ -24,7 +24,16 @@ from rich.table import Table
 FABRIC_API_BASE = "https://api.fabric.microsoft.com/v1"
 FABRIC_SCOPE = "https://api.fabric.microsoft.com/.default"
 
-SHORTCUT_CONTAINERS = ["costs", "metrics", "logs", "metadata"]
+SHORTCUT_CONTAINERS = [
+    "costs",
+    "metrics",
+    "logs",
+    "metadata",
+    "am-appmetrics",
+    "am-appdependencies",
+    "am-apprequests",
+    "am-apptraces",
+]
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 NOTEBOOKS_DIR = REPO_ROOT / "fabric" / "notebooks"
@@ -112,6 +121,7 @@ class FabricClient:
         item_type: str,
         definition: dict[str, Any] | None = None,
         description: str | None = None,
+        creation_payload: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Create a workspace item if it does not already exist, otherwise return existing."""
         existing = self._find_item(workspace_id, display_name, item_type)
@@ -127,6 +137,9 @@ class FabricClient:
             payload["description"] = description
         if definition:
             payload["definition"] = definition
+        # creationPayload carries type-specific options (e.g. enableSchemas for a Lakehouse).
+        if creation_payload:
+            payload["creationPayload"] = creation_payload
 
         resp = self._post(f"/workspaces/{workspace_id}/items", payload)
         if resp.status_code == 202:
@@ -166,8 +179,17 @@ class FabricClient:
     # ------------------------------------------------------------------
 
     def create_or_get_lakehouse(self, workspace_id: str, display_name: str = "Observability") -> dict[str, Any]:
-        """Create a Lakehouse item in the workspace."""
-        return self.create_or_get_item(workspace_id, display_name, "Lakehouse")
+        """Create a schema-enabled Lakehouse item in the workspace.
+
+        `enableSchemas=True` provisions the lakehouse with schema support, so Delta
+        tables live under `Tables/<schema>/<table>` (the notebooks write to `dbo`).
+        """
+        return self.create_or_get_item(
+            workspace_id,
+            display_name,
+            "Lakehouse",
+            creation_payload={"enableSchemas": True},
+        )
 
     # ------------------------------------------------------------------
     # Shortcuts
@@ -180,6 +202,7 @@ class FabricClient:
         shortcut_name: str,
         storage_account_url: str,
         container_name: str,
+        connection_id: str,
         sub_path: str = "/",
     ) -> None:
         """Create an ADLS Gen2 shortcut in the Lakehouse Files section."""
@@ -197,6 +220,9 @@ class FabricClient:
             # 404 means no shortcuts yet — safe to proceed.
             pass
 
+        # connectionId is mandatory for ADLS Gen2 shortcuts; it references a
+        # Fabric cloud connection, even when the connection itself uses the
+        # workspace managed identity for storage authentication.
         payload = {
             "path": "Files",
             "name": shortcut_name,
@@ -204,15 +230,10 @@ class FabricClient:
                 "adlsGen2": {
                     "location": storage_account_url,
                     "subpath": sub_path,
-                    "connectionId": None,
+                    "connectionId": connection_id,
                 },
             },
         }
-
-        # connectionId is optional when managed identity is used.
-        # Strip it out so the API can use the workspace identity.
-        if payload["target"]["adlsGen2"]["connectionId"] is None:
-            del payload["target"]["adlsGen2"]["connectionId"]
 
         try:
             self._post(path, payload)
@@ -225,8 +246,19 @@ class FabricClient:
     # Notebooks
     # ------------------------------------------------------------------
 
-    def import_notebooks(self, workspace_id: str, notebooks_dir: pathlib.Path) -> list[dict[str, Any]]:
-        """Import all .ipynb notebooks from a directory."""
+    def import_notebooks(
+        self,
+        workspace_id: str,
+        notebooks_dir: pathlib.Path,
+        lakehouse_id: str | None = None,
+        lakehouse_name: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Import all .ipynb notebooks from a directory.
+
+        When a lakehouse is supplied, each notebook is bound to it as its default
+        lakehouse so the medallion cells resolve relative `Tables/…` / `Files/…`
+        paths against the freshly created lakehouse.
+        """
         results: list[dict[str, Any]] = []
         if not notebooks_dir.is_dir():
             console.print(f"[yellow]⚠  Notebooks directory not found: {notebooks_dir}[/yellow]")
@@ -240,6 +272,18 @@ class FabricClient:
         for nb_path in notebook_files:
             display_name = nb_path.stem
             raw_content = nb_path.read_bytes()
+
+            if lakehouse_id:
+                nb_json = json.loads(raw_content)
+                nb_meta = nb_json.setdefault("metadata", {})
+                nb_meta.setdefault("dependencies", {})["lakehouse"] = {
+                    "default_lakehouse": lakehouse_id,
+                    "default_lakehouse_name": lakehouse_name,
+                    "default_lakehouse_workspace_id": workspace_id,
+                    "known_lakehouses": [{"id": lakehouse_id}],
+                }
+                raw_content = json.dumps(nb_json).encode("utf-8")
+
             encoded = base64.b64encode(raw_content).decode("utf-8")
 
             definition = {
@@ -268,8 +312,95 @@ class FabricClient:
     # Pipelines
     # ------------------------------------------------------------------
 
-    def import_pipelines(self, workspace_id: str, pipelines_dir: pathlib.Path) -> list[dict[str, Any]]:
-        """Import all pipeline JSON definitions from a directory."""
+    @staticmethod
+    def _pipeline_references(definition: dict[str, Any]) -> set[str]:
+        """Return the names of pipelines referenced via invoke/execute activities."""
+        refs: set[str] = set()
+        activities = definition.get("properties", {}).get("activities", [])
+        for act in activities:
+            act_type = act.get("type")
+            tp = act.get("typeProperties", {})
+            if act_type == "ExecutePipeline":
+                ref = tp.get("pipeline", {}).get("referenceName")
+                if ref:
+                    refs.add(ref)
+            elif act_type == "InvokePipeline":
+                # New Invoke pipeline activity references the target by pipelineId,
+                # which the templates carry as the target pipeline's display name.
+                ref = tp.get("pipelineId")
+                if ref:
+                    refs.add(ref)
+        return refs
+
+    def _resolve_item_id(self, workspace_id: str, display_name: str, item_type: str) -> str | None:
+        """Return the ID of a workspace item by display name, or None if not found."""
+        item = self._find_item(workspace_id, display_name, item_type)
+        return item.get("id") if item else None
+
+    def _resolve_pipeline_content(
+        self,
+        content: dict[str, Any],
+        workspace_id: str,
+        notebook_map: dict[str, str],
+        pipeline_map: dict[str, str],
+        pipeline_connection_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Inject workspace/notebook/pipeline GUIDs into a pipeline definition.
+
+        Fabric requires TridentNotebook activities to carry a real workspaceId and
+        notebookId (GUID). The new InvokePipeline activity targets a pipeline by
+        workspaceId + pipelineId (GUID) and needs a connection. Legacy
+        ExecutePipeline references point at a pipeline GUID. The templates reference
+        notebooks and pipelines by display name, so resolve those to the IDs
+        assigned when the items were created.
+        """
+        activities = content.get("properties", {}).get("activities", [])
+        for act in activities:
+            act_type = act.get("type")
+            tp = act.setdefault("typeProperties", {})
+
+            if act_type == "TridentNotebook":
+                tp["workspaceId"] = workspace_id
+                nb_ref = tp.get("notebookId")
+                nb_id = notebook_map.get(nb_ref) or self._resolve_item_id(
+                    workspace_id, nb_ref, "Notebook"
+                )
+                if nb_id:
+                    tp["notebookId"] = nb_id
+                else:
+                    console.print(f"  [red]✖  Notebook '{nb_ref}' not found in workspace.[/red]")
+
+            elif act_type == "ExecutePipeline":
+                ref = tp.get("pipeline", {})
+                pl_ref = ref.get("referenceName")
+                if pl_ref in pipeline_map:
+                    ref["referenceName"] = pipeline_map[pl_ref]
+
+            elif act_type == "InvokePipeline":
+                tp["workspaceId"] = workspace_id
+                pl_ref = tp.get("pipelineId")
+                pl_id = pipeline_map.get(pl_ref) or self._resolve_item_id(
+                    workspace_id, pl_ref, "DataPipeline"
+                )
+                if pl_id:
+                    tp["pipelineId"] = pl_id
+                else:
+                    console.print(f"  [red]✖  Pipeline '{pl_ref}' not found in workspace.[/red]")
+                if pipeline_connection_id:
+                    act.setdefault("externalReferences", {})["connection"] = pipeline_connection_id
+        return content
+
+    def import_pipelines(
+        self,
+        workspace_id: str,
+        pipelines_dir: pathlib.Path,
+        pipeline_connection_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Import all pipeline JSON definitions from a directory.
+
+        Pipelines are imported in dependency order so that a pipeline referenced
+        by an invoke/execute activity is created before the pipeline that calls it.
+        """
         results: list[dict[str, Any]] = []
         if not pipelines_dir.is_dir():
             console.print(f"[yellow]⚠  Pipelines directory not found: {pipelines_dir}[/yellow]")
@@ -280,10 +411,34 @@ class FabricClient:
             console.print("[yellow]⚠  No pipeline .json files found.[/yellow]")
             return results
 
+        # Map notebook display names to the GUIDs assigned at import time.
+        notebook_map = {
+            nb.get("displayName"): nb.get("id")
+            for nb in self._list_items(workspace_id, "Notebook")
+            if nb.get("id")
+        }
+        # Pipeline GUIDs are resolved as each pipeline is created (dependency order).
+        pipeline_map: dict[str, str] = {}
+
+        # Parse each file: the item display name must match the internal pipeline
+        # name so ExecutePipeline referenceName values resolve inside Fabric.
+        parsed: dict[str, dict[str, Any]] = {}
         for pl_path in pipeline_files:
-            display_name = pl_path.stem
-            raw_content = pl_path.read_bytes()
-            encoded = base64.b64encode(raw_content).decode("utf-8")
+            content = json.loads(pl_path.read_bytes())
+            name = content.get("name", pl_path.stem)
+            parsed[name] = {
+                "path": pl_path,
+                "content": content,
+                "refs": self._pipeline_references(content),
+            }
+
+        for name in self._topological_order(parsed):
+            info = parsed[name]
+            pl_path = info["path"]
+            resolved = self._resolve_pipeline_content(
+                info["content"], workspace_id, notebook_map, pipeline_map, pipeline_connection_id
+            )
+            encoded = base64.b64encode(json.dumps(resolved).encode("utf-8")).decode("utf-8")
 
             definition = {
                 "parts": [
@@ -297,14 +452,42 @@ class FabricClient:
 
             item = self.create_or_get_item(
                 workspace_id,
-                display_name,
+                name,
                 "DataPipeline",
                 definition=definition,
                 description=f"Imported from {pl_path.name}",
             )
             results.append(item)
 
+            # Record this pipeline's GUID so pipelines that invoke it resolve correctly.
+            pl_id = item.get("id") or self._resolve_item_id(workspace_id, name, "DataPipeline")
+            if pl_id:
+                pipeline_map[name] = pl_id
+
         return results
+
+    @staticmethod
+    def _topological_order(parsed: dict[str, dict[str, Any]]) -> list[str]:
+        """Order pipeline names so dependencies (referenced pipelines) come first."""
+        ordered: list[str] = []
+        visited: set[str] = set()
+
+        def visit(name: str, stack: set[str]) -> None:
+            if name in visited or name not in parsed:
+                return
+            if name in stack:
+                # Cyclic reference — break to avoid infinite recursion.
+                return
+            stack.add(name)
+            for dep in parsed[name]["refs"]:
+                visit(dep, stack)
+            stack.discard(name)
+            visited.add(name)
+            ordered.append(name)
+
+        for name in parsed:
+            visit(name, set())
+        return ordered
 
 
 def _print_summary(workspace: dict[str, Any], lakehouse: dict[str, Any], notebooks: list, pipelines: list) -> None:
@@ -343,7 +526,24 @@ def _print_summary(workspace: dict[str, Any], lakehouse: dict[str, Any], noteboo
     required=True,
     help="Fabric capacity ID to assign the workspace to.",
 )
-def main(workspace_name: str, storage_account_url: str, capacity_id: str) -> None:
+@click.option(
+    "--connection-id",
+    required=True,
+    help="Fabric cloud connection ID (GUID) bound to the ADLS Gen2 account for shortcuts.",
+)
+@click.option(
+    "--pipeline-connection-id",
+    default=None,
+    help="Fabric connection ID (GUID) for the new Invoke pipeline activity. If omitted, "
+         "the activity keeps its placeholder connection and must be wired up in the portal.",
+)
+def main(
+    workspace_name: str,
+    storage_account_url: str,
+    capacity_id: str,
+    connection_id: str,
+    pipeline_connection_id: str | None,
+) -> None:
     """Provision a Microsoft Fabric workspace for observability analytics.
 
     Creates a workspace, Lakehouse, ADLS Gen2 shortcuts, and imports
@@ -375,6 +575,7 @@ def main(workspace_name: str, storage_account_url: str, capacity_id: str) -> Non
                         shortcut_name=container,
                         storage_account_url=storage_account_url,
                         container_name=container,
+                        connection_id=connection_id,
                         sub_path=f"/{container}",
                     )
         else:
@@ -382,11 +583,20 @@ def main(workspace_name: str, storage_account_url: str, capacity_id: str) -> Non
 
         # 4. Notebooks ---------------------------------------------------
         with console.status("Importing notebooks…"):
-            notebooks = client.import_notebooks(workspace_id, NOTEBOOKS_DIR)
+            notebooks = client.import_notebooks(
+                workspace_id,
+                NOTEBOOKS_DIR,
+                lakehouse_id=lakehouse_id or None,
+                lakehouse_name=lakehouse.get("displayName", "Observability"),
+            )
 
         # 5. Pipelines ---------------------------------------------------
         with console.status("Importing pipelines…"):
-            pipelines = client.import_pipelines(workspace_id, PIPELINES_DIR)
+            pipelines = client.import_pipelines(
+                workspace_id,
+                PIPELINES_DIR,
+                pipeline_connection_id=pipeline_connection_id,
+            )
 
         # Summary --------------------------------------------------------
         _print_summary(workspace, lakehouse, notebooks, pipelines)

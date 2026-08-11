@@ -1,0 +1,116 @@
+table ResourceInventory
+	lineageTag: tbl-resource-inventory
+
+	column resource_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: resource_id
+		lineageTag: ri-resource-id
+
+	column resource_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: resource_name
+		lineageTag: ri-resource-name
+
+	column resource_type
+		dataType: string
+		summarizeBy: none
+		sourceColumn: resource_type
+		lineageTag: ri-resource-type
+
+	column resource_group
+		dataType: string
+		summarizeBy: none
+		sourceColumn: resource_group
+		lineageTag: ri-resource-group
+
+	column region
+		dataType: string
+		summarizeBy: none
+		sourceColumn: region
+		lineageTag: ri-region
+
+	column tags
+		dataType: string
+		summarizeBy: none
+		sourceColumn: tags
+		lineageTag: ri-tags
+
+	column total_cost
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		summarizeBy: sum
+		sourceColumn: total_cost
+		lineageTag: ri-total-cost
+
+	column avg_daily_cost
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		summarizeBy: average
+		sourceColumn: avg_daily_cost
+		lineageTag: ri-avg-daily-cost
+
+	column latest_cost_date
+		dataType: dateTime
+		formatString: Long Date
+		summarizeBy: none
+		sourceColumn: latest_cost_date
+		lineageTag: ri-latest-cost-date
+
+	column naming_compliant
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		summarizeBy: none
+		sourceColumn: naming_compliant
+		lineageTag: ri-naming-compliant
+
+	column compliance_score
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: compliance_score
+		lineageTag: ri-compliance-score
+
+	column compliance_status
+		dataType: string
+		summarizeBy: none
+		sourceColumn: compliance_status
+		lineageTag: ri-compliance-status
+
+	column snapshot_date
+		dataType: dateTime
+		formatString: Long Date
+		summarizeBy: none
+		sourceColumn: snapshot_date
+		lineageTag: ri-snapshot-date
+
+	column is_current
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		summarizeBy: none
+		sourceColumn: is_current
+		lineageTag: ri-is-current
+
+	measure ResourceCount = DISTINCTCOUNT(ResourceInventory[resource_id])
+		formatString: #,0
+		lineageTag: m-resource-count
+
+	measure TotalResourceCost = SUM(ResourceInventory[total_cost])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: m-total-resource-cost
+
+	measure CompliantResourceCount = CALCULATE(DISTINCTCOUNT(ResourceInventory[resource_id]), ResourceInventory[naming_compliant] = TRUE)
+		formatString: #,0
+		lineageTag: m-compliant-count
+
+	measure CompliancePct = DIVIDE([CompliantResourceCount], [ResourceCount])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: m-compliance-pct
+
+	partition ResourceInventory = entity
+		mode: directLake
+		source
+			entityName: gold_resource_inventory
+			schemaName: dbo
+			expressionSource: 'DirectLake - Observability Analytics'

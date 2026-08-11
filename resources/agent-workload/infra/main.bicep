@@ -12,6 +12,9 @@ param openAiModelName string = 'gpt-5.4'
 @description('Object ID of the user/principal running the deployment. Granted Foundry Owner on the Foundry resource.')
 param principalId string = ''
 
+@description('Resource ID of the observability storage account. When set, fctv6-log exports App telemetry tables to it. Populate via azd env (e.g. AZURE_OBSERVABILITY_STORAGE_ACCOUNT_ID).')
+param observabilityStorageAccountId string = ''
+
 var tags = {
   environment: environmentName
   project: 'observability-platform'
@@ -38,6 +41,7 @@ module monitoring 'modules/monitoring.bicep' = {
     location: location
     environmentName: environmentName
     tags: tags
+    dataExportStorageAccountId: observabilityStorageAccountId
   }
 }
 

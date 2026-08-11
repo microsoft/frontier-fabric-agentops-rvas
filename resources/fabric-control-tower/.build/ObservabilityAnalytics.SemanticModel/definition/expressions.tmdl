@@ -1,0 +1,6 @@
+expression 'DirectLake - Observability Analytics' =
+		let
+		    Source = Sql.Database("7x56ffa4c6ge7g3q7puaalnmla-ugl6fmafanuuzewx4mx7ebc3ve.datawarehouse.fabric.microsoft.com", "Observability")
+		in
+		    Source
+	lineageTag: dl-observability-analytics-expression
