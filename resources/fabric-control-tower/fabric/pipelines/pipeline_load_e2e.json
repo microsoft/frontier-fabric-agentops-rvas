@@ -13,23 +13,7 @@
           "retryIntervalInSeconds": 60
         },
         "typeProperties": {
-          "notebookId": "01_bronze_ingestion",
-          "parameters": {
-            "FromMonth": {
-              "value": {
-                "value": "@pipeline().parameters.FromMonth",
-                "type": "Expression"
-              },
-              "type": "int"
-            },
-            "ToMonth": {
-              "value": {
-                "value": "@pipeline().parameters.ToMonth",
-                "type": "Expression"
-              },
-              "type": "int"
-            }
-          }
+          "notebookId": "01_bronze_ingestion"
         }
       },
       {
@@ -129,14 +113,6 @@
       }
     ],
     "parameters": {
-      "FromMonth": {
-        "type": "int",
-        "defaultValue": -3
-      },
-      "ToMonth": {
-        "type": "int",
-        "defaultValue": 0
-      },
       "WebhookUrl": {
         "type": "string",
         "defaultValue": "https://your-logic-app-or-webhook-endpoint.azurewebsites.net/api/pipeline-alerts"

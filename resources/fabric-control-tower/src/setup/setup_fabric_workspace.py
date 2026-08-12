@@ -156,6 +156,39 @@ class FabricClient:
         console.print(f"  [green]✔  Created {item_type} '{display_name}'.[/green]")
         return item
 
+    def update_item_definition(self, workspace_id: str, item_id: str, definition: dict[str, Any]) -> None:
+        """Overwrite an existing item's definition (e.g. push new notebook content)."""
+        self._post(
+            f"/workspaces/{workspace_id}/items/{item_id}/updateDefinition",
+            {"definition": definition},
+        )
+
+    def create_or_update_notebook(
+        self,
+        workspace_id: str,
+        display_name: str,
+        definition: dict[str, Any],
+        description: str | None = None,
+    ) -> dict[str, Any]:
+        """Create a Notebook, or overwrite its definition if it already exists.
+
+        Unlike `create_or_get_item` (which skips existing items), this pushes the
+        latest notebook content — with the default-lakehouse metadata baked into the
+        supplied definition — so re-running the setup refreshes notebooks in place.
+        """
+        existing = self._find_item(workspace_id, display_name, "Notebook")
+        if existing:
+            self.update_item_definition(workspace_id, existing["id"], definition)
+            console.print(f"  [green]✔  Updated Notebook '{display_name}'.[/green]")
+            return existing
+        return self.create_or_get_item(
+            workspace_id,
+            display_name,
+            "Notebook",
+            definition=definition,
+            description=description,
+        )
+
     # ------------------------------------------------------------------
     # Workspace
     # ------------------------------------------------------------------
@@ -187,7 +220,8 @@ class FabricClient:
         """Create a schema-enabled Lakehouse item in the workspace.
 
         `enableSchemas=True` provisions the lakehouse with schema support, so Delta
-        tables live under `Tables/<schema>/<table>` (the notebooks write to `dbo`).
+        tables live under `Tables/<schema>/<table>` (the medallion notebooks write to
+        the `bronze`, `silver` and `analytics` schemas).
         """
         return self.create_or_get_item(
             workspace_id,
@@ -307,10 +341,9 @@ class FabricClient:
                 ],
             }
 
-            item = self.create_or_get_item(
+            item = self.create_or_update_notebook(
                 workspace_id,
                 display_name,
-                "Notebook",
                 definition=definition,
                 description=f"Imported from {nb_path.name}",
             )

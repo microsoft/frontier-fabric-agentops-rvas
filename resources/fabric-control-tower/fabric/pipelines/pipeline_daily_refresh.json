@@ -9,10 +9,7 @@
         "dependsOn": [],
         "typeProperties": {
           "waitOnCompletion": true,
-          "parameters": {
-            "FromMonth": -1,
-            "ToMonth": 0
-          },
+          "parameters": {},
           "operationType": "InvokeFabricPipeline",
           "workspaceId": "00000000-0000-0000-0000-000000000000",
           "pipelineId": "Load E2E Pipeline"
