@@ -24,16 +24,21 @@ from rich.table import Table
 FABRIC_API_BASE = "https://api.fabric.microsoft.com/v1"
 FABRIC_SCOPE = "https://api.fabric.microsoft.com/.default"
 
-SHORTCUT_CONTAINERS = [
+# Shortcuts created directly under Files/ (name == container == subpath).
+ROOT_SHORTCUT_CONTAINERS = [
     "costs",
-    "metrics",
-    "logs",
     "metadata",
-    "am-appmetrics",
-    "am-appdependencies",
-    "am-apprequests",
-    "am-apptraces",
 ]
+
+# App-telemetry families: each becomes a plain lakehouse folder under Files/ that
+# holds a shortcut to its matching am-* storage container
+# (e.g. Files/appdependencies/am-appdependencies). Keyed by folder -> container.
+NESTED_SHORTCUT_CONTAINERS = {
+    "appdependencies": "am-appdependencies",
+    "apptraces": "am-apptraces",
+    "appmetrics": "am-appmetrics",
+    "apprequests": "am-apprequests",
+}
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 NOTEBOOKS_DIR = REPO_ROOT / "fabric" / "notebooks"
@@ -204,17 +209,22 @@ class FabricClient:
         container_name: str,
         connection_id: str,
         sub_path: str = "/",
+        parent_path: str = "Files",
     ) -> None:
-        """Create an ADLS Gen2 shortcut in the Lakehouse Files section."""
+        """Create an ADLS Gen2 shortcut under `parent_path` in the Lakehouse.
+
+        `parent_path` may be nested (e.g. "Files/appdependencies"); OneLake creates
+        the intermediate folder, so the shortcut lands inside a plain lakehouse folder.
+        """
         path = f"/workspaces/{workspace_id}/items/{lakehouse_id}/shortcuts"
 
-        # Check for existing shortcut (the shortcuts API returns a list).
+        # Check for an existing shortcut with the same name at the same parent path.
         try:
             resp = self._get(path)
             existing = resp.json().get("value", [])
             for sc in existing:
-                if sc.get("name") == shortcut_name:
-                    console.print(f"  [yellow]⏭  Shortcut '{shortcut_name}' already exists — skipping.[/yellow]")
+                if sc.get("name") == shortcut_name and sc.get("path") == parent_path:
+                    console.print(f"  [yellow]⏭  Shortcut '{parent_path}/{shortcut_name}' already exists — skipping.[/yellow]")
                     return
         except requests.HTTPError:
             # 404 means no shortcuts yet — safe to proceed.
@@ -224,7 +234,7 @@ class FabricClient:
         # Fabric cloud connection, even when the connection itself uses the
         # workspace managed identity for storage authentication.
         payload = {
-            "path": "Files",
+            "path": parent_path,
             "name": shortcut_name,
             "target": {
                 "adlsGen2": {
@@ -237,9 +247,9 @@ class FabricClient:
 
         try:
             self._post(path, payload)
-            console.print(f"  [green]✔  Created shortcut '{shortcut_name}' → {container_name}.[/green]")
+            console.print(f"  [green]✔  Created shortcut '{parent_path}/{shortcut_name}' → {container_name}.[/green]")
         except requests.HTTPError as exc:
-            console.print(f"  [red]✖  Failed to create shortcut '{shortcut_name}': {exc}[/red]")
+            console.print(f"  [red]✖  Failed to create shortcut '{parent_path}/{shortcut_name}': {exc}[/red]")
             raise
 
     # ------------------------------------------------------------------
@@ -568,7 +578,8 @@ def main(
         # 3. ADLS Gen2 shortcuts -----------------------------------------
         if lakehouse_id:
             with console.status("Creating ADLS Gen2 shortcuts…"):
-                for container in SHORTCUT_CONTAINERS:
+                # Root-level shortcuts (cost exports + resource metadata).
+                for container in ROOT_SHORTCUT_CONTAINERS:
                     client.create_shortcut(
                         workspace_id=workspace_id,
                         lakehouse_id=lakehouse_id,
@@ -577,6 +588,19 @@ def main(
                         container_name=container,
                         connection_id=connection_id,
                         sub_path=f"/{container}",
+                    )
+                # App telemetry: one plain folder per family, each holding its
+                # am-* shortcut (Files/<folder>/am-<folder>).
+                for folder, container in NESTED_SHORTCUT_CONTAINERS.items():
+                    client.create_shortcut(
+                        workspace_id=workspace_id,
+                        lakehouse_id=lakehouse_id,
+                        shortcut_name=container,
+                        storage_account_url=storage_account_url,
+                        container_name=container,
+                        connection_id=connection_id,
+                        sub_path=f"/{container}",
+                        parent_path=f"Files/{folder}",
                     )
         else:
             console.print("[yellow]⚠  Lakehouse ID unavailable — skipping shortcuts.[/yellow]")
