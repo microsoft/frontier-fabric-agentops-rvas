@@ -1,0 +1,236 @@
+table fact_genai_calls
+	lineageTag: tbl-fact_genai_calls
+
+	measure 'Total Calls' = COUNTROWS(fact_genai_calls)
+		formatString: #,0
+		lineageTag: meas-total-calls
+
+	measure Errors = CALCULATE(COUNTROWS(fact_genai_calls), fact_genai_calls[is_error] = TRUE())
+		formatString: #,0
+		lineageTag: meas-errors
+
+	measure 'Error Rate' = DIVIDE([Errors], [Total Calls])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: meas-error-rate
+
+	measure 'Avg Latency (ms)' = AVERAGE(fact_genai_calls[duration_ms])
+		formatString: #,0
+		lineageTag: meas-avg-latency-ms
+
+	measure 'Max Latency (ms)' = MAX(fact_genai_calls[duration_ms])
+		formatString: #,0
+		lineageTag: meas-max-latency-ms
+
+	measure 'Total Tokens' = SUM(fact_genai_calls[total_tokens])
+		formatString: #,0
+		lineageTag: meas-total-tokens
+
+	measure 'Input Tokens' = SUM(fact_genai_calls[input_tokens])
+		formatString: #,0
+		lineageTag: meas-input-tokens
+
+	measure 'Output Tokens' = SUM(fact_genai_calls[output_tokens])
+		formatString: #,0
+		lineageTag: meas-output-tokens
+
+	measure 'Cached Tokens' = SUM(fact_genai_calls[cached_tokens])
+		formatString: #,0
+		lineageTag: meas-cached-tokens
+
+	measure Conversations = DISTINCTCOUNT(fact_genai_calls[conversation_id])
+		formatString: #,0
+		lineageTag: meas-conversations
+
+	measure 'Tool Calls' = CALCULATE(COUNTROWS(fact_genai_calls), fact_genai_calls[span_type] IN {"execute_tool", "invoke_tool"})
+		formatString: #,0
+		lineageTag: meas-tool-calls
+
+	column event_time
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: col-fact_genai_calls-event_time
+		summarizeBy: none
+		sourceColumn: event_time
+
+	column date_key
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: col-fact_genai_calls-date_key
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column span_type
+		dataType: string
+		lineageTag: col-fact_genai_calls-span_type
+		summarizeBy: none
+		sourceColumn: span_type
+
+	column operation_name
+		dataType: string
+		lineageTag: col-fact_genai_calls-operation_name
+		summarizeBy: none
+		sourceColumn: operation_name
+
+	column conversation_id
+		dataType: string
+		lineageTag: col-fact_genai_calls-conversation_id
+		summarizeBy: none
+		sourceColumn: conversation_id
+
+	column response_id
+		dataType: string
+		lineageTag: col-fact_genai_calls-response_id
+		summarizeBy: none
+		sourceColumn: response_id
+
+	column agent_id
+		dataType: string
+		lineageTag: col-fact_genai_calls-agent_id
+		summarizeBy: none
+		sourceColumn: agent_id
+
+	column agent_name
+		dataType: string
+		lineageTag: col-fact_genai_calls-agent_name
+		summarizeBy: none
+		sourceColumn: agent_name
+
+	column agent_version
+		dataType: string
+		lineageTag: col-fact_genai_calls-agent_version
+		summarizeBy: none
+		sourceColumn: agent_version
+
+	column project_id
+		dataType: string
+		lineageTag: col-fact_genai_calls-project_id
+		summarizeBy: none
+		sourceColumn: project_id
+
+	column request_model
+		dataType: string
+		lineageTag: col-fact_genai_calls-request_model
+		summarizeBy: none
+		sourceColumn: request_model
+
+	column response_model
+		dataType: string
+		lineageTag: col-fact_genai_calls-response_model
+		summarizeBy: none
+		sourceColumn: response_model
+
+	column provider
+		dataType: string
+		lineageTag: col-fact_genai_calls-provider
+		summarizeBy: none
+		sourceColumn: provider
+
+	column finish_reasons
+		dataType: string
+		lineageTag: col-fact_genai_calls-finish_reasons
+		summarizeBy: none
+		sourceColumn: finish_reasons
+
+	column content_filter_results
+		dataType: string
+		lineageTag: col-fact_genai_calls-content_filter_results
+		summarizeBy: none
+		sourceColumn: content_filter_results
+
+	column blueprint_id
+		dataType: string
+		lineageTag: col-fact_genai_calls-blueprint_id
+		summarizeBy: none
+		sourceColumn: blueprint_id
+
+	column tool_name
+		dataType: string
+		lineageTag: col-fact_genai_calls-tool_name
+		summarizeBy: none
+		sourceColumn: tool_name
+
+	column tool_type
+		dataType: string
+		lineageTag: col-fact_genai_calls-tool_type
+		summarizeBy: none
+		sourceColumn: tool_type
+
+	column duration_ms
+		dataType: double
+		formatString: #,0
+		lineageTag: col-fact_genai_calls-duration_ms
+		summarizeBy: none
+		sourceColumn: duration_ms
+
+	column success
+		dataType: boolean
+		lineageTag: col-fact_genai_calls-success
+		summarizeBy: none
+		sourceColumn: success
+
+	column result_code
+		dataType: string
+		lineageTag: col-fact_genai_calls-result_code
+		summarizeBy: none
+		sourceColumn: result_code
+
+	column item_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_genai_calls-item_count
+		summarizeBy: none
+		sourceColumn: item_count
+
+	column input_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_genai_calls-input_tokens
+		summarizeBy: none
+		sourceColumn: input_tokens
+
+	column output_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_genai_calls-output_tokens
+		summarizeBy: none
+		sourceColumn: output_tokens
+
+	column cached_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_genai_calls-cached_tokens
+		summarizeBy: none
+		sourceColumn: cached_tokens
+
+	column total_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_genai_calls-total_tokens
+		summarizeBy: none
+		sourceColumn: total_tokens
+
+	column foundry_account
+		dataType: string
+		lineageTag: col-fact_genai_calls-foundry_account
+		summarizeBy: none
+		sourceColumn: foundry_account
+
+	column foundry_project
+		dataType: string
+		lineageTag: col-fact_genai_calls-foundry_project
+		summarizeBy: none
+		sourceColumn: foundry_project
+
+	column is_error
+		dataType: boolean
+		lineageTag: col-fact_genai_calls-is_error
+		summarizeBy: none
+		sourceColumn: is_error
+
+	partition fact_genai_calls = entity
+		mode: directLake
+		source
+			entityName: fact_genai_calls
+			schemaName: analytics
+			expressionSource: 'DirectLake - Analytics'
+

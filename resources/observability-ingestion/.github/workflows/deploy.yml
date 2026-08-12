@@ -17,6 +17,12 @@ env:
   AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
   AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
   AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  # Resource group + workspace name of the agent-workload deployment whose Log
+  # Analytics workspace should also export App telemetry to the observability
+  # storage account. Set these as repository/environment variables. Leave unset
+  # to skip the cross-resource-group export (the module is gated on non-empty).
+  AGENT_WORKLOAD_RESOURCE_GROUP: ${{ vars.AGENT_WORKLOAD_RESOURCE_GROUP }}
+  AGENT_WORKLOAD_WORKSPACE_NAME: ${{ vars.AGENT_WORKLOAD_WORKSPACE_NAME }}
 
 jobs:
   deploy-infra:
@@ -47,6 +53,8 @@ jobs:
           AZURE_ENV_NAME: ${{ env.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ env.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ env.AZURE_SUBSCRIPTION_ID }}
+          AGENT_WORKLOAD_RESOURCE_GROUP: ${{ env.AGENT_WORKLOAD_RESOURCE_GROUP }}
+          AGENT_WORKLOAD_WORKSPACE_NAME: ${{ env.AGENT_WORKLOAD_WORKSPACE_NAME }}
 
       - name: Capture deployment outputs
         id: outputs

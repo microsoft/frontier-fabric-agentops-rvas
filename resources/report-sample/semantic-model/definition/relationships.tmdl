@@ -1,0 +1,56 @@
+relationship rel_cost_date
+	fromColumn: fact_cost.charge_date
+	toColumn: dim_date.date_key
+
+relationship rel_cost_resource
+	fromColumn: fact_cost.resource_id
+	toColumn: dim_resource.resource_id
+
+relationship rel_genai_date
+	fromColumn: fact_genai_calls.date_key
+	toColumn: dim_date.date_key
+
+relationship rel_genai_agent
+	fromColumn: fact_genai_calls.agent_id
+	toColumn: dim_agent.agent_id
+
+relationship rel_genai_model
+	fromColumn: fact_genai_calls.response_model
+	toColumn: dim_model.model_name
+
+relationship rel_token_date
+	fromColumn: fact_token_consumption.timeday
+	toColumn: dim_date.date_key
+
+relationship rel_token_agent
+	fromColumn: fact_token_consumption.agent_id
+	toColumn: dim_agent.agent_id
+
+relationship rel_token_model
+	fromColumn: fact_token_consumption.response_model
+	toColumn: dim_model.model_name
+
+relationship rel_steps_date
+	fromColumn: fact_conversation_steps.date_key
+	toColumn: dim_date.date_key
+
+relationship rel_steps_agent
+	fromColumn: fact_conversation_steps.agent_id
+	toColumn: dim_agent.agent_id
+
+relationship rel_steps_model
+	fromColumn: fact_conversation_steps.response_model
+	toColumn: dim_model.model_name
+
+relationship rel_token_conv
+	fromColumn: fact_token_consumption.conversation_id
+	toColumn: dim_conversation.conversation_id
+
+relationship rel_steps_conv
+	fromColumn: fact_conversation_steps.conversation_id
+	toColumn: dim_conversation.conversation_id
+
+relationship rel_genai_conv
+	fromColumn: fact_genai_calls.conversation_id
+	toColumn: dim_conversation.conversation_id
+

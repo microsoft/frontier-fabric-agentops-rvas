@@ -1,0 +1,46 @@
+table dim_conversation
+	lineageTag: tbl-dim_conversation
+
+	column conversation_id
+		dataType: string
+		lineageTag: col-dim_conversation-conversation_id
+		summarizeBy: none
+		sourceColumn: conversation_id
+
+	column agent_id
+		dataType: string
+		lineageTag: col-dim_conversation-agent_id
+		summarizeBy: none
+		sourceColumn: agent_id
+
+	column agent_name
+		dataType: string
+		lineageTag: col-dim_conversation-agent_name
+		summarizeBy: none
+		sourceColumn: agent_name
+
+	column response_model
+		dataType: string
+		lineageTag: col-dim_conversation-response_model
+		summarizeBy: none
+		sourceColumn: response_model
+
+	column foundry_account
+		dataType: string
+		lineageTag: col-dim_conversation-foundry_account
+		summarizeBy: none
+		sourceColumn: foundry_account
+
+	column foundry_project
+		dataType: string
+		lineageTag: col-dim_conversation-foundry_project
+		summarizeBy: none
+		sourceColumn: foundry_project
+
+	partition dim_conversation = entity
+		mode: directLake
+		source
+			entityName: dim_conversation
+			schemaName: analytics
+			expressionSource: 'DirectLake - Analytics'
+

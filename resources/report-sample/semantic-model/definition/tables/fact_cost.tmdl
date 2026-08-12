@@ -1,0 +1,259 @@
+table fact_cost
+	lineageTag: tbl-fact_cost
+
+	measure 'Total Cost' = SUM(fact_cost[billed_cost])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: meas-total-cost
+
+	measure 'Effective Cost' = SUM(fact_cost[effective_cost])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: meas-effective-cost
+
+	measure 'List Cost' = SUM(fact_cost[list_cost])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: meas-list-cost
+
+	measure 'Cost (USD)' = SUM(fact_cost[billed_cost_usd])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: meas-cost-usd
+
+	measure 'AI Services Cost' = CALCULATE([Total Cost], fact_cost[is_ai_service] = TRUE())
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: meas-ai-services-cost
+
+	measure 'Foundry Models Cost' = CALCULATE([Total Cost], fact_cost[is_foundry_models] = TRUE())
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: meas-foundry-models-cost
+
+	measure 'Cost Lines' = COUNTROWS(fact_cost)
+		formatString: #,0
+		lineageTag: meas-cost-lines
+
+	column charge_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: col-fact_cost-charge_date
+		summarizeBy: none
+		sourceColumn: charge_date
+
+	column billing_period_start
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: col-fact_cost-billing_period_start
+		summarizeBy: none
+		sourceColumn: billing_period_start
+
+	column billing_period_end
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: col-fact_cost-billing_period_end
+		summarizeBy: none
+		sourceColumn: billing_period_end
+
+	column resource_id
+		dataType: string
+		lineageTag: col-fact_cost-resource_id
+		summarizeBy: none
+		sourceColumn: resource_id
+
+	column resource_name
+		dataType: string
+		lineageTag: col-fact_cost-resource_name
+		summarizeBy: none
+		sourceColumn: resource_name
+
+	column resource_type
+		dataType: string
+		lineageTag: col-fact_cost-resource_type
+		summarizeBy: none
+		sourceColumn: resource_type
+
+	column service_name
+		dataType: string
+		lineageTag: col-fact_cost-service_name
+		summarizeBy: none
+		sourceColumn: service_name
+
+	column service_category
+		dataType: string
+		lineageTag: col-fact_cost-service_category
+		summarizeBy: none
+		sourceColumn: service_category
+
+	column region_id
+		dataType: string
+		lineageTag: col-fact_cost-region_id
+		summarizeBy: none
+		sourceColumn: region_id
+
+	column region_name
+		dataType: string
+		lineageTag: col-fact_cost-region_name
+		summarizeBy: none
+		sourceColumn: region_name
+
+	column subscription_id
+		dataType: string
+		lineageTag: col-fact_cost-subscription_id
+		summarizeBy: none
+		sourceColumn: subscription_id
+
+	column subscription_name
+		dataType: string
+		lineageTag: col-fact_cost-subscription_name
+		summarizeBy: none
+		sourceColumn: subscription_name
+
+	column resource_group
+		dataType: string
+		lineageTag: col-fact_cost-resource_group
+		summarizeBy: none
+		sourceColumn: resource_group
+
+	column sku_id
+		dataType: string
+		lineageTag: col-fact_cost-sku_id
+		summarizeBy: none
+		sourceColumn: sku_id
+
+	column meter_category
+		dataType: string
+		lineageTag: col-fact_cost-meter_category
+		summarizeBy: none
+		sourceColumn: meter_category
+
+	column meter_subcategory
+		dataType: string
+		lineageTag: col-fact_cost-meter_subcategory
+		summarizeBy: none
+		sourceColumn: meter_subcategory
+
+	column meter_name
+		dataType: string
+		lineageTag: col-fact_cost-meter_name
+		summarizeBy: none
+		sourceColumn: meter_name
+
+	column charge_category
+		dataType: string
+		lineageTag: col-fact_cost-charge_category
+		summarizeBy: none
+		sourceColumn: charge_category
+
+	column charge_description
+		dataType: string
+		lineageTag: col-fact_cost-charge_description
+		summarizeBy: none
+		sourceColumn: charge_description
+
+	column pricing_category
+		dataType: string
+		lineageTag: col-fact_cost-pricing_category
+		summarizeBy: none
+		sourceColumn: pricing_category
+
+	column commitment_discount_type
+		dataType: string
+		lineageTag: col-fact_cost-commitment_discount_type
+		summarizeBy: none
+		sourceColumn: commitment_discount_type
+
+	column consumed_unit
+		dataType: string
+		lineageTag: col-fact_cost-consumed_unit
+		summarizeBy: none
+		sourceColumn: consumed_unit
+
+	column pricing_unit
+		dataType: string
+		lineageTag: col-fact_cost-pricing_unit
+		summarizeBy: none
+		sourceColumn: pricing_unit
+
+	column tags
+		dataType: string
+		lineageTag: col-fact_cost-tags
+		summarizeBy: none
+		sourceColumn: tags
+
+	column billed_cost
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: col-fact_cost-billed_cost
+		summarizeBy: none
+		sourceColumn: billed_cost
+
+	column effective_cost
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: col-fact_cost-effective_cost
+		summarizeBy: none
+		sourceColumn: effective_cost
+
+	column list_cost
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: col-fact_cost-list_cost
+		summarizeBy: none
+		sourceColumn: list_cost
+
+	column contracted_cost
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: col-fact_cost-contracted_cost
+		summarizeBy: none
+		sourceColumn: contracted_cost
+
+	column billed_cost_usd
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: col-fact_cost-billed_cost_usd
+		summarizeBy: none
+		sourceColumn: billed_cost_usd
+
+	column consumed_quantity
+		dataType: double
+		formatString: #,0.00
+		lineageTag: col-fact_cost-consumed_quantity
+		summarizeBy: none
+		sourceColumn: consumed_quantity
+
+	column pricing_quantity
+		dataType: double
+		formatString: #,0.00
+		lineageTag: col-fact_cost-pricing_quantity
+		summarizeBy: none
+		sourceColumn: pricing_quantity
+
+	column is_ai_service
+		dataType: boolean
+		lineageTag: col-fact_cost-is_ai_service
+		summarizeBy: none
+		sourceColumn: is_ai_service
+
+	column is_foundry_models
+		dataType: boolean
+		lineageTag: col-fact_cost-is_foundry_models
+		summarizeBy: none
+		sourceColumn: is_foundry_models
+
+	column cost_year
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_cost-cost_year
+		summarizeBy: none
+		sourceColumn: cost_year
+
+	column cost_month
+		dataType: string
+		lineageTag: col-fact_cost-cost_month
+		summarizeBy: none
+		sourceColumn: cost_month
+
+	partition fact_cost = entity
+		mode: directLake
+		source
+			entityName: fact_cost
+			schemaName: analytics
+			expressionSource: 'DirectLake - Analytics'
+

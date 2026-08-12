@@ -1,0 +1,28 @@
+table dim_model
+	lineageTag: tbl-dim_model
+
+	column model_name
+		dataType: string
+		lineageTag: col-dim_model-model_name
+		summarizeBy: none
+		sourceColumn: model_name
+
+	column provider
+		dataType: string
+		lineageTag: col-dim_model-provider
+		summarizeBy: none
+		sourceColumn: provider
+
+	column request_model
+		dataType: string
+		lineageTag: col-dim_model-request_model
+		summarizeBy: none
+		sourceColumn: request_model
+
+	partition dim_model = entity
+		mode: directLake
+		source
+			entityName: dim_model
+			schemaName: analytics
+			expressionSource: 'DirectLake - Analytics'
+

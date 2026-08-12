@@ -1,0 +1,7 @@
+expression 'DirectLake - Analytics' =
+		let
+		    Source = Sql.Database("{{LAKEHOUSE_SQL_ENDPOINT}}", "{{LAKEHOUSE_NAME}}")
+		in
+		    Source
+	lineageTag: expr-directlake-analytics
+

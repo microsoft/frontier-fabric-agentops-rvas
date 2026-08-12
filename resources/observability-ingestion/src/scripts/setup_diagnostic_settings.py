@@ -258,5 +258,22 @@ def main() -> None:
     )
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# DISABLED (commented, not deleted).
+# Configuring diagnostic settings across ALL resources in the subscription is no
+# longer part of the observability-ingestion flow. Telemetry now reaches the
+# observability storage account ONLY via Log Analytics Data Export rules on the
+# workspaces (see infra/modules/monitoring.bicep and
+# infra/modules/agent-workload-export.bicep). To re-enable per-resource
+# diagnostic settings, uncomment the entrypoint below.
+# ─────────────────────────────────────────────────────────────────────────────
+# if __name__ == "__main__":
+#     sys.exit(main() or 0)
+
 if __name__ == "__main__":
-    sys.exit(main() or 0)
+    logger.info(
+        "setup_diagnostic_settings is disabled: per-resource diagnostic settings "
+        "are no longer configured. Data reaches storage via Log Analytics Data "
+        "Export rules defined in Bicep. No action taken."
+    )
+    sys.exit(0)

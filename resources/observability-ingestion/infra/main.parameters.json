@@ -13,6 +13,12 @@
     },
     "deploymentUserPrincipalId": {
       "value": "${AZURE_PRINCIPAL_ID}"
+    },
+    "agentWorkloadResourceGroupName": {
+      "value": "${AGENT_WORKLOAD_RESOURCE_GROUP}"
+    },
+    "agentWorkloadWorkspaceName": {
+      "value": "${AGENT_WORKLOAD_WORKSPACE_NAME}"
     }
   }
 }

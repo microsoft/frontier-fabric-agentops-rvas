@@ -1,0 +1,214 @@
+table fact_conversation_steps
+	lineageTag: tbl-fact_conversation_steps
+
+	measure Steps = COUNTROWS(fact_conversation_steps)
+		formatString: #,0
+		lineageTag: meas-steps
+
+	measure 'Step Tokens' = SUM(fact_conversation_steps[total_tokens])
+		formatString: #,0
+		lineageTag: meas-step-tokens
+
+	measure 'Tool Steps' = CALCULATE(COUNTROWS(fact_conversation_steps), fact_conversation_steps[span_type] IN {"execute_tool", "invoke_tool"})
+		formatString: #,0
+		lineageTag: meas-tool-steps
+
+	measure 'Distinct Conversations' = DISTINCTCOUNT(fact_conversation_steps[conversation_id])
+		formatString: #,0
+		lineageTag: meas-distinct-conversations
+
+	column event_time
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: col-fact_conversation_steps-event_time
+		summarizeBy: none
+		sourceColumn: event_time
+
+	column date_key
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: col-fact_conversation_steps-date_key
+		summarizeBy: none
+		sourceColumn: date_key
+
+	column span_type
+		dataType: string
+		lineageTag: col-fact_conversation_steps-span_type
+		summarizeBy: none
+		sourceColumn: span_type
+
+	column conversation_id
+		dataType: string
+		lineageTag: col-fact_conversation_steps-conversation_id
+		summarizeBy: none
+		sourceColumn: conversation_id
+
+	column response_id
+		dataType: string
+		lineageTag: col-fact_conversation_steps-response_id
+		summarizeBy: none
+		sourceColumn: response_id
+
+	column operation_name
+		dataType: string
+		lineageTag: col-fact_conversation_steps-operation_name
+		summarizeBy: none
+		sourceColumn: operation_name
+
+	column agent_id
+		dataType: string
+		lineageTag: col-fact_conversation_steps-agent_id
+		summarizeBy: none
+		sourceColumn: agent_id
+
+	column agent_name
+		dataType: string
+		lineageTag: col-fact_conversation_steps-agent_name
+		summarizeBy: none
+		sourceColumn: agent_name
+
+	column agent_version
+		dataType: string
+		lineageTag: col-fact_conversation_steps-agent_version
+		summarizeBy: none
+		sourceColumn: agent_version
+
+	column response_model
+		dataType: string
+		lineageTag: col-fact_conversation_steps-response_model
+		summarizeBy: none
+		sourceColumn: response_model
+
+	column project_id
+		dataType: string
+		lineageTag: col-fact_conversation_steps-project_id
+		summarizeBy: none
+		sourceColumn: project_id
+
+	column input_messages
+		dataType: string
+		lineageTag: col-fact_conversation_steps-input_messages
+		summarizeBy: none
+		sourceColumn: input_messages
+
+	column output_messages
+		dataType: string
+		lineageTag: col-fact_conversation_steps-output_messages
+		summarizeBy: none
+		sourceColumn: output_messages
+
+	column tool_name
+		dataType: string
+		lineageTag: col-fact_conversation_steps-tool_name
+		summarizeBy: none
+		sourceColumn: tool_name
+
+	column tool_type
+		dataType: string
+		lineageTag: col-fact_conversation_steps-tool_type
+		summarizeBy: none
+		sourceColumn: tool_type
+
+	column tool_call_arguments
+		dataType: string
+		lineageTag: col-fact_conversation_steps-tool_call_arguments
+		summarizeBy: none
+		sourceColumn: tool_call_arguments
+
+	column tool_call_result
+		dataType: string
+		lineageTag: col-fact_conversation_steps-tool_call_result
+		summarizeBy: none
+		sourceColumn: tool_call_result
+
+	column tool_definitions
+		dataType: string
+		lineageTag: col-fact_conversation_steps-tool_definitions
+		summarizeBy: none
+		sourceColumn: tool_definitions
+
+	column finish_reasons
+		dataType: string
+		lineageTag: col-fact_conversation_steps-finish_reasons
+		summarizeBy: none
+		sourceColumn: finish_reasons
+
+	column content_filter_results
+		dataType: string
+		lineageTag: col-fact_conversation_steps-content_filter_results
+		summarizeBy: none
+		sourceColumn: content_filter_results
+
+	column duration_ms
+		dataType: double
+		formatString: #,0
+		lineageTag: col-fact_conversation_steps-duration_ms
+		summarizeBy: none
+		sourceColumn: duration_ms
+
+	column success
+		dataType: boolean
+		lineageTag: col-fact_conversation_steps-success
+		summarizeBy: none
+		sourceColumn: success
+
+	column result_code
+		dataType: string
+		lineageTag: col-fact_conversation_steps-result_code
+		summarizeBy: none
+		sourceColumn: result_code
+
+	column input_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_conversation_steps-input_tokens
+		summarizeBy: none
+		sourceColumn: input_tokens
+
+	column output_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_conversation_steps-output_tokens
+		summarizeBy: none
+		sourceColumn: output_tokens
+
+	column cached_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_conversation_steps-cached_tokens
+		summarizeBy: none
+		sourceColumn: cached_tokens
+
+	column foundry_account
+		dataType: string
+		lineageTag: col-fact_conversation_steps-foundry_account
+		summarizeBy: none
+		sourceColumn: foundry_account
+
+	column foundry_project
+		dataType: string
+		lineageTag: col-fact_conversation_steps-foundry_project
+		summarizeBy: none
+		sourceColumn: foundry_project
+
+	column total_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_conversation_steps-total_tokens
+		summarizeBy: none
+		sourceColumn: total_tokens
+
+	column step_number
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_conversation_steps-step_number
+		summarizeBy: none
+		sourceColumn: step_number
+
+	partition fact_conversation_steps = entity
+		mode: directLake
+		source
+			entityName: fact_conversation_steps
+			schemaName: analytics
+			expressionSource: 'DirectLake - Analytics'
+

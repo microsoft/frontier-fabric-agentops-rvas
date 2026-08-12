@@ -1,0 +1,20 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["TMDL-Extension"]
+
+ref table dim_agent
+ref table dim_date
+ref table dim_model
+ref table dim_resource
+ref table fact_conversation_steps
+ref table fact_cost
+ref table fact_genai_calls
+ref table fact_token_consumption
+ref table dim_conversation
+

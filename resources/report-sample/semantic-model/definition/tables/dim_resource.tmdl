@@ -1,0 +1,180 @@
+table dim_resource
+	lineageTag: tbl-dim_resource
+
+	measure Resources = COUNTROWS(dim_resource)
+		formatString: #,0
+		lineageTag: meas-resources
+
+	measure 'AI Resources' = CALCULATE(COUNTROWS(dim_resource), dim_resource[is_ai_resource] = TRUE())
+		formatString: #,0
+		lineageTag: meas-ai-resources
+
+	measure 'Governed Resources' = CALCULATE(COUNTROWS(dim_resource), dim_resource[is_governed] = TRUE())
+		formatString: #,0
+		lineageTag: meas-governed-resources
+
+	measure 'Governance Coverage' = DIVIDE([Governed Resources] + 0, [Resources])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: meas-governance-coverage
+
+	measure 'Owner Tag Coverage' = DIVIDE(CALCULATE(COUNTROWS(dim_resource), dim_resource[has_owner_tag] = TRUE()) + 0, [Resources])
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: meas-owner-tag-coverage
+
+	column resource_id
+		dataType: string
+		lineageTag: col-dim_resource-resource_id
+		summarizeBy: none
+		sourceColumn: resource_id
+
+	column resource_name
+		dataType: string
+		lineageTag: col-dim_resource-resource_name
+		summarizeBy: none
+		sourceColumn: resource_name
+
+	column resource_type
+		dataType: string
+		lineageTag: col-dim_resource-resource_type
+		summarizeBy: none
+		sourceColumn: resource_type
+
+	column location
+		dataType: string
+		lineageTag: col-dim_resource-location
+		summarizeBy: none
+		sourceColumn: location
+
+	column resource_group
+		dataType: string
+		lineageTag: col-dim_resource-resource_group
+		summarizeBy: none
+		sourceColumn: resource_group
+
+	column subscription_id
+		dataType: string
+		lineageTag: col-dim_resource-subscription_id
+		summarizeBy: none
+		sourceColumn: subscription_id
+
+	column kind
+		dataType: string
+		lineageTag: col-dim_resource-kind
+		summarizeBy: none
+		sourceColumn: kind
+
+	column sku_name
+		dataType: string
+		lineageTag: col-dim_resource-sku_name
+		summarizeBy: none
+		sourceColumn: sku_name
+
+	column sku_tier
+		dataType: string
+		lineageTag: col-dim_resource-sku_tier
+		summarizeBy: none
+		sourceColumn: sku_tier
+
+	column sku_family
+		dataType: string
+		lineageTag: col-dim_resource-sku_family
+		summarizeBy: none
+		sourceColumn: sku_family
+
+	column sku_size
+		dataType: string
+		lineageTag: col-dim_resource-sku_size
+		summarizeBy: none
+		sourceColumn: sku_size
+
+	column identity_type
+		dataType: string
+		lineageTag: col-dim_resource-identity_type
+		summarizeBy: none
+		sourceColumn: identity_type
+
+	column identity_principal_id
+		dataType: string
+		lineageTag: col-dim_resource-identity_principal_id
+		summarizeBy: none
+		sourceColumn: identity_principal_id
+
+	column tag_environment
+		dataType: string
+		lineageTag: col-dim_resource-tag_environment
+		summarizeBy: none
+		sourceColumn: tag_environment
+
+	column tag_project
+		dataType: string
+		lineageTag: col-dim_resource-tag_project
+		summarizeBy: none
+		sourceColumn: tag_project
+
+	column tag_azd_env
+		dataType: string
+		lineageTag: col-dim_resource-tag_azd_env
+		summarizeBy: none
+		sourceColumn: tag_azd_env
+
+	column tag_azd_service
+		dataType: string
+		lineageTag: col-dim_resource-tag_azd_service
+		summarizeBy: none
+		sourceColumn: tag_azd_service
+
+	column tag_contact
+		dataType: string
+		lineageTag: col-dim_resource-tag_contact
+		summarizeBy: none
+		sourceColumn: tag_contact
+
+	column tag_created_by_policy
+		dataType: string
+		lineageTag: col-dim_resource-tag_created_by_policy
+		summarizeBy: none
+		sourceColumn: tag_created_by_policy
+
+	column tag_security_control
+		dataType: string
+		lineageTag: col-dim_resource-tag_security_control
+		summarizeBy: none
+		sourceColumn: tag_security_control
+
+	column is_ai_resource
+		dataType: boolean
+		lineageTag: col-dim_resource-is_ai_resource
+		summarizeBy: none
+		sourceColumn: is_ai_resource
+
+	column has_owner_tag
+		dataType: boolean
+		lineageTag: col-dim_resource-has_owner_tag
+		summarizeBy: none
+		sourceColumn: has_owner_tag
+
+	column has_project_tag
+		dataType: boolean
+		lineageTag: col-dim_resource-has_project_tag
+		summarizeBy: none
+		sourceColumn: has_project_tag
+
+	column has_environment_tag
+		dataType: boolean
+		lineageTag: col-dim_resource-has_environment_tag
+		summarizeBy: none
+		sourceColumn: has_environment_tag
+
+	column is_governed
+		dataType: boolean
+		lineageTag: col-dim_resource-is_governed
+		summarizeBy: none
+		sourceColumn: is_governed
+
+	partition dim_resource = entity
+		mode: directLake
+		source
+			entityName: dim_resource
+			schemaName: analytics
+			expressionSource: 'DirectLake - Analytics'
+

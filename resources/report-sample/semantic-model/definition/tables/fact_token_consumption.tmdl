@@ -1,0 +1,129 @@
+table fact_token_consumption
+	lineageTag: tbl-fact_token_consumption
+
+	measure 'Token Total' = SUM(fact_token_consumption[sum_total_tokens])
+		formatString: #,0
+		lineageTag: meas-token-total
+
+	measure 'Token Input' = SUM(fact_token_consumption[sum_input_tokens])
+		formatString: #,0
+		lineageTag: meas-token-input
+
+	measure 'Token Output' = SUM(fact_token_consumption[sum_output_tokens])
+		formatString: #,0
+		lineageTag: meas-token-output
+
+	measure 'Token Cached' = SUM(fact_token_consumption[sum_cached_tokens])
+		formatString: #,0
+		lineageTag: meas-token-cached
+
+	measure 'Token Conversations' = DISTINCTCOUNT(fact_token_consumption[conversation_id])
+		formatString: #,0
+		lineageTag: meas-token-conversations
+
+	measure 'Token Responses' = SUM(fact_token_consumption[response_count])
+		formatString: #,0
+		lineageTag: meas-token-responses
+
+	measure 'Avg Tokens / Conversation' = DIVIDE([Token Total], [Token Conversations])
+		formatString: #,0
+		lineageTag: meas-avg-tokens--conversation
+
+	column timeday
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: col-fact_token_consumption-timeday
+		summarizeBy: none
+		sourceColumn: timeday
+
+	column conversation_id
+		dataType: string
+		lineageTag: col-fact_token_consumption-conversation_id
+		summarizeBy: none
+		sourceColumn: conversation_id
+
+	column agent_id
+		dataType: string
+		lineageTag: col-fact_token_consumption-agent_id
+		summarizeBy: none
+		sourceColumn: agent_id
+
+	column agent_name
+		dataType: string
+		lineageTag: col-fact_token_consumption-agent_name
+		summarizeBy: none
+		sourceColumn: agent_name
+
+	column response_model
+		dataType: string
+		lineageTag: col-fact_token_consumption-response_model
+		summarizeBy: none
+		sourceColumn: response_model
+
+	column project_id
+		dataType: string
+		lineageTag: col-fact_token_consumption-project_id
+		summarizeBy: none
+		sourceColumn: project_id
+
+	column foundry_account
+		dataType: string
+		lineageTag: col-fact_token_consumption-foundry_account
+		summarizeBy: none
+		sourceColumn: foundry_account
+
+	column foundry_project
+		dataType: string
+		lineageTag: col-fact_token_consumption-foundry_project
+		summarizeBy: none
+		sourceColumn: foundry_project
+
+	column last_event_time
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: col-fact_token_consumption-last_event_time
+		summarizeBy: none
+		sourceColumn: last_event_time
+
+	column sum_cached_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_token_consumption-sum_cached_tokens
+		summarizeBy: none
+		sourceColumn: sum_cached_tokens
+
+	column sum_input_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_token_consumption-sum_input_tokens
+		summarizeBy: none
+		sourceColumn: sum_input_tokens
+
+	column sum_output_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_token_consumption-sum_output_tokens
+		summarizeBy: none
+		sourceColumn: sum_output_tokens
+
+	column sum_total_tokens
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_token_consumption-sum_total_tokens
+		summarizeBy: none
+		sourceColumn: sum_total_tokens
+
+	column response_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: col-fact_token_consumption-response_count
+		summarizeBy: none
+		sourceColumn: response_count
+
+	partition fact_token_consumption = entity
+		mode: directLake
+		source
+			entityName: fact_token_consumption
+			schemaName: analytics
+			expressionSource: 'DirectLake - Analytics'
+
