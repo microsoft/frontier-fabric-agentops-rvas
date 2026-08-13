@@ -13,6 +13,7 @@ import base64
 import json
 import pathlib
 import sys
+import time
 from typing import Any
 
 import click
@@ -211,6 +212,73 @@ class FabricClient:
         workspace = resp.json()
         console.print(f"[green]✔  Created workspace '{display_name}'.[/green]")
         return workspace
+
+    # ------------------------------------------------------------------
+    # Workspace identity
+    # ------------------------------------------------------------------
+
+    def _get_workspace_identity_sp(self, workspace_id: str) -> str | None:
+        """Return the workspace identity's service principal ID, or None if unset."""
+        resp = self._get(f"/workspaces/{workspace_id}")
+        identity = resp.json().get("workspaceIdentity") or {}
+        return identity.get("servicePrincipalId")
+
+    def provision_workspace_identity(self, workspace_id: str) -> str | None:
+        """Provision the workspace identity if needed and return its SP ID.
+
+        The identity is an auto-managed service principal; provisioning is a
+        long-running operation, so poll the workspace until the SP surfaces.
+        """
+        sp_id = self._get_workspace_identity_sp(workspace_id)
+        if sp_id:
+            console.print("  [yellow]⏭  Workspace identity already provisioned.[/yellow]")
+            return sp_id
+
+        try:
+            self._post(f"/workspaces/{workspace_id}/provisionIdentity")
+        except requests.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else "?"
+            console.print(
+                f"  [yellow]⚠  provisionIdentity returned {status} — checking for an existing identity.[/yellow]"
+            )
+
+        for _ in range(30):
+            sp_id = self._get_workspace_identity_sp(workspace_id)
+            if sp_id:
+                console.print("  [green]✔  Workspace identity provisioned.[/green]")
+                return sp_id
+            time.sleep(5)
+        return None
+
+    def assign_workspace_role(
+        self,
+        workspace_id: str,
+        principal_id: str,
+        role: str = "Member",
+        principal_type: str = "ServicePrincipal",
+    ) -> None:
+        """Grant a workspace role to a principal (idempotent).
+
+        Used to make the workspace identity a workspace member so an
+        InvokePipeline activity that authenticates as the identity can run the
+        target pipeline unattended.
+        """
+        payload = {
+            "principal": {"id": principal_id, "type": principal_type},
+            "role": role,
+        }
+        try:
+            self._post(f"/workspaces/{workspace_id}/roleAssignments", payload)
+            console.print(f"  [green]✔  Granted '{role}' to the workspace identity.[/green]")
+        except requests.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else None
+            body = exc.response.text if exc.response is not None else ""
+            if status == 409 or "already" in body.lower():
+                console.print(
+                    "  [yellow]⏭  Workspace identity already has a workspace role — skipping.[/yellow]"
+                )
+            else:
+                raise
 
     # ------------------------------------------------------------------
     # Lakehouse
@@ -580,12 +648,27 @@ def _print_summary(workspace: dict[str, Any], lakehouse: dict[str, Any], noteboo
     help="Fabric connection ID (GUID) for the new Invoke pipeline activity. If omitted, "
          "the activity keeps its placeholder connection and must be wired up in the portal.",
 )
+@click.option(
+    "--workspace-identity-role",
+    default="Member",
+    show_default=True,
+    help="Workspace role granted to the workspace identity so an InvokePipeline "
+         "activity authenticating as the identity can run the target pipeline unattended.",
+)
+@click.option(
+    "--skip-workspace-identity-role",
+    is_flag=True,
+    default=False,
+    help="Skip provisioning the workspace identity and granting it a workspace role.",
+)
 def main(
     workspace_name: str,
     storage_account_url: str,
     capacity_id: str,
     connection_id: str,
     pipeline_connection_id: str | None,
+    workspace_identity_role: str,
+    skip_workspace_identity_role: bool,
 ) -> None:
     """Provision a Microsoft Fabric workspace for observability analytics.
 
@@ -602,6 +685,23 @@ def main(
         with console.status("Creating workspace…"):
             workspace = client.create_or_get_workspace(workspace_name, capacity_id)
         workspace_id = workspace["id"]
+
+        # 1b. Workspace identity membership ------------------------------
+        # An InvokePipeline activity authenticates as the workspace identity;
+        # grant it a workspace role so scheduled/manual runs can call the target
+        # pipeline (Fabric grants the identity no workspace role by default).
+        if not skip_workspace_identity_role:
+            with console.status("Provisioning workspace identity & granting role…"):
+                identity_sp_id = client.provision_workspace_identity(workspace_id)
+                if identity_sp_id:
+                    client.assign_workspace_role(
+                        workspace_id, identity_sp_id, role=workspace_identity_role
+                    )
+                else:
+                    console.print(
+                        "[yellow]⚠  Could not resolve the workspace identity service "
+                        "principal — skipping role grant.[/yellow]"
+                    )
 
         # 2. Lakehouse ---------------------------------------------------
         with console.status("Creating Lakehouse…"):
