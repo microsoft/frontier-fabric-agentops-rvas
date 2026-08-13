@@ -56,6 +56,7 @@ class Conversation(BaseModel):
     metadata: dict = Field(default_factory=dict)
     createdAt: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updatedAt: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    foundryConversationId: str | None = None
     messages: list[Message] = Field(default_factory=list)
 
 
@@ -179,6 +180,7 @@ async def send_message(conversation_id: str, request: SendMessageRequest):
                 "messages": [{"role": "user", "content": request.content}],
                 "session_id": conversation_id,
                 "mode": request.mode,
+                "conversation_id": items[0].get("foundryConversationId"),
             },
         )
         agent_response.raise_for_status()
@@ -201,6 +203,11 @@ async def send_message(conversation_id: str, request: SendMessageRequest):
     try:
         conversation = items[0]
         conversation["updatedAt"] = datetime.now(timezone.utc).isoformat()
+        # Persist the Foundry conversation id (agent mode) so later turns reuse it and
+        # Foundry telemetry groups the whole conversation under one gen_ai.conversation.id.
+        foundry_conversation_id = agent_data.get("conversation_id")
+        if foundry_conversation_id:
+            conversation["foundryConversationId"] = foundry_conversation_id
         await app.state.conversations_container.upsert_item(body=conversation)
     except Exception as exc:
         logger.warning("Failed to update conversation timestamp: %s", exc)

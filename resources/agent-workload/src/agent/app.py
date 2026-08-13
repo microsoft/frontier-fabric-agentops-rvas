@@ -246,6 +246,7 @@ class AgentRequest(BaseModel):
     session_id: Optional[str] = None
     model: Optional[str] = Field(default=None, description="Model override (uses deployment default if not set)")
     mode: str = Field(default="model", description="Chat mode: 'model' for direct model calls or 'agent' for the Foundry agent")
+    conversation_id: Optional[str] = Field(default=None, description="Foundry conversation id to reuse so agent-run telemetry is attributable")
 
 
 class UsageInfo(BaseModel):
@@ -257,6 +258,7 @@ class AgentResponse(BaseModel):
     response: str
     model: str
     usage: UsageInfo
+    conversation_id: Optional[str] = None
 
 
 class StreamChunk(BaseModel):
@@ -327,17 +329,23 @@ def _suppress_telemetry():
 
 def _run_agent(request: AgentRequest) -> AgentResponse:
     inputs = [{"role": m.role, "content": m.content} for m in request.messages]
+    client = _get_agent_client()
 
     # Contact the pre-created Foundry agent through the Responses API. The agent endpoint
     # defines the model and instructions, so we only pass the conversation input.
     # Telemetry is suppressed here because Foundry emits agent-run traces automatically.
+    # Reuse the caller's Foundry conversation when known, otherwise create one; passing
+    # `conversation` makes Foundry stamp gen_ai.conversation.id on its own telemetry so
+    # the run is attributable (agent + conversation) in the report.
     with _suppress_telemetry():
-        response = _get_agent_client().responses.create(input=inputs)
+        conversation_id = request.conversation_id or client.conversations.create().id
+        response = client.responses.create(input=inputs, conversation=conversation_id)
 
     usage = getattr(response, "usage", None)
     return AgentResponse(
         response=response.output_text or "",
         model=AZURE_AI_AGENT_MODEL,
+        conversation_id=conversation_id,
         usage=UsageInfo(
             prompt_tokens=getattr(usage, "input_tokens", 0) or 0,
             completion_tokens=getattr(usage, "output_tokens", 0) or 0,
