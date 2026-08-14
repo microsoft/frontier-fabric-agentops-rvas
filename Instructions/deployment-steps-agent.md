@@ -4,19 +4,19 @@ These guides shows steps and variables to be used to deploy the entire solution.
 
 ## Variables
 
-- **subscription-name** = AngandinAzureTeam
-- **subscription-id** = 1e055937-2346-4ba4-9c11-a0b05a0977a7
+- **subscription-name** = FoundryCentralSubscription
+- **subscription-id** = XXXXXXXX-YYYY-ZZZZ-KKKK-QQQQQQQQQQQQ
 
 - **location** = sweden central
 
-- **env name for agent-workload** = fctv11
-- **Resource Group for agent-workload** = RG-Foundry-11
+- **env name for agent-workload** = fctv01
+- **Resource Group for agent-workload** = RG-Foundry-01
 
-- **env name for observability-ingestion** = fctv11-o
-- **Resource Group for observability-ingestion** = RG-Foundry-11-o
+- **env name for observability-ingestion** = fctv01-o
+- **Resource Group for observability-ingestion** = RG-Foundry-01-o
 
-- **Fabric workspace name** = ws_sc_fct_11
-- **Fabric capacity to leverage** = fabricsc
+- **Fabric workspace name** = ws_sc_fct_01
+- **Fabric capacity to leverage** = fabricsc01
 
 > **!!! Environment name must be not more than 8 character long !!!**
 
