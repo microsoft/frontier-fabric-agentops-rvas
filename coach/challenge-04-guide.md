@@ -13,9 +13,9 @@
 
 ## Coaching objectives
 
-This is the data-engineering core of the RVAS. Keep teams focused on **correlation**, not just
-"notebooks ran." The Control Tower becomes valuable when cost, telemetry, resource metadata, and agent
-activity can be joined into one operational story.
+This is the data-engineering core of the RVAS. Verify **correlation**, not just
+"notebooks ran." Focus on how cost, telemetry, resource metadata, and agent activity
+can be joined to answer operational questions.
 
 Make sure they can explain the medallion rationale:
 
@@ -133,7 +133,7 @@ Ask the team to show:
    operational telemetry.
 6. **Rationale proof** — one team member explains Bronze/Silver/Gold without reading the doc.
 
-✅ Pass when Gold is populated, the pipeline is green, and the correlation proof is real.
+✅ Pass when Gold is populated, the pipeline succeeds, and the team demonstrates correlation.
 
 ## Common pitfalls & fixes
 
@@ -151,16 +151,15 @@ Ask the team to show:
 
 ## Talking points (mini-briefing)
 
-- **Bronze protects optionality.** When a schema or business rule changes, you can replay from raw
+- **Bronze preserves raw data.** When a schema or business rule changes, you can replay from raw
   Delta rather than rebuild the landing zone.
-- **Silver is where trust is earned.** Standardized FOCUS costs and conformed telemetry make cross-source
-  joins defensible.
-- **Gold is a product, not a dump.** It should be fast, named for business questions, and shaped for
+- **Silver standardizes data.** Standardized FOCUS costs and conformed telemetry support cross-source joins.
+- **Gold supports business questions.** It should be fast, named for those questions, and shaped for
   Direct Lake consumption.
-- **Correlation is the Control Tower moment.** A dashboard that shows cost, traces, and agents in
-  separate panels is still fragmented; joined insight is what leadership asked for.
-- **Automation matters.** Pipelines, retries, alerts, and refresh windows are what turn notebooks into
-  an operating platform.
+- **Correlation answers leadership's questions.** Join cost, traces, and agent data rather than
+  only showing them in separate panels.
+- **Automation supports ongoing operation.** Use pipelines, retries, alerts, and refresh windows
+  to run the notebooks.
 
 ## If they finish early
 

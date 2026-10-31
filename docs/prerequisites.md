@@ -1,8 +1,7 @@
 # Prerequisites & Environment Setup
 
-Work through this checklist **with your coach before Day 1**. The RVAS runs on the **customer's
-own environment** — your Azure subscription(s) plus a Microsoft Fabric capacity. Getting access and
-quota sorted up front is the single biggest factor in a smooth event.
+Confirm access, quota, and tooling **with your coach before Day 1**. The RVAS runs in the
+**customer's environment**: Azure subscription(s) and a Microsoft Fabric capacity.
 
 > ⏱️ **Lead time:** Azure AI Foundry model quota and Fabric tenant enablement can take from minutes
 > to a few business days depending on your tenant's governance. **Start at least 3–5 business days
@@ -21,7 +20,7 @@ You need at least one Azure subscription where your team can create resources.
 | **Cost Management Reader** at the billing scope | Configure FOCUS cost exports (Challenge 2) | Ask your billing admin |
 | Ability to **register resource providers** | First-time use of Container Apps, APIM, etc. | `az provider register --namespace Microsoft.App` |
 
-> 🏢 **Multiple subscriptions?** That's fine and realistic. A common pattern: the **agent workload**
+> **Multiple subscriptions?** A common pattern is that the **agent workload**
 > and **landing zone** live in one subscription, while **cost exports** are scoped at the billing
 > account / management group. Note your subscription IDs in Challenge 0.
 
@@ -53,14 +52,14 @@ The Control Tower runs on **Microsoft Fabric**. You have two options:
 
 ### Option B — Paid Fabric capacity
 
-- Any **F2 or higher** capacity works. F2 handles the RVAS data volumes comfortably; the
+- Any **F2 or higher** capacity works for the RVAS data volumes; the
   reference Q&A notes F64+ for production scale.
 - Create it in the Azure portal (`Microsoft.Fabric/capacities`) and **pause it** outside working
   hours to control cost.
 
 ### Tenant settings (admin, one-time)
 
-A **Fabric / Power BI tenant administrator** must ensure:
+A **Fabric / Power BI tenant administrator** must confirm:
 
 - **Microsoft Fabric is enabled** for the tenant (or for the relevant security group). See
   [Enable Microsoft Fabric](https://learn.microsoft.com/fabric/admin/fabric-switch).
@@ -114,7 +113,7 @@ git --version
 
 ## 7. Cost expectations & hygiene
 
-This RVAS is intentionally low-cost, but **clean up when you're done**.
+Plan for these costs and **clean up when you're done**:
 
 - **Fabric** — free on trial; pause paid capacity outside hours. OneLake storage is a few cents/GB.
 - **Agent workload** — serverless Cosmos DB, Container Apps autoscaling, and `gpt-5-mini` keep
@@ -132,9 +131,9 @@ cd frontier-fabric-agentops-rvas
 
 ---
 
-## ✅ Pre-flight checklist
+## Pre-flight checklist
 
-Bring this to the kickoff. You're ready when every box is ticked:
+Confirm each item before kickoff:
 
 - [ ] Each member can `az login` to the target subscription
 - [ ] Roles confirmed: Contributor (+ User Access Administrator), Cost Management Reader
@@ -147,5 +146,5 @@ Bring this to the kickoff. You're ready when every box is ticked:
 - [ ] Local tooling installed and verified (`az`, `azd`, `python`, `docker`, `git`)
 - [ ] Repo cloned
 
-Stuck on any item? That's exactly what **[Challenge 0](../challenges/challenge-00-mission-setup.md)**
-and your coach are for.
+Resolve access and setup issues with your coach in
+[Challenge 0](../challenges/challenge-00-mission-setup.md).

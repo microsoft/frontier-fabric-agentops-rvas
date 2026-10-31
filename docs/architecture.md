@@ -1,11 +1,7 @@
 # Reference Architecture — AgentOps Control Tower (Fabric Edition)
 
-This document describes the end-to-end architecture your team will build during the RVAS. Use
-it as your north star: every challenge stands up one slice of this picture.
-
-> The `resources/` directory contains a working reference implementation of everything described
-> here. Treat it as the "answer key" foundation — deploy what accelerates you, and spend your
-> creativity on the Fabric Control Tower.
+Each challenge builds a stage of this architecture. Use the reference assets in `resources/`
+to deploy the Azure foundation and focus on the Fabric Control Tower.
 
 ---
 
@@ -100,7 +96,7 @@ reads.
 
 ### 3. Process — *Challenges 3 & 4*
 
-Microsoft Fabric brings the data in **without copying it**:
+Microsoft Fabric uses two ways to connect the source data:
 
 - **OneLake shortcuts** point at the ADLS Gen2 containers — Fabric reads them as if local.
 - **Cosmos DB Mirroring** continuously replicates agent conversations into OneLake Delta tables.
@@ -116,9 +112,9 @@ retries, and failure alerts.
 
 ### 4. Serve & Act — *Challenges 5 & 6*
 
-A **Direct Lake** semantic model reads the Gold Delta tables directly from OneLake — import-like
-performance, no data movement, always current after a pipeline run. **Power BI** dashboards surface
-the Control Tower views, and **Data Activator** raises real-time alerts when KPIs breach thresholds.
+A **Direct Lake** semantic model reads the Gold Delta tables directly from OneLake.
+After the pipeline updates the tables and refreshes the model, **Power BI** dashboards show the
+Control Tower views. Challenge 6 adds **Data Activator** alerts for KPIs that breach thresholds.
 
 ---
 
@@ -135,8 +131,7 @@ the Control Tower views, and **Data Activator** raises real-time alerts when KPI
 
 ## The Gold data products
 
-The Gold layer is the heart of the Control Tower. It produces the data products that answer the
-business questions:
+The Gold layer organizes data around the business questions:
 
 | Gold table | Answers | Powers |
 |---|---|---|
@@ -173,12 +168,12 @@ The Control Tower is graded on whether it can surface these:
 ## Why Microsoft Fabric
 
 Fabric unifies data engineering, warehousing, real-time intelligence, and BI on a single **OneLake**
-foundation. For an AgentOps Control Tower that is decisive:
+foundation. This Control Tower uses:
 
-- **OneLake shortcuts** eliminate data duplication and egress for ADLS Gen2 telemetry.
+- **OneLake shortcuts** read ADLS Gen2 telemetry in place without duplicating it.
 - **Mirroring** gives near-real-time Cosmos DB replication with no ETL to manage.
-- **Direct Lake** delivers import-grade Power BI performance straight off Delta — no refresh lag.
+- **Direct Lake** lets Power BI read Delta tables directly from OneLake.
 - **Data Activator** turns Gold-layer conditions into live operational alerts.
 
-Synapse and Databricks are valid alternatives for the medallion layer; the tight Lakehouse → model →
-Power BI → Data Activator integration is what makes Fabric the natural fit here.
+Synapse and Databricks are alternatives for the medallion layer. This RVAS uses Fabric to connect
+the Lakehouse, semantic model, Power BI, and Data Activator.

@@ -70,15 +70,8 @@
         <article class="article prose">
 <h1 id="challenge-5-—-stand-up-the-control-tower">Challenge 5 — Stand Up the Control Tower</h1>
 <hr>
-<blockquote>
-<p><strong>Mission log.</strong>
-The lake is full, the Gold tables are polished, and leadership is done waiting for screenshots from
-five different portals. This is the payoff: turn the medallion data products into a live <strong>AgentOps
-Control Tower</strong> that answers the three questions in one place — reliability, cost, and performance.</p>
-</blockquote>
-<p>In this challenge your team builds the semantic model and Power BI report that the customer will use
-in the showcase. The goal is not a beautiful wallpaper dashboard; it is a single pane of glass that can
-answer operational questions <strong>live</strong> from the Gold Delta tables.</p>
+<p>Build a <strong>Direct Lake semantic model</strong> and Power BI report over the Gold Delta tables.
+Use the report in the customer showcase to answer questions about reliability, cost, and performance.</p>
 <h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
 <p>By the end of this challenge you will have:</p>
 <ul>
@@ -97,7 +90,7 @@ answer operational questions <strong>live</strong> from the Gold Delta tables.</
 <a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/</code></a>.</li>
 <li>The semantic model reference at
 <a href="../code.html?path=resources%2Ffabric-control-tower%2Fsrc%2Fsetup%2Fsemantic_model.json"><code>resources/fabric-control-tower/src/setup/semantic_model.json</code></a>.</li>
-<li>The architecture north star in <a href="../docs/architecture.html"><code>docs/architecture.md</code></a>, especially the
+<li>The reference architecture in <a href="../docs/architecture.html"><code>docs/architecture.md</code></a>, especially the
 Gold data products and Core KPIs.</li>
 </ul>
 <h2 id="the-dashboard-contract">The dashboard contract<a class="anchor" href="#the-dashboard-contract" aria-hidden="true">#</a></h2>
@@ -119,8 +112,6 @@ Gold data products and Core KPIs.</li>
 <td>Are we meeting SLAs? How much traffic, token usage, and response time are we seeing?</td>
 </tr>
 </tbody></table></div>
-<p>The Gold layer gives you the data products. The semantic model makes them trustworthy. The report makes
-them usable under pressure.</p>
 <h2 id="your-mission">Your mission<a class="anchor" href="#your-mission" aria-hidden="true">#</a></h2>
 <h3 id="1-create-the-direct-lake-semantic-model">1. Create the Direct Lake semantic model<a class="anchor" href="#1-create-the-direct-lake-semantic-model" aria-hidden="true">#</a></h3>
 <p>Build or import a semantic model over the Gold Delta tables produced in Challenge 4:</p>
@@ -192,7 +183,7 @@ slicer or one resource filter to control the related report visuals.</p>
 <p>Add time intelligence so the report can show <strong>YTD</strong>, <strong>MTD</strong>, prior period, and rolling 30-day views.
 Mark <code>Calendar</code> as the date table using the <code>Date</code> column — <code>CostYTD</code> and <code>CostMoMChange</code> rely on
 <code>TOTALYTD</code> and <code>DATEADD</code>, which need a marked date table to resolve correctly.
-The measures do not need to be fancy, but they must be correct and reusable across pages.</p>
+Keep measures correct and reusable across pages.</p>
 <h3 id="3-build-the-reliability-page">3. Build the Reliability page<a class="anchor" href="#3-build-the-reliability-page" aria-hidden="true">#</a></h3>
 <p>Design this page around the question: <strong>Which agents are healthy, and where are the errors?</strong></p>
 <p>Include visuals that cover:</p>
@@ -202,8 +193,8 @@ The measures do not need to be fancy, but they must be correct and reusable acro
 <li>Availability scorecards.</li>
 <li>Pipeline health or latest Gold refresh status if your team captured it.</li>
 </ul>
-<p>A coach should be able to point at one unhealthy agent or service and ask, &quot;What changed?&quot; Your page
-should make the answer obvious.</p>
+<p>A coach should be able to point at one unhealthy agent or service and ask, &quot;What changed?&quot;
+Use the page to show the relevant trends and outliers.</p>
 <h3 id="4-build-the-cost-page">4. Build the Cost page<a class="anchor" href="#4-build-the-cost-page" aria-hidden="true">#</a></h3>
 <p>Design this page around the question: <strong>What is each service or Azure resource costing us?</strong></p>
 <p>Include visuals that cover:</p>
@@ -225,10 +216,9 @@ getting better or worse.</p>
 <li>Conversation, interaction, and session volume.</li>
 <li>Response-time trends by model and topic.</li>
 </ul>
-<p>Connect performance to reliability and cost. High traffic is good only if latency, errors, and spend
-stay under control.</p>
+<p>Compare traffic with latency, errors, and cost to assess performance.</p>
 <h3 id="6-confirm-direct-lake-mode">6. Confirm Direct Lake mode<a class="anchor" href="#6-confirm-direct-lake-mode" aria-hidden="true">#</a></h3>
-<p>Before you claim victory, prove the model is actually Direct Lake:</p>
+<p>Verify that the model uses Direct Lake:</p>
 <ul>
 <li>Storage mode is <strong>Direct Lake</strong> for all five model tables, including <code>Calendar</code> and
 <code>ResourceInventory</code>, which bind to the physical dimensions.</li>
@@ -365,7 +355,7 @@ model was created, resync the model metadata.</p>
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

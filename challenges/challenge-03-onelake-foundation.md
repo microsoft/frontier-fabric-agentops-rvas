@@ -4,15 +4,9 @@
 
 ---
 
-> **Mission log.**
-> The Control Tower has signals now — agent conversations in Cosmos DB, telemetry and cost files in
-> ADLS Gen2 — but the customer's enterprise data is still sitting outside the tower walls. Your job is
-> to connect it to Microsoft Fabric without copying piles of data around. This is where OneLake becomes
-> the customer's unifying data estate.
-
-In this challenge you build the **Fabric foundation** for the rest of the RVAS: a Lakehouse that
-sees the Challenge 2 landing-zone files through **OneLake shortcuts**, and a mirrored Cosmos DB source
-that brings Challenge 1 agent conversations into OneLake Delta tables for near-real-time analytics.
+Connect the Challenge 2 landing-zone files to a Fabric Lakehouse through **OneLake shortcuts**.
+Use **Cosmos DB Mirroring** to replicate the Challenge 1 agent conversations into OneLake Delta
+tables for near-real-time analytics.
 
 The important distinction: shortcuts are **zero-copy pointers** to existing files; Mirroring is
 **managed replication** into Fabric. You need both.
@@ -27,7 +21,7 @@ By the end of this challenge you will have:
   `costs`, `metadata`, three application telemetry sources, and two platform diagnostic sources.
 - Cosmos DB **Mirroring** configured for the agent conversation data from Challenge 1.
 - Proof that Fabric can query both a shortcut-backed file and a mirrored Cosmos table.
-- A crisp explanation of **zero-copy shortcuts** vs **Mirroring replication**.
+- An explanation of **zero-copy shortcuts** vs **Mirroring replication**.
 
 ## Prerequisites
 
@@ -45,7 +39,7 @@ By the end of this challenge you will have:
 
 ## The foundation
 
-Your architecture now gets its Fabric entry point:
+The two data paths feed Challenge 4:
 
 ```text
 Challenge 2 ADLS Gen2 landing zone       Challenge 1 Cosmos DB
@@ -159,7 +153,7 @@ Mirroring reports a running status, otherwise the source tables will not exist y
 
 ### 5. Prove both paths work
 
-Show your team and coach that Fabric can read from both enterprise connection patterns:
+Show your team and coach that Fabric can read from both paths:
 
 - **Shortcut path:** browse all seven paths in the shortcut contract and open or query at least one
   Parquet file and one JSON file.
@@ -192,7 +186,7 @@ Show your team and coach that Fabric can read from both enterprise connection pa
 
 A OneLake shortcut is a pointer. The files stay in the ADLS Gen2 storage account from Challenge 2, but
 Fabric presents them inside the Lakehouse `Files/` tree. You avoid duplicate storage, export jobs, and
-extra egress. If the source file changes, Fabric reads the source location.
+an extra copy step. If the source file changes, Fabric reads the source location.
 </details>
 
 <details>
@@ -232,7 +226,7 @@ Mirroring status and sync timestamp.
 
 For a shortcut file, use a Fabric notebook to read a Parquet file or folder from `Files/costs` or
 `Files/metadata`. For a mirrored table, run a simple `SELECT TOP 10` in the mirrored database SQL
-endpoint or inspect it from Spark. Keep it simple — Challenge 4 will do the heavy transformation.
+endpoint or inspect it from Spark. Challenge 4 covers transformation.
 </details>
 
 ## Resources

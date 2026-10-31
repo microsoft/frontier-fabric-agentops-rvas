@@ -17,8 +17,8 @@
 
 ## Architecture Overview
 
-The **Agents Runtime** is the core execution block of the observability platform. It processes
-requests across three microservices and persists conversation data. Application telemetry begins at
+The **Agents Runtime** processes requests across three microservices and persists conversation data.
+Application telemetry begins at
 the backend; the frontend is not instrumented in this reference workload.
 
 | Component | Role |
@@ -95,7 +95,7 @@ coordinates for the following challenge.
 |---|---|
 | **Technology** | Next.js 14 (React, TypeScript) |
 | **Port** | 3000 |
-| **Purpose** | Modern chat interface for user interactions with the AI agent. Renders streaming responses, manages conversation state, and provides a clean UX for the RVAS. |
+| **Purpose** | Chat interface for the AI agent. Renders streaming responses and manages conversation state. |
 
 ### Backend — `src/backend`
 
@@ -504,7 +504,7 @@ The infrastructure is defined in Bicep modules under `infra/`:
 
 ## Contributing
 
-Contributions are welcome! Please follow these steps:
+To contribute:
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/my-feature`
@@ -514,7 +514,7 @@ Contributions are welcome! Please follow these steps:
 6. Push to your fork: `git push origin feature/my-feature`
 7. Open a Pull Request against `main`
 
-Please follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages.
+Follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages.
 
 ---
 

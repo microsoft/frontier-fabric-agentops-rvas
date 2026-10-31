@@ -1,6 +1,6 @@
 # Coach Handbook
 
-Everything an instructor needs to run the **AgentOps Control Tower** RVAS. Read this first, then
+Use this handbook to run the **AgentOps Control Tower** RVAS. Read it first, then
 review the per-challenge coach guides.
 
 > 🧑‍🏫 **Coaching philosophy:** facilitate, don't solve. Let teams struggle productively. Ask
@@ -56,9 +56,8 @@ Compressed to **1.5 days?** Pre-provision Challenge 0 prerequisites, run Challen
 | Stuck (15+ min) | Share the specific command/snippet from the coach guide |
 | Out of time | Have them deploy the reference asset directly so they can continue the arc |
 
-The arc matters more than any single challenge — **don't let a team fall off the path.** It's fine to
-fast-forward a team through Challenges 1–2 (Azure foundation) so they reach the **Fabric** core
-(3–6), which is the point of the event.
+Keep teams moving toward the **Fabric** core (3–6), the focus of the event. If needed,
+fast-forward a team through Challenges 1–2 (Azure foundation).
 
 ## Per-challenge guides
 
@@ -91,7 +90,7 @@ The rubric lives in [`challenges/README.md`](../challenges/README.md#scoring). F
 
 ## Facilitation tips
 
-- Keep the **three business questions** on a whiteboard all event. Every challenge ladders up to them.
+- Keep the **three business questions** on a whiteboard all event. Connect each challenge to them.
 - Celebrate the first end-to-end **trace** (Challenge 1) and the first **Direct Lake** visual
   (Challenge 5) — they're the "aha" moments.
 - If energy dips in the data-engineering middle (Challenge 4), remind teams the payoff is the

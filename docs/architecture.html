@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reference Architecture — AgentOps Control Tower (Fabric Edition) · Frontier Fabric AgentOps RVAS</title>
-  <meta name="description" content="Reference Architecture — AgentOps Control Tower (Fabric Edition)">
+  <meta name="description" content="Each challenge builds a stage of this architecture. Use the reference assets in resources/
+to deploy the Azure foundation and focus on the Fabric Control Tower.">
   <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,13 +62,8 @@
         <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <span>Docs</span> <span class="sep">/</span> <span>Reference Architecture — AgentOps Control Tower (Fabric Edition)</span></div><div class="meta-row"><span class="chip cat-docs">Docs</span></div>
         <article class="article prose">
 <h1 id="reference-architecture-—-agentops-control-tower-fabric-edition">Reference Architecture — AgentOps Control Tower (Fabric Edition)</h1>
-<p>This document describes the end-to-end architecture your team will build during the RVAS. Use
-it as your north star: every challenge stands up one slice of this picture.</p>
-<blockquote>
-<p>The <code>resources/</code> directory contains a working reference implementation of everything described
-here. Treat it as the &quot;answer key&quot; foundation — deploy what accelerates you, and spend your
-creativity on the Fabric Control Tower.</p>
-</blockquote>
+<p>Each challenge builds a stage of this architecture. Use the reference assets in <code>resources/</code>
+to deploy the Azure foundation and focus on the Fabric Control Tower.</p>
 <hr>
 <h2 id="the-big-picture">The big picture<a class="anchor" href="#the-big-picture" aria-hidden="true">#</a></h2>
 <div class="mermaid">graph TB
@@ -171,7 +167,7 @@ enforces a consistent event schema across agents.</p>
 <p>All land in <strong>ADLS Gen2</strong> with hierarchical namespace and date-partitioned paths for efficient Spark
 reads.</p>
 <h3 id="3-process-—-challenges-3-4">3. Process — <em>Challenges 3 &amp; 4</em><a class="anchor" href="#3-process-—-challenges-3-4" aria-hidden="true">#</a></h3>
-<p>Microsoft Fabric brings the data in <strong>without copying it</strong>:</p>
+<p>Microsoft Fabric uses two ways to connect the source data:</p>
 <ul>
 <li><strong>OneLake shortcuts</strong> point at the ADLS Gen2 containers — Fabric reads them as if local.</li>
 <li><strong>Cosmos DB Mirroring</strong> continuously replicates agent conversations into OneLake Delta tables.</li>
@@ -185,9 +181,9 @@ reads.</p>
 <p>Pipelines orchestrate Bronze → Silver → Gold → semantic-model refresh with dependency ordering,
 retries, and failure alerts.</p>
 <h3 id="4-serve-act-—-challenges-5-6">4. Serve &amp; Act — <em>Challenges 5 &amp; 6</em><a class="anchor" href="#4-serve-act-—-challenges-5-6" aria-hidden="true">#</a></h3>
-<p>A <strong>Direct Lake</strong> semantic model reads the Gold Delta tables directly from OneLake — import-like
-performance, no data movement, always current after a pipeline run. <strong>Power BI</strong> dashboards surface
-the Control Tower views, and <strong>Data Activator</strong> raises real-time alerts when KPIs breach thresholds.</p>
+<p>A <strong>Direct Lake</strong> semantic model reads the Gold Delta tables directly from OneLake.
+After the pipeline updates the tables and refreshes the model, <strong>Power BI</strong> dashboards show the
+Control Tower views. Challenge 6 adds <strong>Data Activator</strong> alerts for KPIs that breach thresholds.</p>
 <hr>
 <h2 id="components">Components<a class="anchor" href="#components" aria-hidden="true">#</a></h2>
 <div class="table-wrap"><table><thead><tr>
@@ -223,8 +219,7 @@ the Control Tower views, and <strong>Data Activator</strong> raises real-time al
 </tbody></table></div>
 <hr>
 <h2 id="the-gold-data-products">The Gold data products<a class="anchor" href="#the-gold-data-products" aria-hidden="true">#</a></h2>
-<p>The Gold layer is the heart of the Control Tower. It produces the data products that answer the
-business questions:</p>
+<p>The Gold layer organizes data around the business questions:</p>
 <div class="table-wrap"><table><thead><tr>
 <th>Gold table</th>
 <th>Answers</th>
@@ -277,15 +272,15 @@ business questions:</p>
 <hr>
 <h2 id="why-microsoft-fabric">Why Microsoft Fabric<a class="anchor" href="#why-microsoft-fabric" aria-hidden="true">#</a></h2>
 <p>Fabric unifies data engineering, warehousing, real-time intelligence, and BI on a single <strong>OneLake</strong>
-foundation. For an AgentOps Control Tower that is decisive:</p>
+foundation. This Control Tower uses:</p>
 <ul>
-<li><strong>OneLake shortcuts</strong> eliminate data duplication and egress for ADLS Gen2 telemetry.</li>
+<li><strong>OneLake shortcuts</strong> read ADLS Gen2 telemetry in place without duplicating it.</li>
 <li><strong>Mirroring</strong> gives near-real-time Cosmos DB replication with no ETL to manage.</li>
-<li><strong>Direct Lake</strong> delivers import-grade Power BI performance straight off Delta — no refresh lag.</li>
+<li><strong>Direct Lake</strong> lets Power BI read Delta tables directly from OneLake.</li>
 <li><strong>Data Activator</strong> turns Gold-layer conditions into live operational alerts.</li>
 </ul>
-<p>Synapse and Databricks are valid alternatives for the medallion layer; the tight Lakehouse → model →
-Power BI → Data Activator integration is what makes Fabric the natural fit here.</p>
+<p>Synapse and Databricks are alternatives for the medallion layer. This RVAS uses Fabric to connect
+the Lakehouse, semantic model, Power BI, and Data Activator.</p>
 
         </article>
         
@@ -303,7 +298,7 @@ Power BI → Data Activator integration is what makes Fabric the natural fit her
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

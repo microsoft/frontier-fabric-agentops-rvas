@@ -13,8 +13,8 @@
 
 ## Coaching objectives
 
-This challenge is about **removing blockers before they cost you Day 2**. Your goal is that every
-team member can reach **both** Azure and Fabric, and that the team has captured their "coordinates."
+Remove access blockers before Day 2. Every team member must be able to reach **both** Azure and
+Fabric, and the team must record their "coordinates."
 Treat it as a readiness gate, not a learning exercise.
 
 **What good looks like:** every member runs `az login` and opens the team's Fabric workspace; the
@@ -22,7 +22,7 @@ team can recite their subscription, region, capacity, and workspace from their n
 
 ## The reference path
 
-Most of this is verification. Drive it briskly.
+Most of this is verification.
 
 1. **Azure access**
    ```bash
@@ -81,10 +81,10 @@ Ask the team to:
 
 ## Talking points (mini-briefing)
 
-- This is the customer's **own environment** — what they build here is reusable Monday morning.
+- Teams build in the customer's **own environment**, so they can reuse the work after the event.
 - Preview the destination: show [`docs/architecture.md`](../docs/architecture.md) and the three
   business questions (reliability, cost, performance). Put them on the board.
-- Emphasize **same-tenant** alignment of subscription + Fabric to avoid identity pain later.
+- Emphasize **same-tenant** alignment of the subscription and Fabric to avoid identity issues later.
 
 ## If they finish early
 

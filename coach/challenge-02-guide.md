@@ -13,10 +13,9 @@
 
 ## Coaching objectives
 
-This challenge turns scattered Azure signals into a single **landing zone** that Fabric can read with
-OneLake shortcuts. Keep teams focused on the outcome: managed `costs` and `metadata` containers plus
-Azure-created `am-*` and `insights-*` export containers with enough proof that Challenge 3 can
-shortcut to them.
+Teams build a single **landing zone** for Azure signals that Fabric can read with
+OneLake shortcuts. Verify the managed `costs` and `metadata` containers and
+Azure-created `am-*` and `insights-*` export containers are ready for Challenge 3.
 
 **What good looks like:** the team validates FOCUS and Resource Graph Parquet, shows the physical
 `am-*` and `insights-*` containers created by Azure, confirms the Log Analytics export rule and
@@ -154,16 +153,16 @@ shortcut to it.
 
 ## Talking points (mini-briefing)
 
-- **FOCUS = FinOps lingua franca.** It standardizes cost fields so spend can be joined to tags,
+- **FOCUS standardizes cost fields** so spend can be joined to tags,
   resources, services, and agent namespaces.
-- **One landing zone beats five silos.** Cost, logs, metrics, metadata, and diagnostics become
-  queryable together instead of trapped in separate portals.
-- **Date partitions are Spark fuel.** The storage layout is already shaped for Fabric notebooks and
+- **One landing zone** makes cost, logs, metrics, metadata, and diagnostics
+  queryable together rather than through separate portals.
+- **Date partitions support Spark processing.** The storage layout is already shaped for Fabric notebooks and
   medallion processing.
 - **Continuous vs batch matters.** Log Analytics and diagnostics stream continuously; cost is a
   scheduled Azure export; Resource Graph is seeded once for the workshop.
-- **This is Challenge 3's shortcut target.** The storage DFS endpoint is the bridge into OneLake with
-  no data copy.
+- **This is Challenge 3's shortcut target.** OneLake uses the storage DFS endpoint to access the data
+  without copying it.
 
 ## If they finish early
 

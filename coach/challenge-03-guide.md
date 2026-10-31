@@ -13,8 +13,7 @@
 
 ## Coaching objectives
 
-This is the **Fabric foundation aha moment**: enterprise data does not need another copy job before it
-can become useful. Teams should leave understanding two distinct patterns:
+Teams connect enterprise data to Fabric through two distinct patterns:
 
 - **OneLake shortcuts** expose ADLS Gen2 files in Fabric with zero duplication.
 - **Cosmos DB Mirroring** continuously replicates operational data into OneLake Delta tables without a
@@ -122,16 +121,14 @@ movement patterns without prompting.
 
 ## Talking points (mini-briefing)
 
-- **OneLake is the unifier.** The customer sees one Fabric data estate even when source data still
+- **OneLake provides one Fabric data estate** even when source data still
   lives in Azure storage or operational databases.
-- **Shortcuts eliminate waste.** No duplicate storage bill, no egress-heavy copy, no stale export job.
-  Fabric reads the ADLS Gen2 files already landed in Challenge 2.
-- **Mirroring is near-real-time without connector glue.** Cosmos DB conversations flow into OneLake
+- **Shortcuts avoid a separate copy job.** Fabric reads the ADLS Gen2 files already landed in Challenge 2.
+- **Mirroring replicates data in near-real-time.** Cosmos DB conversations flow into OneLake
   Delta tables so data engineers can query them like lake data.
 - **This is the Bronze feed.** Challenge 4 will refine shortcut files and mirrored tables into Bronze,
   Silver, and Gold products for reliability, cost, and performance.
-- **Identity is the enterprise control plane.** If RBAC is right, the pattern scales; if identity is
-  wrong, every shortcut and mirror becomes a support ticket.
+- **Identity controls access.** Verify RBAC for shortcuts and Mirroring to avoid access failures.
 
 ## If they finish early
 

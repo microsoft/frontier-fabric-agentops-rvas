@@ -4,26 +4,18 @@
 
 ---
 
-> **Mission log, finale.**
-> The Control Tower is no longer just a beautiful set of dashboards. Leadership has one more ask:
-> make it watch the estate **for them**. When reliability slips, cost spikes, or ownership matters, the
-> platform should alert, attribute, and protect the view automatically.
-
-This is the **stretch finale**. You do **not** need to complete every option. Pick the operational goals
-that matter most to your team and make at least two of them real enough to demo.
-
-By the end, your AgentOps Control Tower should feel production-ready: live alerts, FinOps
-chargeback/showback, governed access, and a daily operating rhythm.
+This **stretch challenge** adds operational features to the Control Tower. Choose at least
+two to build and demonstrate: alerts, chargeback/showback, access control, or pipeline automation.
 
 ## Objectives
 
-By the end of this challenge you will have selected from a menu to:
+Choose at least two of these objectives:
 
 - Trigger an operational alert from a Gold-layer or semantic-model condition.
 - Attribute blended AI-agent cost to teams, use cases, or clients.
 - Protect dashboards with Power BI **Row-Level Security (RLS)**.
 - Schedule the daily Fabric pipeline and wire failure notification.
-- Explain how reliability, cost, and performance become **actionable** — not just visible.
+- Explain how your chosen features support operational decisions.
 
 ## Prerequisites
 
@@ -35,7 +27,7 @@ By the end of this challenge you will have selected from a menu to:
 
 ## The finale menu
 
-Pick at least **two** paths. Fast teams can go for all four.
+Complete at least **two** paths. Completing all four is optional.
 
 ```text
 Gold data products + Direct Lake semantic model
@@ -46,7 +38,7 @@ Gold data products + Direct Lake semantic model
               └─ D. Automation           → run the tower every morning
 ```
 
-### A. Real-time alerts — make the tower raise its hand
+### A. Real-time alerts
 
 Use **Fabric Data Activator (Activator)** to trigger on a meaningful condition from a supported source
 such as a Power BI visual/measure, Eventstream, or KQL-backed item.
@@ -60,8 +52,7 @@ Choose a KPI tied to the Control Tower targets:
 | Retry rate | Rises above 3% |
 | Daily cost variance | Exceeds 20% day-over-day or against baseline |
 
-Your goal is not to create every alert. Your goal is to prove one **useful** alert can fire and notify
-an operator through Teams or email.
+Demonstrate one useful alert that fires and notifies an operator through Teams or email.
 
 #### What to build
 
@@ -70,7 +61,7 @@ an operator through Teams or email.
 - Simulate a breach by changing the filter context, test data, or threshold.
 - Capture proof that the alert fired.
 
-### B. FinOps chargeback/showback — make cost accountable
+### B. FinOps chargeback/showback
 
 The Cost dashboard answered "what are we spending?" Now answer: **who owns it?**
 
@@ -98,10 +89,9 @@ Create a chargeback or showback view that lets a leader see:
 Aim for a matrix visual: team/use case down the rows, cost/run rate/MoM across the columns. If you can
 show one agent rolling up to a team and use case, the pattern is working.
 
-### C. Access control — govern the view with RLS
+### C. Access control with RLS
 
-The Control Tower is enterprise-facing now. Every team should see the slice they own, not everyone
-else's data.
+Limit each team's view to the data it owns.
 
 Use standard Power BI **Row-Level Security (RLS)** on the semantic model so report consumers are
 filtered to their subscription, resource group, team, or agent namespace.
@@ -115,10 +105,10 @@ filtered to their subscription, resource group, team, or agent namespace.
 
 A simple ownership table is enough for the RVAS. Production can map Entra groups to roles later.
 
-### D. Automation — give the tower a daily operating rhythm
+### D. Pipeline automation
 
 The reference Fabric assets include a **Daily Refresh Pipeline** intended to run around **06:00 UTC** and
-process the current month incrementally. Your job is to make that operational.
+process the current month incrementally. Configure its schedule and failure notifications.
 
 #### What to build
 
@@ -126,8 +116,6 @@ process the current month incrementally. Your job is to make that operational.
 - Confirm the pipeline runs Bronze → Silver → Gold → semantic-model refresh in order.
 - Enable failure notifications through Fabric alerts, email, or Teams webhook.
 - Bonus: add a capacity-utilization forecast or threshold view for the next week.
-
-This is the moment the Control Tower becomes something the customer can wake up to every morning.
 
 ## Success criteria
 
@@ -193,15 +181,7 @@ Check the schedule timezone carefully. The reference operating rhythm is ~06:00 
 
 ⬅️ Previous: **[Challenge 5 — Stand Up the Control Tower](challenge-05-control-tower-dashboards.md)**
 
-## 🏁 You've built the AgentOps Control Tower
+## Showcase
 
-Congratulations — your team has taken the customer from scattered telemetry to an operational Fabric
-Control Tower. You can now answer the three questions that started the mission:
-
-1. **Reliability:** Which agents are healthy, and where are errors or latency spikes coming from?
-2. **Cost:** What is each agent, team, or use case costing, and who owns the run rate?
-3. **Performance:** Are we meeting SLAs, and how much capacity or token volume are we consuming?
-
-Head back to the [Challenge Index](README.md) for showcase guidance, scoring, and the final demo arc.
-Then celebrate — you built a Control Tower that does more than report. It watches, alerts, governs, and
-helps the business act.
+Use the [Challenge Index](README.md) for showcase guidance and scoring.
+Demonstrate your chosen operational features alongside the reliability, cost, and performance dashboards.

@@ -1,10 +1,8 @@
 # Frontier Fabric AgentOps RVAS
 
-### Build an **AgentOps Control Tower** on Microsoft Fabric
-
-> A hands-on, challenge-based RVAS (Real Value Acceleration Solutions) where your team builds a Fabric-based control tower that
-> **ingests and correlates telemetry from Azure services and Foundry-built agents** — enabling
-> end-to-end monitoring, analytics, and dashboards for **reliability, cost, and performance**.
+Build a Microsoft Fabric control tower for **AI-agent reliability, cost, and performance**.
+In this hands-on RVAS (Real Value Acceleration Solutions), your team ingests and correlates
+telemetry from Azure services and Foundry-built agents, then builds dashboards and alerts.
 
 ![RVAS](https://img.shields.io/badge/format-RVAS-blueviolet)
 ![Microsoft Fabric](https://img.shields.io/badge/Microsoft-Fabric-117865)
@@ -13,40 +11,34 @@
 ![Duration](https://img.shields.io/badge/duration-1.5--2%20days-informational)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-> **🌐 Explore it online:** browse every challenge, coach guide, doc, and reference file — without
-> leaving the browser — at **<https://microsoft.github.io/frontier-fabric-agentops-rvas/>**. Running
-> this for a customer? Use the **[delivery composer](https://microsoft.github.io/frontier-fabric-agentops-rvas/builder.html)**
-> to pick the challenges that fit their environment and export a tailored delivery brief.
+Browse the challenges, coach guides, documentation, and reference files at
+<https://microsoft.github.io/frontier-fabric-agentops-rvas/>. Use the
+[delivery composer](https://microsoft.github.io/frontier-fabric-agentops-rvas/builder.html)
+to select challenges for a customer's environment and export a delivery brief.
 
 ---
 
-## The Mission
+## The mission
 
-Your customer has gone all-in on AI agents. Teams across the business are shipping agents built on
-**Azure AI Foundry**, running on **Azure Container Apps**, and backed by **Cosmos DB**. Adoption is
-exploding — and so is the blind spot.
-
-Nobody can answer the questions leadership keeps asking:
+Your customer runs **Azure AI Foundry** agents on **Azure Container Apps**, backed by **Cosmos DB**.
+Leadership needs answers to three questions:
 
 - **Reliability** — Which agents are healthy? Where are errors and latency spikes coming from?
 - **Cost** — What is each agent costing us? Which team or use case owns that spend?
-- **Performance** — Are we meeting SLAs? How many tokens are we burning, and is it trending up?
+- **Performance** — Are we meeting SLAs? How many tokens are we using, and is usage increasing?
 
 The telemetry exists, but it is scattered across Application Insights, Azure Monitor, Cost
-Management, Resource Graph, and Cosmos DB. The customer has chosen **Microsoft Fabric** to unify it
-all into a single **AgentOps Control Tower**.
+Management, Resource Graph, and Cosmos DB. Your team will bring it together in an
+**AgentOps Control Tower** on **Microsoft Fabric**: deploy the agent workload, land its telemetry,
+connect it through OneLake shortcuts and Cosmos DB Mirroring, refine it through a medallion
+architecture, and build dashboards.
 
-**That is your job.** Over the course of this RVAS your team will stand up the end-to-end
-platform: light up a live agent workload, land its telemetry in a lake, connect it to Fabric with
-zero-copy OneLake shortcuts and Cosmos DB Mirroring, refine it through a medallion architecture, and
-deliver the Control Tower dashboards that finally give the business a single pane of glass.
-
-This is **not** a guided click-through. Each challenge gives you a goal and success criteria — *how*
-you get there is up to your team. Coaches are in the room to unblock you, not to hand you the answer.
+Each challenge gives you a goal and success criteria. Your team chooses the implementation;
+coaches help when you're blocked.
 
 ---
 
-## What You'll Build
+## What you'll build
 
 ```mermaid
 graph TB
@@ -90,13 +82,12 @@ graph TB
     GLD --> ACT
 ```
 
-By the end you will have a working pipeline that flows from **a user's click**, through **agent
-inference and tool calls**, into **OneLake**, and out to **executive dashboards and live alerts** —
-all on first-party Microsoft technology.
+The pipeline connects user activity, agent inference, and tool calls to OneLake and executive
+dashboards. The stretch challenge adds live alerts. All components use Microsoft technology.
 
 ---
 
-## RVAS Format
+## RVAS format
 
 | | |
 |---|---|
@@ -106,40 +97,39 @@ all on first-party Microsoft technology.
 | **Environment** | The **customer's own** Azure subscription(s) + a Microsoft Fabric capacity (**trial capacity is fine**) |
 | **Roles** | Platform/Cloud engineer · Data engineer · FinOps practitioner · AI engineer (mix per team) |
 
-Teams progress through the challenges in order — each one builds on the last. You are encouraged to
-divide and conquer within a challenge, then regroup at each success checkpoint.
+Follow the challenge dependencies. Divide tasks within your team and regroup at each success checkpoint.
 
 ---
 
-## The Challenges
+## The challenges
 
 | # | Challenge | What you'll achieve | Primary skills |
 |---|---|---|---|
 | **0** | [Mission Briefing & Environment Setup](challenges/challenge-00-mission-setup.md) | Azure + Fabric trial capacity ready, tooling installed, team onboarded | Setup, Fabric admin |
 | **1** | [Light Up the Agents](challenges/challenge-01-agent-telemetry.md) | Deploy the Foundry agent workload and confirm telemetry is flowing | Azure, Container Apps, App Insights |
 | **2** | [Build the Telemetry Landing Zone](challenges/challenge-02-landing-zone.md) | Land cost, metrics, logs, metadata & diagnostics in ADLS Gen2 | Azure Monitor, FinOps, IaC |
-| **3** | [Connect Fabric to the Enterprise](challenges/challenge-03-onelake-foundation.md) | Lakehouse + OneLake shortcuts + Cosmos DB Mirroring (zero-copy) | Fabric, OneLake |
+| **3** | [Connect Fabric to the Enterprise](challenges/challenge-03-onelake-foundation.md) | Lakehouse + zero-copy OneLake shortcuts + Cosmos DB Mirroring | Fabric, OneLake |
 | **4** | [Refine the Signal](challenges/challenge-04-medallion-pipeline.md) | Bronze→Silver→Gold medallion pipeline correlating all sources | PySpark, data engineering |
 | **5** | [Stand Up the Control Tower](challenges/challenge-05-control-tower-dashboards.md) | Direct Lake semantic model + Reliability/Cost/Performance dashboards | Power BI, DAX, semantic modeling |
 | **6** | [Make It Operational](challenges/challenge-06-operationalize.md) 🏆 | Stretch: real-time alerts, FinOps chargeback, RLS, automation | Data Activator, FinOps, governance |
 
-See the [**Challenge Index**](challenges/README.md) for the full arc, dependencies, and scoring.
+See the [Challenge Index](challenges/README.md) for dependencies and scoring.
 
 ---
 
-## Getting Started
+## Getting started
 
-1. **Read the mission** (above) and the [reference architecture](docs/architecture.md).
+1. Read the [reference architecture](docs/architecture.md).
 2. **Confirm prerequisites** — work through [`docs/prerequisites.md`](docs/prerequisites.md) with your coach **before day 1**. This covers Azure roles, Fabric trial capacity, and local tooling.
 3. **Start with [Challenge 0](challenges/challenge-00-mission-setup.md).**
 4. Keep the [FAQ](docs/faq.md) handy.
 
-> 💡 **Coaches:** start at the [Coach Handbook](coach/README.md). Each challenge has a matching coach
-> guide with the reference solution, key commands, common pitfalls, and talking points.
+Coaches: start with the [Coach Handbook](coach/README.md). Each challenge has a guide with the
+reference solution, key commands, common pitfalls, and talking points.
 
 ---
 
-## Repository Structure
+## Repository structure
 
 ```
 frontier-fabric-agentops-rvas/
@@ -162,9 +152,8 @@ frontier-fabric-agentops-rvas/
     └── observability-sdk/        # Shared Python SDK for agent telemetry
 ```
 
-The `resources/` directory contains a **complete reference implementation**. Teams are encouraged to
-deploy the provided infrastructure as a foundation and focus their creative energy on the Fabric
-Control Tower itself. Coaches hold the keys to the reference solution for each challenge.
+Use the reference implementation in `resources/` to deploy the Azure foundation and focus on
+the Fabric Control Tower. Coaches decide when to share each challenge's reference solution.
 
 ---
 
@@ -172,9 +161,9 @@ Control Tower itself. Coaches hold the keys to the reference solution for each c
 
 After this RVAS, your team will be able to:
 
-- Deploy and instrument **Azure AI Foundry agents** that emit production-grade telemetry.
+- Deploy and instrument **Azure AI Foundry agents** that emit structured telemetry.
 - Build a unified **observability landing zone** spanning telemetry, cost, and metadata.
-- Use **OneLake shortcuts** and **Cosmos DB Mirroring** to bring enterprise data into Fabric with zero copy.
+- Read enterprise files through zero-copy **OneLake shortcuts** and replicate Cosmos DB data through **Mirroring**.
 - Engineer a **medallion (Bronze/Silver/Gold)** lakehouse that correlates reliability, cost, and performance signals.
 - Deliver **Direct Lake** Power BI dashboards and **real-time alerts** for an AgentOps Control Tower.
 - Apply **FinOps** practices (FOCUS cost normalization, chargeback/showback) to AI workloads.
@@ -183,9 +172,8 @@ After this RVAS, your team will be able to:
 
 ## Contributing
 
-This RVAS is maintained as an open asset. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to
-propose improvements, report issues, or add challenges. Bug reports and feature requests are welcome
-via GitHub Issues.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) to propose improvements or add challenges.
+Report bugs and request features through GitHub Issues.
 
 ## License
 

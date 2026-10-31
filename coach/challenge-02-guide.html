@@ -84,10 +84,9 @@
 </tr>
 </tbody></table></div>
 <h2 id="coaching-objectives">Coaching objectives<a class="anchor" href="#coaching-objectives" aria-hidden="true">#</a></h2>
-<p>This challenge turns scattered Azure signals into a single <strong>landing zone</strong> that Fabric can read with
-OneLake shortcuts. Keep teams focused on the outcome: managed <code>costs</code> and <code>metadata</code> containers plus
-Azure-created <code>am-*</code> and <code>insights-*</code> export containers with enough proof that Challenge 3 can
-shortcut to them.</p>
+<p>Teams build a single <strong>landing zone</strong> for Azure signals that Fabric can read with
+OneLake shortcuts. Verify the managed <code>costs</code> and <code>metadata</code> containers and
+Azure-created <code>am-*</code> and <code>insights-*</code> export containers are ready for Challenge 3.</p>
 <p><strong>What good looks like:</strong> the team validates FOCUS and Resource Graph Parquet, shows the physical
 <code>am-*</code> and <code>insights-*</code> containers created by Azure, confirms the Log Analytics export rule and
 diagnostic setting, and records the storage account name, resource ID, and DFS endpoint.</p>
@@ -213,16 +212,16 @@ shortcut to it.</p>
 </tbody></table></div>
 <h2 id="talking-points-mini-briefing">Talking points (mini-briefing)<a class="anchor" href="#talking-points-mini-briefing" aria-hidden="true">#</a></h2>
 <ul>
-<li><strong>FOCUS = FinOps lingua franca.</strong> It standardizes cost fields so spend can be joined to tags,
+<li><strong>FOCUS standardizes cost fields</strong> so spend can be joined to tags,
 resources, services, and agent namespaces.</li>
-<li><strong>One landing zone beats five silos.</strong> Cost, logs, metrics, metadata, and diagnostics become
-queryable together instead of trapped in separate portals.</li>
-<li><strong>Date partitions are Spark fuel.</strong> The storage layout is already shaped for Fabric notebooks and
+<li><strong>One landing zone</strong> makes cost, logs, metrics, metadata, and diagnostics
+queryable together rather than through separate portals.</li>
+<li><strong>Date partitions support Spark processing.</strong> The storage layout is already shaped for Fabric notebooks and
 medallion processing.</li>
 <li><strong>Continuous vs batch matters.</strong> Log Analytics and diagnostics stream continuously; cost is a
 scheduled Azure export; Resource Graph is seeded once for the workshop.</li>
-<li><strong>This is Challenge 3&#39;s shortcut target.</strong> The storage DFS endpoint is the bridge into OneLake with
-no data copy.</li>
+<li><strong>This is Challenge 3&#39;s shortcut target.</strong> OneLake uses the storage DFS endpoint to access the data
+without copying it.</li>
 </ul>
 <h2 id="if-they-finish-early">If they finish early<a class="anchor" href="#if-they-finish-early" aria-hidden="true">#</a></h2>
 <ul>
@@ -264,7 +263,7 @@ feeds each one.</li>
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

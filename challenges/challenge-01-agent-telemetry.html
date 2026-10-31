@@ -49,9 +49,9 @@
           <li><a class="h2" href="#the-workload">The workload</a></li>
           <li><a class="h2" href="#your-mission">Your mission</a></li>
           <li><a class="h3" href="#1-deploy-the-workload">1. Deploy the workload</a></li>
-          <li><a class="h3" href="#2-make-the-agent-work-for-its-telemetry">2. Make the agent work for its telemetry</a></li>
-          <li><a class="h3" href="#3-prove-the-signal-is-flowing">3. Prove the signal is flowing</a></li>
-          <li><a class="h3" href="#4-confirm-the-data-exhaust">4. Confirm the data exhaust</a></li>
+          <li><a class="h3" href="#2-generate-agent-traffic">2. Generate agent traffic</a></li>
+          <li><a class="h3" href="#3-verify-telemetry">3. Verify telemetry</a></li>
+          <li><a class="h3" href="#4-verify-cosmos-db-records">4. Verify Cosmos DB records</a></li>
           <li><a class="h2" href="#success-criteria">Success criteria</a></li>
           <li><a class="h2" href="#hints">Hints</a></li>
           <li><a class="h2" href="#resources">Resources</a></li>
@@ -68,16 +68,8 @@
         <article class="article prose">
 <h1 id="challenge-1-—-light-up-the-agents">Challenge 1 — Light Up the Agents</h1>
 <hr>
-<blockquote>
-<p><strong>Mission log.</strong>
-You can&#39;t monitor what doesn&#39;t exist yet. The Control Tower needs something to watch — a real,
-running agent that talks to a model, calls tools, stores conversations, and (crucially) <strong>emits
-telemetry at every hop</strong>. Today you bring the customer&#39;s agent workload online and prove the signal
-is flowing.</p>
-</blockquote>
-<p>This is the <strong>source</strong> of everything the Control Tower will eventually correlate: traces, custom
-token and latency metrics, and conversation records. Get it emitting cleanly and the rest of the platform
-has something real to chew on.</p>
+<p>Deploy the agent workload and confirm that it produces traces, token and latency metrics,
+and Cosmos DB conversation records. Later challenges use this data in the Control Tower.</p>
 <h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
 <p>By the end of this challenge you will have:</p>
 <ul>
@@ -95,7 +87,7 @@ Application Insights.</li>
 </ul>
 <h2 id="the-workload">The workload<a class="anchor" href="#the-workload" aria-hidden="true">#</a></h2>
 <p>The provided app has three Container Apps, backed by Cosmos DB and a Foundry model deployment, all
-wired to Application Insights. API Management is provisioned for future gateway integration, but the
+connected to Application Insights. API Management is provisioned for future gateway integration, but the
 reference application currently calls the Container Apps directly:</p>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>User → Frontend (Next.js) → Backend (FastAPI) → Agent (FastAPI) → Azure AI Foundry
                                   │
@@ -111,14 +103,14 @@ reference workload.</p>
 <li>Capture the output <strong>service URLs</strong> (frontend, backend, agent), the Application Insights and Cosmos
 DB resource names, and the Log Analytics workspace name and resource ID.</li>
 </ul>
-<h3 id="2-make-the-agent-work-for-its-telemetry">2. Make the agent work for its telemetry<a class="anchor" href="#2-make-the-agent-work-for-its-telemetry" aria-hidden="true">#</a></h3>
+<h3 id="2-generate-agent-traffic">2. Generate agent traffic<a class="anchor" href="#2-generate-agent-traffic" aria-hidden="true">#</a></h3>
 <ul>
 <li>Open the frontend and <strong>have a conversation</strong> with the agent — send several different prompts so
 there&#39;s a variety of traffic. (Bonus: script a handful of requests to the agent API to generate
 volume.)</li>
-<li>Confirm the agent is actually calling the model and returning completions (not erroring).</li>
+<li>Confirm the agent calls the model and returns completions without errors.</li>
 </ul>
-<h3 id="3-prove-the-signal-is-flowing">3. Prove the signal is flowing<a class="anchor" href="#3-prove-the-signal-is-flowing" aria-hidden="true">#</a></h3>
+<h3 id="3-verify-telemetry">3. Verify telemetry<a class="anchor" href="#3-verify-telemetry" aria-hidden="true">#</a></h3>
 <p>Using Application Insights for this workload, demonstrate <strong>all</strong> of the following:</p>
 <ul>
 <li>A <strong>distributed trace</strong> that starts at the backend and shows the request flowing through the agent
@@ -126,9 +118,9 @@ to Azure OpenAI, alongside the correlated Cosmos DB operations.</li>
 <li>The <strong>Application Map</strong>, showing the backend and agent services plus their Cosmos DB and Azure
 OpenAI dependencies.</li>
 <li>The <strong>custom metrics</strong> the agent emits for <strong>token consumption and latency</strong> — and explain to
-a teammate what they&#39;ll be worth to the Control Tower later.</li>
+a teammate how the Control Tower will use them.</li>
 </ul>
-<h3 id="4-confirm-the-data-exhaust">4. Confirm the data exhaust<a class="anchor" href="#4-confirm-the-data-exhaust" aria-hidden="true">#</a></h3>
+<h3 id="4-verify-cosmos-db-records">4. Verify Cosmos DB records<a class="anchor" href="#4-verify-cosmos-db-records" aria-hidden="true">#</a></h3>
 <ul>
 <li>In Cosmos DB, find the <strong>conversations</strong> and <strong>interactions</strong> your traffic created. Note the
 database/container names and partition keys: <code>/sessionId</code> for <code>conversations</code> and
@@ -141,11 +133,11 @@ database/container names and partition keys: <code>/sessionId</code> for <code>c
 <li><input disabled="" type="checkbox"> The <strong>Application Map</strong> shows the backend and agent plus Cosmos DB and Azure OpenAI dependencies</li>
 <li><input disabled="" type="checkbox"> You can point to the custom token and latency metrics emitted by the agent</li>
 <li><input disabled="" type="checkbox"> Conversation/interaction documents are visible in <strong>Cosmos DB</strong></li>
-<li><input disabled="" type="checkbox"> You&#39;ve recorded the App Insights, Log Analytics, and Cosmos DB resource coordinates for later challenges</li>
+<li><input disabled="" type="checkbox"> You&#39;ve recorded the App Insights, Log Analytics, and Cosmos DB resource details for later challenges</li>
 </ul>
 <blockquote>
-<p>🧭 <strong>Checkpoint:</strong> walk your coach through a single user message and trace its journey across the
-telemetry — from the click to the model and back.</p>
+<p>🧭 <strong>Checkpoint:</strong> send one message through the frontend, then show your coach its backend,
+agent, model, and Cosmos DB telemetry.</p>
 </blockquote>
 <h2 id="hints">Hints<a class="anchor" href="#hints" aria-hidden="true">#</a></h2>
 <details>
@@ -223,7 +215,7 @@ details</strong> to see the backend, agent, Azure OpenAI, and Cosmos DB operatio
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

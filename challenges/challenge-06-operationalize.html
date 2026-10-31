@@ -47,14 +47,14 @@
           <li><a class="h2" href="#objectives">Objectives</a></li>
           <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
           <li><a class="h2" href="#the-finale-menu">The finale menu</a></li>
-          <li><a class="h3" href="#a-real-time-alerts-—-make-the-tower-raise-its-hand">A. Real-time alerts — make the tower raise its hand</a></li>
-          <li><a class="h3" href="#b-finops-chargebackshowback-—-make-cost-accountable">B. FinOps chargeback/showback — make cost accountable</a></li>
-          <li><a class="h3" href="#c-access-control-—-govern-the-view-with-rls">C. Access control — govern the view with RLS</a></li>
-          <li><a class="h3" href="#d-automation-—-give-the-tower-a-daily-operating-rhythm">D. Automation — give the tower a daily operating rhythm</a></li>
+          <li><a class="h3" href="#a-real-time-alerts">A. Real-time alerts</a></li>
+          <li><a class="h3" href="#b-finops-chargebackshowback">B. FinOps chargeback/showback</a></li>
+          <li><a class="h3" href="#c-access-control-with-rls">C. Access control with RLS</a></li>
+          <li><a class="h3" href="#d-pipeline-automation">D. Pipeline automation</a></li>
           <li><a class="h2" href="#success-criteria">Success criteria</a></li>
           <li><a class="h2" href="#hints">Hints</a></li>
           <li><a class="h2" href="#resources">Resources</a></li>
-          <li><a class="h2" href="#🏁-youve-built-the-agentops-control-tower">🏁 You&#39;ve built the AgentOps Control Tower</a></li>
+          <li><a class="h2" href="#showcase">Showcase</a></li>
         </ul>
       </aside>
       <main class="doc-main">
@@ -68,24 +68,16 @@
         <article class="article prose">
 <h1 id="challenge-6-—-make-it-operational">Challenge 6 — Make It Operational</h1>
 <hr>
-<blockquote>
-<p><strong>Mission log, finale.</strong>
-The Control Tower is no longer just a beautiful set of dashboards. Leadership has one more ask:
-make it watch the estate <strong>for them</strong>. When reliability slips, cost spikes, or ownership matters, the
-platform should alert, attribute, and protect the view automatically.</p>
-</blockquote>
-<p>This is the <strong>stretch finale</strong>. You do <strong>not</strong> need to complete every option. Pick the operational goals
-that matter most to your team and make at least two of them real enough to demo.</p>
-<p>By the end, your AgentOps Control Tower should feel production-ready: live alerts, FinOps
-chargeback/showback, governed access, and a daily operating rhythm.</p>
+<p>This <strong>stretch challenge</strong> adds operational features to the Control Tower. Choose at least
+two to build and demonstrate: alerts, chargeback/showback, access control, or pipeline automation.</p>
 <h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
-<p>By the end of this challenge you will have selected from a menu to:</p>
+<p>Choose at least two of these objectives:</p>
 <ul>
 <li>Trigger an operational alert from a Gold-layer or semantic-model condition.</li>
 <li>Attribute blended AI-agent cost to teams, use cases, or clients.</li>
 <li>Protect dashboards with Power BI <strong>Row-Level Security (RLS)</strong>.</li>
 <li>Schedule the daily Fabric pipeline and wire failure notification.</li>
-<li>Explain how reliability, cost, and performance become <strong>actionable</strong> — not just visible.</li>
+<li>Explain how your chosen features support operational decisions.</li>
 </ul>
 <h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
 <ul>
@@ -96,14 +88,14 @@ chargeback/showback, governed access, and a daily operating rhythm.</p>
 <li>Optional: Teams or email destination for alert notifications.</li>
 </ul>
 <h2 id="the-finale-menu">The finale menu<a class="anchor" href="#the-finale-menu" aria-hidden="true">#</a></h2>
-<p>Pick at least <strong>two</strong> paths. Fast teams can go for all four.</p>
+<p>Complete at least <strong>two</strong> paths. Completing all four is optional.</p>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-text">Gold data products + Direct Lake semantic model
               │
               ├─ A. Real-time alerts     → notify when a KPI breaches
               ├─ B. FinOps chargeback    → show who owns the run rate
               ├─ C. Access control       → secure each team&#39;s slice
               └─ D. Automation           → run the tower every morning</code></pre>
-<h3 id="a-real-time-alerts-—-make-the-tower-raise-its-hand">A. Real-time alerts — make the tower raise its hand<a class="anchor" href="#a-real-time-alerts-—-make-the-tower-raise-its-hand" aria-hidden="true">#</a></h3>
+<h3 id="a-real-time-alerts">A. Real-time alerts<a class="anchor" href="#a-real-time-alerts" aria-hidden="true">#</a></h3>
 <p>Use <strong>Fabric Data Activator (Activator)</strong> to trigger on a meaningful condition from a supported source
 such as a Power BI visual/measure, Eventstream, or KQL-backed item.</p>
 <p>Choose a KPI tied to the Control Tower targets:</p>
@@ -128,8 +120,7 @@ such as a Power BI visual/measure, Eventstream, or KQL-backed item.</p>
 <td>Exceeds 20% day-over-day or against baseline</td>
 </tr>
 </tbody></table></div>
-<p>Your goal is not to create every alert. Your goal is to prove one <strong>useful</strong> alert can fire and notify
-an operator through Teams or email.</p>
+<p>Demonstrate one useful alert that fires and notifies an operator through Teams or email.</p>
 <h4 id="what-to-build">What to build</h4>
 <ul>
 <li>Pick one Gold table or semantic-model measure that represents a business KPI.</li>
@@ -137,7 +128,7 @@ an operator through Teams or email.</p>
 <li>Simulate a breach by changing the filter context, test data, or threshold.</li>
 <li>Capture proof that the alert fired.</li>
 </ul>
-<h3 id="b-finops-chargebackshowback-—-make-cost-accountable">B. FinOps chargeback/showback — make cost accountable<a class="anchor" href="#b-finops-chargebackshowback-—-make-cost-accountable" aria-hidden="true">#</a></h3>
+<h3 id="b-finops-chargebackshowback">B. FinOps chargeback/showback<a class="anchor" href="#b-finops-chargebackshowback" aria-hidden="true">#</a></h3>
 <p>The Cost dashboard answered &quot;what are we spending?&quot; Now answer: <strong>who owns it?</strong></p>
 <p>Attribute blended cost across model tokens, Cosmos DB RUs, compute, API Management, and supporting
 platform resources using:</p>
@@ -157,9 +148,8 @@ platform resources using:</p>
 </ul>
 <p>Aim for a matrix visual: team/use case down the rows, cost/run rate/MoM across the columns. If you can
 show one agent rolling up to a team and use case, the pattern is working.</p>
-<h3 id="c-access-control-—-govern-the-view-with-rls">C. Access control — govern the view with RLS<a class="anchor" href="#c-access-control-—-govern-the-view-with-rls" aria-hidden="true">#</a></h3>
-<p>The Control Tower is enterprise-facing now. Every team should see the slice they own, not everyone
-else&#39;s data.</p>
+<h3 id="c-access-control-with-rls">C. Access control with RLS<a class="anchor" href="#c-access-control-with-rls" aria-hidden="true">#</a></h3>
+<p>Limit each team&#39;s view to the data it owns.</p>
 <p>Use standard Power BI <strong>Row-Level Security (RLS)</strong> on the semantic model so report consumers are
 filtered to their subscription, resource group, team, or agent namespace.</p>
 <h4 id="what-to-build-2">What to build</h4>
@@ -170,9 +160,9 @@ filtered to their subscription, resource group, team, or agent namespace.</p>
 <li>Show that the same page returns different slices for different roles.</li>
 </ul>
 <p>A simple ownership table is enough for the RVAS. Production can map Entra groups to roles later.</p>
-<h3 id="d-automation-—-give-the-tower-a-daily-operating-rhythm">D. Automation — give the tower a daily operating rhythm<a class="anchor" href="#d-automation-—-give-the-tower-a-daily-operating-rhythm" aria-hidden="true">#</a></h3>
+<h3 id="d-pipeline-automation">D. Pipeline automation<a class="anchor" href="#d-pipeline-automation" aria-hidden="true">#</a></h3>
 <p>The reference Fabric assets include a <strong>Daily Refresh Pipeline</strong> intended to run around <strong>06:00 UTC</strong> and
-process the current month incrementally. Your job is to make that operational.</p>
+process the current month incrementally. Configure its schedule and failure notifications.</p>
 <h4 id="what-to-build-3">What to build</h4>
 <ul>
 <li>Schedule the Daily Refresh pipeline to run daily at about 06:00 UTC.</li>
@@ -180,7 +170,6 @@ process the current month incrementally. Your job is to make that operational.</
 <li>Enable failure notifications through Fabric alerts, email, or Teams webhook.</li>
 <li>Bonus: add a capacity-utilization forecast or threshold view for the next week.</li>
 </ul>
-<p>This is the moment the Control Tower becomes something the customer can wake up to every morning.</p>
 <h2 id="success-criteria">Success criteria<a class="anchor" href="#success-criteria" aria-hidden="true">#</a></h2>
 <p>Complete <strong>at least TWO</strong> of the following:</p>
 <ul>
@@ -242,17 +231,9 @@ Power BI&#39;s <strong>View as</strong> feature before showing the coach.</p>
 </ul>
 <hr>
 <p>⬅️ Previous: <strong><a href="challenge-05-control-tower-dashboards.html">Challenge 5 — Stand Up the Control Tower</a></strong></p>
-<h2 id="🏁-youve-built-the-agentops-control-tower">🏁 You&#39;ve built the AgentOps Control Tower<a class="anchor" href="#🏁-youve-built-the-agentops-control-tower" aria-hidden="true">#</a></h2>
-<p>Congratulations — your team has taken the customer from scattered telemetry to an operational Fabric
-Control Tower. You can now answer the three questions that started the mission:</p>
-<ol>
-<li><strong>Reliability:</strong> Which agents are healthy, and where are errors or latency spikes coming from?</li>
-<li><strong>Cost:</strong> What is each agent, team, or use case costing, and who owns the run rate?</li>
-<li><strong>Performance:</strong> Are we meeting SLAs, and how much capacity or token volume are we consuming?</li>
-</ol>
-<p>Head back to the <a href="README.html">Challenge Index</a> for showcase guidance, scoring, and the final demo arc.
-Then celebrate — you built a Control Tower that does more than report. It watches, alerts, governs, and
-helps the business act.</p>
+<h2 id="showcase">Showcase<a class="anchor" href="#showcase" aria-hidden="true">#</a></h2>
+<p>Use the <a href="README.html">Challenge Index</a> for showcase guidance and scoring.
+Demonstrate your chosen operational features alongside the reliability, cost, and performance dashboards.</p>
 
         </article>
         
@@ -274,7 +255,7 @@ helps the business act.</p>
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

@@ -4,15 +4,8 @@
 
 ---
 
-> **Mission log.**
-> You can't monitor what doesn't exist yet. The Control Tower needs something to watch — a real,
-> running agent that talks to a model, calls tools, stores conversations, and (crucially) **emits
-> telemetry at every hop**. Today you bring the customer's agent workload online and prove the signal
-> is flowing.
-
-This is the **source** of everything the Control Tower will eventually correlate: traces, custom
-token and latency metrics, and conversation records. Get it emitting cleanly and the rest of the platform
-has something real to chew on.
+Deploy the agent workload and confirm that it produces traces, token and latency metrics,
+and Cosmos DB conversation records. Later challenges use this data in the Control Tower.
 
 ## Objectives
 
@@ -33,7 +26,7 @@ By the end of this challenge you will have:
 ## The workload
 
 The provided app has three Container Apps, backed by Cosmos DB and a Foundry model deployment, all
-wired to Application Insights. API Management is provisioned for future gateway integration, but the
+connected to Application Insights. API Management is provisioned for future gateway integration, but the
 reference application currently calls the Container Apps directly:
 
 ```
@@ -55,14 +48,14 @@ reference workload.
 - Capture the output **service URLs** (frontend, backend, agent), the Application Insights and Cosmos
   DB resource names, and the Log Analytics workspace name and resource ID.
 
-### 2. Make the agent work for its telemetry
+### 2. Generate agent traffic
 
 - Open the frontend and **have a conversation** with the agent — send several different prompts so
   there's a variety of traffic. (Bonus: script a handful of requests to the agent API to generate
   volume.)
-- Confirm the agent is actually calling the model and returning completions (not erroring).
+- Confirm the agent calls the model and returns completions without errors.
 
-### 3. Prove the signal is flowing
+### 3. Verify telemetry
 
 Using Application Insights for this workload, demonstrate **all** of the following:
 
@@ -71,9 +64,9 @@ Using Application Insights for this workload, demonstrate **all** of the followi
 - The **Application Map**, showing the backend and agent services plus their Cosmos DB and Azure
   OpenAI dependencies.
 - The **custom metrics** the agent emits for **token consumption and latency** — and explain to
-  a teammate what they'll be worth to the Control Tower later.
+  a teammate how the Control Tower will use them.
 
-### 4. Confirm the data exhaust
+### 4. Verify Cosmos DB records
 
 - In Cosmos DB, find the **conversations** and **interactions** your traffic created. Note the
   database/container names and partition keys: `/sessionId` for `conversations` and
@@ -86,10 +79,10 @@ Using Application Insights for this workload, demonstrate **all** of the followi
 - [ ] The **Application Map** shows the backend and agent plus Cosmos DB and Azure OpenAI dependencies
 - [ ] You can point to the custom token and latency metrics emitted by the agent
 - [ ] Conversation/interaction documents are visible in **Cosmos DB**
-- [ ] You've recorded the App Insights, Log Analytics, and Cosmos DB resource coordinates for later challenges
+- [ ] You've recorded the App Insights, Log Analytics, and Cosmos DB resource details for later challenges
 
-> 🧭 **Checkpoint:** walk your coach through a single user message and trace its journey across the
-> telemetry — from the click to the model and back.
+> 🧭 **Checkpoint:** send one message through the frontend, then show your coach its backend,
+> agent, model, and Cosmos DB telemetry.
 
 ## Hints
 

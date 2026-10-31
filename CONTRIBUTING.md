@@ -1,9 +1,7 @@
 # Contributing to the Frontier Fabric AgentOps RVAS
 
-Thanks for your interest in improving this RVAS! This repo is an open teaching asset — the more
-real-world the challenges, hints, and coach guides are, the better the experience for the next
-customer team that runs it. Contributions of all sizes are welcome, from fixing a typo to authoring a
-brand-new challenge.
+Contribute fixes, clearer instructions, reference code, or new challenges to this open teaching
+asset. Keep the content useful for customer teams building an AgentOps Control Tower.
 
 ## Ways to contribute
 
@@ -16,10 +14,10 @@ brand-new challenge.
 | Add a brand-new challenge or stretch goal | `challenges/` **and** `coach/` (always add both) |
 | Report a bug or unclear instruction | GitHub Issues |
 
-## Golden rule: challenges and coach guides travel together
+## Keep challenges and coach guides in sync
 
 Every attendee-facing challenge in `challenges/` has a matching instructor guide in `coach/`. If you
-change one, update the other in the same pull request so they never drift:
+change one, update the other in the same pull request:
 
 - A new task in a challenge needs a matching checkpoint + reference path in the guide.
 - A renamed file needs its prev/next nav links and the coach cross-link updated.
@@ -28,7 +26,7 @@ change one, update the other in the same pull request so they never drift:
 
 **Attendee challenges** (`challenges/`) describe **what** to accomplish, not **how**:
 
-1. A short "mission log" blockquote story hook at the top.
+1. A short paragraph explaining the scenario and what the team will build.
 2. `## Objectives` and `## Prerequisites`.
 3. `## Your mission` — numbered task groups describing the goal, not click-by-click steps.
 4. `## Success criteria` — a verifiable checklist.
@@ -42,23 +40,22 @@ change one, update the other in the same pull request so they never drift:
 2. Coaching objectives and a concrete reference path (exact commands/paths).
 3. Checkpoint verification, a common-pitfalls table, talking points, and an "if they finish early" note.
 
-Keep the three business questions — **reliability, cost, performance** — threaded through new content.
+Connect new content to the three business questions: **reliability, cost, and performance**.
 
 ## Making changes
 
 1. Fork the repo and create a topic branch: `git checkout -b improve-challenge-04`.
 2. Make your changes. Keep relative Markdown links valid (challenge nav, coach cross-links, `resources/` and `docs/` references).
 3. Open a pull request with a clear description of the change and which challenge(s)/guide(s) it affects.
-4. For substantive changes, please open an Issue first so we can align on direction.
+4. Before making substantive changes, open an Issue to agree on the direction.
 
 ## The website (GitHub Pages)
 
-The repo doubles as its own website at
-<https://microsoft.github.io/frontier-fabric-agentops-rvas/>. So visitors never have to leave the
-site, **every Markdown file is pre-rendered into a branded HTML page** that sits next to its source
+The website at <https://microsoft.github.io/frontier-fabric-agentops-rvas/> serves
+**Markdown content as generated HTML pages** next to their sources
 (`challenges/challenge-01-agent-telemetry.md` → `challenges/challenge-01-agent-telemetry.html`), and
-reference-implementation code is viewable in-place through `code.html`. The landing page
-(`index.html`) and the delivery composer (`builder.html`) tie it all together.
+reference code is viewable through `code.html`. The landing page is `index.html`;
+the delivery composer is `builder.html`.
 
 GitHub Pages serves this repo in **legacy mode** (the branch root, as-is) — there is no CI build — so
 the generated HTML is committed to the repo. **If you edit any Markdown, regenerate the site** so the
@@ -71,7 +68,8 @@ npm run build      # regenerates all *.html pages + builder-data.json
 
 What the build does:
 
-- Renders every `.md` (outside `.git`, `.agents`, `node_modules`, `tools`) to a branded `.html` page.
+- Renders content `.md` files (outside `.git`, `.agents`, `node_modules`, `tools`) to branded `.html`
+  pages. `TONE-OF-VOICE.md` stores writing guidance and is not published.
 - Rewrites links so navigation stays on the site: `*.md` → `*.html`, directories → their `README.html`
   (or the parent component page), and code files → the in-site `code.html` viewer.
 - Regenerates `builder-data.json` (challenge metadata + dependencies) that powers `builder.html`.
@@ -83,7 +81,7 @@ the next build. Styling lives in `assets/css/site.css`; the generator lives in `
 ## Reporting issues
 
 Use GitHub Issues for bug reports, unclear instructions, broken links, or environment/setup problems
-encountered during a run. Please include the challenge number, your environment (Azure region, Fabric
+encountered during a run. Include the challenge number, your environment (Azure region, Fabric
 capacity SKU), and what you expected vs. what happened.
 
 ## Contributor License Agreement

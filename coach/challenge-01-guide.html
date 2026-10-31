@@ -84,10 +84,9 @@
 </tr>
 </tbody></table></div>
 <h2 id="coaching-objectives">Coaching objectives<a class="anchor" href="#coaching-objectives" aria-hidden="true">#</a></h2>
-<p>The point is <strong>not</strong> &quot;deploy an app&quot; — it&#39;s understanding <strong>what telemetry the Control Tower will
-later consume and why</strong>. Make sure teams can trace a single user message from the backend through
-the agent and can name the custom token and latency metrics. That mental model pays off in later
-challenges.</p>
+<p>Teams need to understand <strong>what telemetry the Control Tower will consume and why</strong>, beyond
+&quot;deploy an app&quot;. Make sure they can trace a single user message from the backend through
+the agent and name the custom token and latency metrics used in later challenges.</p>
 <p><strong>What good looks like:</strong> the team shows a correlated transaction (backend → agent → model, with
 Cosmos operations), points at token and latency metrics, and finds their conversations in Cosmos DB.
 Application telemetry begins at the backend; the frontend is not instrumented. APIM is provisioned,
@@ -214,8 +213,8 @@ model and Cosmos so you can attribute latency and errors precisely. Frontend and
 remain future hardening opportunities.</li>
 <li><strong>Managed identity everywhere</strong> — no secrets; auth is Entra + RBAC. This is also how Fabric will
 reach the data later.</li>
-<li><strong>Tokens = money.</strong> The custom token metric is the seed of cost-per-request and FinOps chargeback
-in Challenges 4–6. Connect today&#39;s metric to that future payoff.</li>
+<li><strong>Token usage informs cost.</strong> Connect the custom token metric to cost-per-request and FinOps
+chargeback in Challenges 4–6.</li>
 <li><strong>Serverless Cosmos DB</strong> is the conversation system-of-record — and the Mirroring source in
 Challenge 3.</li>
 </ul>
@@ -251,7 +250,7 @@ Challenge 3.</li>
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

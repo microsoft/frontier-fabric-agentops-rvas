@@ -13,11 +13,10 @@
 
 ## Coaching objectives
 
-This is where reliability, cost, and performance become **actionable**. The team already has a Control
-Tower; now they prove the customer can operate it on Monday morning.
+Teams add operational controls for reliability, cost, and performance to the Control Tower.
 
-Treat this as a menu. Teams only need two success criteria, but push them toward the options that best
-fit their skills and showcase story.
+Teams only need two success criteria. Help them choose the options that best
+fit their skills and showcase.
 
 **What good looks like:** the team demonstrates two live operational controls — an alert fires, a
 chargeback matrix attributes cost, RLS filters two roles differently, or the daily pipeline is scheduled
@@ -81,7 +80,7 @@ changed."
 
 ### D. Daily pipeline automation
 
-Goal: schedule the Control Tower operating rhythm.
+Goal: schedule regular Control Tower updates.
 
 Reference path:
 
@@ -126,14 +125,13 @@ three business questions.
 
 - **Close the loop:** detect → alert → act. Dashboards explain; operations require a trigger and an
   owner.
-- **Showback drives behavior.** When teams see their run rate and MoM change, they optimize prompts,
+- **Showback informs cost decisions.** Teams can use run rate and MoM change to guide changes to prompts,
   model choice, cache hit rate, and resource sizing.
-- **Governance is part of observability.** RLS turns one enterprise Control Tower into safe views for
+- **Governance is part of observability.** RLS filters one enterprise Control Tower's views for
   many teams.
-- **Production-ready means scheduled, owned, and monitored.** A report that only updates manually is a
-  demo; a scheduled pipeline with failure alerting is an operating system.
-- **Unattributed cost is a signal.** Missing tags are not a reason to hide cost — they are a backlog for
-  platform governance.
+- **Schedule, assign ownership, and monitor updates.** Use a scheduled pipeline with failure alerting
+  rather than relying only on manual report updates.
+- **Keep unattributed cost visible.** Use missing tags to identify platform governance work.
 
 ## If they go further
 

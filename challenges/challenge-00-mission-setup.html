@@ -47,11 +47,11 @@
           <li><a class="h2" href="#objectives">Objectives</a></li>
           <li><a class="h2" href="#prerequisites">Prerequisites</a></li>
           <li><a class="h2" href="#your-mission">Your mission</a></li>
-          <li><a class="h3" href="#1-establish-the-beachhead-azure">1. Establish the beachhead (Azure)</a></li>
-          <li><a class="h3" href="#2-confirm-your-firepower-foundry-model-quota">2. Confirm your firepower (Foundry model quota)</a></li>
-          <li><a class="h3" href="#3-raise-the-towers-platform-fabric">3. Raise the tower&#39;s platform (Fabric)</a></li>
-          <li><a class="h3" href="#4-arm-the-team-tooling-get-the-code">4. Arm the team (tooling) &amp; get the code</a></li>
-          <li><a class="h3" href="#5-record-your-coordinates">5. Record your coordinates</a></li>
+          <li><a class="h3" href="#1-confirm-azure-access">1. Confirm Azure access</a></li>
+          <li><a class="h3" href="#2-confirm-foundry-model-quota">2. Confirm Foundry model quota</a></li>
+          <li><a class="h3" href="#3-set-up-fabric-capacity-and-workspace">3. Set up Fabric capacity and workspace</a></li>
+          <li><a class="h3" href="#4-install-tools-and-get-the-code">4. Install tools and get the code</a></li>
+          <li><a class="h3" href="#5-record-environment-details">5. Record environment details</a></li>
           <li><a class="h2" href="#success-criteria">Success criteria</a></li>
           <li><a class="h2" href="#hints">Hints</a></li>
           <li><a class="h2" href="#resources">Resources</a></li>
@@ -68,16 +68,8 @@
         <article class="article prose">
 <h1 id="challenge-0-—-mission-briefing-environment-setup">Challenge 0 — Mission Briefing &amp; Environment Setup</h1>
 <hr>
-<blockquote>
-<p><strong>Mission log, Day 1.</strong>
-The customer&#39;s AI agents are multiplying faster than anyone can track. Before you can build the
-Control Tower, you need a launchpad: access to the customer&#39;s cloud, the right tools on your
-machines, and a Microsoft Fabric capacity to build on. A control tower is only as good as the
-ground it&#39;s built on — so let&#39;s pour the foundation.</p>
-</blockquote>
-<p>In this challenge your team gets fully provisioned and confirms every member can reach Azure <strong>and</strong>
-Fabric. Don&#39;t skip the verification steps — a missing role or quota gap discovered now saves hours
-later.</p>
+<p>Confirm that every team member can access <strong>Azure and Fabric</strong>, has the required tools, and can
+use the chosen model quota. Resolve missing roles or quota before deploying the workloads.</p>
 <h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
 <p>By the end of this challenge you will have:</p>
 <ul>
@@ -85,7 +77,7 @@ later.</p>
 <li>Verified Azure AI Foundry model quota in a region that also supports Fabric.</li>
 <li>A working <strong>Microsoft Fabric capacity</strong> (trial or paid) and a <strong>team workspace</strong> on it.</li>
 <li>Local tooling installed and verified for every team member.</li>
-<li>Cloned this repository and oriented yourselves in the <code>resources/</code> toolbox.</li>
+<li>Cloned this repository and located the reference assets in <code>resources/</code>.</li>
 </ul>
 <h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
 <ul>
@@ -95,7 +87,7 @@ team now; it is the companion to this challenge.</li>
 Fabric.</li>
 </ul>
 <h2 id="your-mission">Your mission<a class="anchor" href="#your-mission" aria-hidden="true">#</a></h2>
-<h3 id="1-establish-the-beachhead-azure">1. Establish the beachhead (Azure)<a class="anchor" href="#1-establish-the-beachhead-azure" aria-hidden="true">#</a></h3>
+<h3 id="1-confirm-azure-access">1. Confirm Azure access<a class="anchor" href="#1-confirm-azure-access" aria-hidden="true">#</a></h3>
 <ul>
 <li>Every team member signs in: <code>az login</code>, and selects the target subscription.</li>
 <li>As a team, <strong>confirm your roles</strong> on the subscription/resource group: you need <strong>Contributor</strong>
@@ -104,30 +96,30 @@ assignments). Identify at least one person who has the rights to create role ass
 <li>Confirm someone has <strong>Cost Management Reader</strong> at the billing scope (needed in Challenge 2).</li>
 <li>Register the resource providers you&#39;ll need so first deployments don&#39;t stall.</li>
 </ul>
-<h3 id="2-confirm-your-firepower-foundry-model-quota">2. Confirm your firepower (Foundry model quota)<a class="anchor" href="#2-confirm-your-firepower-foundry-model-quota" aria-hidden="true">#</a></h3>
+<h3 id="2-confirm-foundry-model-quota">2. Confirm Foundry model quota<a class="anchor" href="#2-confirm-foundry-model-quota" aria-hidden="true">#</a></h3>
 <ul>
 <li>Confirm access to <strong>Azure AI Foundry / Azure OpenAI</strong> and locate <strong>quota</strong> for <code>gpt-5-mini</code>, the
 model used by the reference workload.</li>
 <li>Pick a <strong>region</strong> that offers both the model and Microsoft Fabric, and agree on it as a team —
 you&#39;ll deploy everything there.</li>
 </ul>
-<h3 id="3-raise-the-towers-platform-fabric">3. Raise the tower&#39;s platform (Fabric)<a class="anchor" href="#3-raise-the-towers-platform-fabric" aria-hidden="true">#</a></h3>
+<h3 id="3-set-up-fabric-capacity-and-workspace">3. Set up Fabric capacity and workspace<a class="anchor" href="#3-set-up-fabric-capacity-and-workspace" aria-hidden="true">#</a></h3>
 <ul>
-<li>Stand up a <strong>Fabric capacity</strong>: start the <strong>60-day free trial</strong> (recommended) or use a paid <strong>F2+</strong>
+<li>Set up a <strong>Fabric capacity</strong>: start the <strong>60-day free trial</strong> (recommended) or use a paid <strong>F2+</strong>
 capacity. Note the <strong>capacity name/ID</strong>.</li>
 <li>Create a <strong>Fabric workspace</strong> for your team and <strong>assign it to the capacity</strong>.</li>
 <li>Make sure each team member can open the workspace at
 <a href="https://app.fabric.microsoft.com" target="_blank" rel="noopener">app.fabric.microsoft.com</a>.</li>
 </ul>
-<h3 id="4-arm-the-team-tooling-get-the-code">4. Arm the team (tooling) &amp; get the code<a class="anchor" href="#4-arm-the-team-tooling-get-the-code" aria-hidden="true">#</a></h3>
+<h3 id="4-install-tools-and-get-the-code">4. Install tools and get the code<a class="anchor" href="#4-install-tools-and-get-the-code" aria-hidden="true">#</a></h3>
 <ul>
 <li>Install and verify the local tools (<code>az</code>, <code>azd</code>, <code>python</code>, <code>node</code>, <code>docker</code>, <code>git</code>). Start Docker
 Desktop (or another compatible container runtime) and confirm its engine is running.</li>
-<li>Clone this repo and take a 5-minute tour of <code>resources/</code> — note where the agent workload, landing
-zone, and Fabric assets live. You&#39;ll come back to each.</li>
+<li>Clone this repo and spend 5 minutes locating the agent workload, landing zone, and Fabric assets
+in <code>resources/</code>.</li>
 </ul>
-<h3 id="5-record-your-coordinates">5. Record your coordinates<a class="anchor" href="#5-record-your-coordinates" aria-hidden="true">#</a></h3>
-<p>Capture these somewhere your team can see them all event — you&#39;ll reuse them constantly:</p>
+<h3 id="5-record-environment-details">5. Record environment details<a class="anchor" href="#5-record-environment-details" aria-hidden="true">#</a></h3>
+<p>Keep these details where your team can find them throughout the event:</p>
 <ul>
 <li>Subscription ID(s), chosen <strong>region</strong>, resource group name convention</li>
 <li>Foundry model + deployment name</li>
@@ -143,11 +135,11 @@ zone, and Fabric assets live. You&#39;ll come back to each.</li>
 <li><input disabled="" type="checkbox"> A team <strong>Fabric workspace</strong> exists, assigned to the capacity, reachable by all members</li>
 <li><input disabled="" type="checkbox"> Local tooling installed and verified (<code>az version</code>, <code>azd version</code>, <code>python --version</code>, <code>docker info</code>)</li>
 <li><input disabled="" type="checkbox"> Repo cloned; team has located the four <code>resources/</code> components</li>
-<li><input disabled="" type="checkbox"> Your &quot;coordinates&quot; (subscription, region, capacity, workspace) are written down</li>
+<li><input disabled="" type="checkbox"> Subscription, region, capacity, and workspace details are recorded</li>
 </ul>
 <blockquote>
 <p>🧭 <strong>Checkpoint:</strong> show your coach that everyone can reach both the Azure portal <strong>and</strong> the Fabric
-workspace, and read back your coordinates.</p>
+workspace, and confirm your recorded environment details.</p>
 </blockquote>
 <h2 id="hints">Hints<a class="anchor" href="#hints" aria-hidden="true">#</a></h2>
 <details>
@@ -190,7 +182,7 @@ in the team&#39;s chosen region.</p>
 <h2 id="resources">Resources<a class="anchor" href="#resources" aria-hidden="true">#</a></h2>
 <ul>
 <li><a href="../docs/prerequisites.html"><code>docs/prerequisites.md</code></a> — the detailed companion checklist</li>
-<li><a href="../docs/architecture.html"><code>docs/architecture.md</code></a> — the picture you&#39;re about to build</li>
+<li><a href="../docs/architecture.html"><code>docs/architecture.md</code></a> — reference architecture</li>
 <li><a href="../resources/README.html"><code>resources/README.md</code></a> — tour of the provided assets</li>
 </ul>
 <hr>
@@ -216,7 +208,7 @@ in the team&#39;s chosen region.</p>
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

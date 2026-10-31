@@ -1,17 +1,15 @@
 # Challenges — AgentOps Control Tower
 
-Welcome to the build. These seven challenges take you from an empty subscription to a fully
-operational **AgentOps Control Tower** on Microsoft Fabric.
+Build an **AgentOps Control Tower** on Microsoft Fabric in seven challenges.
+Challenges 0–5 cover setup, data ingestion, and dashboards; Challenge 6 adds operational features.
 
 ## How the challenges work
 
-- **Goal-oriented, not click-by-click.** Each challenge gives you a scenario, clear **objectives**,
-  and **success criteria**. *How* you get there is your team's call. The
-  [`resources/`](../resources/) folder is your toolbox.
-- **Sequential.** Each challenge builds on the previous one — complete them in order.
-- **Checkpoints.** When you meet the success criteria, show your coach for a ✅ before moving on.
-- **Hints are there if you need them.** Each challenge ends with hints and links. Try first, then
-  peek. Coaches hold the full reference solution.
+- Each challenge gives you a scenario, objectives, and success criteria. Your team chooses how to
+  implement it, using the assets in [`resources/`](../resources/) as needed.
+- Follow the dependencies below.
+- Show your coach the success criteria before moving on.
+- Try the tasks before opening the hints. Coaches have the reference solutions.
 
 ## The arc
 
@@ -41,8 +39,7 @@ graph LR
 
 ## Scoring
 
-This is a learning RVAS, not a competition — but if your event wants friendly scoring, here's a
-simple rubric (coaches can adapt). Points are awarded per challenge at the success checkpoint.
+Scoring is optional. Coaches can adapt this rubric and award points at each success checkpoint.
 
 | Challenge | Base points | Bonus opportunities |
 |---|---|---|
@@ -60,14 +57,14 @@ customer actually run on this?*
 
 ## What "done" looks like
 
-By the end of Challenge 5 your team can stand in front of the customer's leadership and answer, live:
+At the end of Challenge 5, demonstrate how your dashboards answer:
 
 1. **Which agents are healthy right now, and where are the errors?** (Reliability)
 2. **What is each agent / team / use case costing us?** (Cost)
 3. **Are we meeting our SLAs, and how much are we scaling?** (Performance)
 
-Challenge 6 makes it *operational* — the Control Tower starts telling **you** when something's wrong.
+Challenge 6 adds alerts, chargeback, row-level security, and automation.
 
 ---
 
-Ready? Start with **[Challenge 0 — Mission Briefing & Environment Setup](challenge-00-mission-setup.md)**.
+Start with **[Challenge 0 — Mission Briefing & Environment Setup](challenge-00-mission-setup.md)**.
