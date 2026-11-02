@@ -49,7 +49,7 @@
           <li><a class="h2" href="#the-refinement-path">The refinement path</a></li>
           <li><a class="h2" href="#your-mission">Your mission</a></li>
           <li><a class="h3" href="#1-land-the-raw-signal-in-bronze">1. Land the raw signal in Bronze</a></li>
-          <li><a class="h3" href="#2-standardize-and-trust-it-in-silver">2. Standardize and trust it in Silver</a></li>
+          <li><a class="h3" href="#2-standardize-data-in-silver">2. Standardize data in Silver</a></li>
           <li><a class="h3" href="#3-build-the-gold-data-products">3. Build the Gold data products</a></li>
           <li><a class="h3" href="#4-orchestrate-the-load">4. Orchestrate the load</a></li>
           <li><a class="h3" href="#5-prove-the-signal-is-correlated">5. Prove the signal is correlated</a></li>
@@ -69,17 +69,9 @@
         <article class="article prose">
 <h1 id="challenge-4-—-refine-the-signal">Challenge 4 — Refine the Signal</h1>
 <hr>
-<blockquote>
-<p><strong>Mission log.</strong>
-The Control Tower can see the enterprise now: cost exports, telemetry files, resource metadata, and
-mirrored agent conversations are all inside Fabric&#39;s reach. But raw signal is still noisy signal.
-Leadership does not need another data swamp — they need trusted products that correlate <strong>cost,
-reliability, and agent activity</strong>.</p>
-</blockquote>
-<p>In this challenge you build the data-engineering heart of the Control Tower: a <strong>Bronze → Silver →
-Gold</strong> medallion pipeline over the OneLake shortcuts and mirrored Cosmos data from Challenge 3. The
-win is not just populated tables. The win is correlation — proving that Fabric can connect the cost of
-running agents to the services, telemetry, resources, and conversations that created that spend.</p>
+<p>Build a <strong>Bronze → Silver → Gold</strong> medallion pipeline over the shortcuts and mirrored Cosmos data
+from Challenge 3. Demonstrate how the Gold tables connect agent cost with services, telemetry,
+resources, or conversations.</p>
 <blockquote>
 <p>⚠️ <strong>Before you run the pipeline.</strong> The <strong>Load E2E Pipeline</strong> ends with a <code>Send Failure Notification</code>
 web activity that POSTs to the <code>WebhookUrl</code> pipeline parameter. Nothing in this repo provisions that
@@ -120,7 +112,7 @@ Gold — correlated data products for the Control Tower
           │
           ▼
 Challenge 5 — Direct Lake semantic model and dashboards</code></pre>
-<p>Keep the purpose of each layer crisp:</p>
+<p>Each layer has a distinct purpose:</p>
 <div class="table-wrap"><table><thead><tr>
 <th>Layer</th>
 <th>What it protects</th>
@@ -157,7 +149,7 @@ row came from.</li>
 </ul>
 </li>
 </ul>
-<h3 id="2-standardize-and-trust-it-in-silver">2. Standardize and trust it in Silver<a class="anchor" href="#2-standardize-and-trust-it-in-silver" aria-hidden="true">#</a></h3>
+<h3 id="2-standardize-data-in-silver">2. Standardize data in Silver<a class="anchor" href="#2-standardize-data-in-silver" aria-hidden="true">#</a></h3>
 <p>Use the Silver transformation path to make the raw signal joinable.</p>
 <ul>
 <li>Normalize cost data to the <a href="https://focus.finops.org/" target="_blank" rel="noopener">FOCUS</a> shape used by the Control Tower.</li>
@@ -169,7 +161,7 @@ agent namespaces.</li>
 </ul>
 <p>The reference path for this layer is <code>02_silver_transformation.ipynb</code>.</p>
 <h3 id="3-build-the-gold-data-products">3. Build the Gold data products<a class="anchor" href="#3-build-the-gold-data-products" aria-hidden="true">#</a></h3>
-<p>Gold is where the Control Tower starts answering business questions. Build the analytics-ready tables
+<p>Build the analytics-ready tables
 listed in the reference architecture:</p>
 <div class="table-wrap"><table><thead><tr>
 <th>Gold table</th>
@@ -200,24 +192,23 @@ listed in the reference architecture:</p>
 <code>04_cosmos_mirroring_transform.ipynb</code> feeding the agent analytics product. After both complete, run
 <code>05_semantic_model_dimensions.ipynb</code> to materialize <code>dim_date</code> and <code>dim_resource</code> for Direct Lake.</p>
 <h3 id="4-orchestrate-the-load">4. Orchestrate the load<a class="anchor" href="#4-orchestrate-the-load" aria-hidden="true">#</a></h3>
-<p>Run the <strong>Load E2E Pipeline</strong> instead of treating this as four disconnected notebooks.</p>
+<p>Use the <strong>Load E2E Pipeline</strong> to run the notebooks in dependency order.</p>
 <ul>
 <li>Confirm the pipeline orders the work as Bronze → Silver → Gold, with the mirrored-agent transform
 included and the semantic-model dimensions built last.</li>
 <li>Use the pipeline parameters to process the intended date/month window.</li>
 <li>Watch dependency ordering, retries, and failure notifications.</li>
 <li>Confirm the final semantic-model refresh activity is ready for Challenge 5.</li>
-<li>Note the <strong>Daily Refresh Pipeline</strong> as the incremental path after the initial load is green.</li>
+<li>Use the <strong>Daily Refresh Pipeline</strong> for incremental processing after the initial load succeeds.</li>
 </ul>
 <h3 id="5-prove-the-signal-is-correlated">5. Prove the signal is correlated<a class="anchor" href="#5-prove-the-signal-is-correlated" aria-hidden="true">#</a></h3>
-<p>This is the checkpoint that matters most. Show one result that joins multiple domains, for example:</p>
+<p>Show one result that joins multiple domains, for example:</p>
 <ul>
 <li>Cost attributed to an agent namespace such as <code>&lt;organization&gt;.&lt;domain&gt;.&lt;agent-name&gt;.&lt;version&gt;</code>.</li>
 <li>Error rate or P95 latency compared with monthly cost for the same service.</li>
 <li>Token volume and response time beside the resource tags or service that owns the workload.</li>
 </ul>
-<p>If the result only shows one source at a time, it is still a dashboard ingredient — not a Control Tower
-insight yet.</p>
+<p>A result from one source alone does not demonstrate correlation.</p>
 <h2 id="success-criteria">Success criteria<a class="anchor" href="#success-criteria" aria-hidden="true">#</a></h2>
 <ul>
 <li><input disabled="" type="checkbox"> Bronze Delta tables exist for the shortcut-backed telemetry/cost/metadata inputs.</li>
@@ -310,9 +301,9 @@ upstream path, schema, or date-window issues — not aggregation math.</p>
 <details>
 <summary>Why the Daily Refresh Pipeline matters</summary>
 
-<p>The Load E2E Pipeline is the first full build. The Daily Refresh Pipeline is the operating model: it
+<p>The Load E2E Pipeline performs the initial load. The Daily Refresh Pipeline
 runs the E2E load on a rolling window so new cost, metrics, logs, metadata, and mirrored conversations
-continue to land without a manual notebook click.</p>
+are processed without running notebooks manually.</p>
 </details>
 
 <h2 id="resources">Resources<a class="anchor" href="#resources" aria-hidden="true">#</a></h2>
@@ -346,7 +337,7 @@ continue to land without a manual notebook click.</p>
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

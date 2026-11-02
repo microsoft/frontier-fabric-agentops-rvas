@@ -12,10 +12,10 @@ Plan for **1.5–2 days**. Challenges 0–5 are the core path; Challenge 6 is a 
 move fast. Each challenge is scoped to roughly 1.5–2.5 hours including discussion.
 
 **Do we build everything from scratch?**
-No. The [`resources/`](../resources/) directory is a complete reference implementation — Bicep,
+No. The [`resources/`](../resources/) directory provides Bicep,
 application code, Fabric setup scripts, PySpark notebooks, pipelines, and a semantic model. The
-intent is that you **deploy the Azure foundation** (Challenges 1–2) quickly and spend your real
-energy on the **Fabric Control Tower** (Challenges 3–6). Coaches decide how much of the reference to
+goal is to **deploy the Azure foundation** (Challenges 1–2) and focus on the
+**Fabric Control Tower** (Challenges 3–6). Coaches decide how much of the reference to
 reveal based on your team's level.
 
 **Can teams share one Fabric capacity?**
@@ -31,19 +31,19 @@ registries (PyPI, npm, MCR/Docker Hub). Azure Cloud Shell is a good fallback for
 ## Environment & access
 
 **Do we need multiple Azure subscriptions?**
-One is enough. Multiple is fully supported and realistic — e.g., workload in one subscription, cost
+One is enough. You can also use multiple subscriptions: for example, the workload in one, with cost
 exports scoped at the billing account. Record your subscription IDs in Challenge 0.
 
 **Which region should we use?**
 One that offers **both** the reference model (`gpt-5-mini`) **and** Microsoft Fabric. East
-US 2, West US 3, and Sweden Central are safe defaults. Keep all resources in one region to avoid
+US 2, West US 3, and Sweden Central are suggested defaults. Verify availability before choosing.
+Keep all resources in one region to avoid
 egress charges with OneLake shortcuts.
 
 **What happens when the Fabric trial expires?**
 After 60 days, trial-capacity access is revoked and assigned workspaces are reassigned. Content stays
 in **OneLake for 7 days** and can be reactivated by assigning the workspace to a paid F or Power BI
-Premium capacity. For a 2-day event this is a non-issue — just don't let a long gap pass before
-revisiting.
+Premium capacity. Reassign the workspace within that window if you want to keep using its content.
 
 **Do we need Power BI Desktop?**
 No — you can author the semantic model and reports in the Fabric/Power BI service. Desktop (Windows)
@@ -54,7 +54,7 @@ is convenient for offline model edits but optional.
 ## Architecture & design
 
 **Why a medallion (Bronze/Silver/Gold) architecture instead of one transformation?**
-Separation of concerns. **Bronze** preserves raw data for reprocessing and audit. **Silver**
+**Bronze** preserves raw data for reprocessing and audit. **Silver**
 standardizes across sources so consumers get a consistent interface. **Gold** pre-computes
 aggregations so dashboards are fast. If a transformation bug appears, reprocess from Bronze without
 re-ingesting from source.
@@ -62,18 +62,18 @@ re-ingesting from source.
 **Why Fabric instead of Synapse or Databricks?**
 Fabric unifies data engineering, warehousing, and BI on a shared **OneLake**. For this scenario the
 tight integration between Lakehouse, notebooks, pipelines, Direct Lake, and Data Activator removes
-data movement and simplifies the architecture. Synapse and Databricks are great alternatives for the
+data movement and simplifies the architecture. Synapse and Databricks are alternatives for the
 medallion layer — the pattern is portable.
 
 **Why OneLake shortcuts and Mirroring instead of copying data in?**
-**Shortcuts** let Fabric read ADLS Gen2 telemetry in place — zero duplication, zero intra-region
-egress. **Mirroring** replicates Cosmos DB conversations into OneLake Delta tables near-real-time
+**Shortcuts** let Fabric read ADLS Gen2 telemetry in place without duplicating it or incurring
+intra-region egress. **Mirroring** replicates Cosmos DB conversations into OneLake Delta tables near-real-time
 with no ETL to build or operate. Together they minimize cost, latency, and maintenance.
 
 **What makes this a "Control Tower" and not just a dashboard?**
-It **correlates** signals that normally live in silos — cost (Cost Management), reliability (Azure
+It **correlates** cost (Cost Management), reliability (Azure
 Monitor), and agent behavior (App Insights + Cosmos DB) — into shared Gold data products, and then
-**acts** on them with real-time alerts. One pane of glass plus automated response.
+**acts** on them with real-time alerts.
 
 **How does cost attribution / chargeback work?**
 The Silver/Gold layers join FOCUS cost data with **resource tags** and the **agent namespace**
@@ -85,19 +85,20 @@ The Silver/Gold layers join FOCUS cost data with **resource tags** and the **age
 ## Performance & scale
 
 **How much data can this handle?**
-It scales with Fabric capacity. F2/F4 handles tens of millions of rows comfortably for the
-RVAS. For enterprise volumes (billions of cost records), use F64+, partition Delta tables by
+It depends on Fabric capacity and the workload. The reference guidance suggests F2/F4 for tens of
+millions of rows and F64+ for enterprise volumes (billions of cost records). Actual capacity needs
+depend on the workload. For enterprise volumes, partition Delta tables by
 month, and Z-order on frequently filtered columns (subscription, date).
 
 **What's the end-to-end latency?**
 ADLS Gen2 data follows the pipeline schedule (the reference daily pipeline runs ~06:00 UTC). Cosmos
 DB mirrored data is typically available within a minute of the write. Direct Lake reflects the
-latest Delta state after each pipeline run — no scheduled dataset refresh needed.
+latest Delta state after the pipeline updates the tables and refreshes the semantic model.
 
 **How long does the end-to-end pipeline take?**
-For a typical 3-month window (a few million cost rows, hundreds of thousands of metric points, tens
-of thousands of logs), the full Bronze→Gold pipeline runs in ~10–15 min on F2; the daily incremental
-finishes in 2–3 min.
+The reference estimate for a 3-month window (a few million cost rows, hundreds of thousands of
+metric points, tens of thousands of logs) is ~10–15 min on F2 for the full Bronze→Gold pipeline
+and 2–3 min for the daily incremental run. Actual times depend on the data and capacity load.
 
 ---
 
@@ -114,7 +115,7 @@ Yes. ADLS Gen2 and OneLake encrypt at rest (Microsoft-managed keys by default; c
 available). Cosmos DB is encrypted at rest. All traffic uses TLS 1.2+.
 
 **What will this cost us?**
-Low for an RVAS: Fabric is free on trial; the agent workload runs a few dollars/day with
+Fabric is free on trial. The agent workload runs a few dollars/day with
 `gpt-5-mini`, serverless Cosmos DB, and scale-to-low Container Apps (APIM Developer tier is the main
 fixed cost); the landing zone is inexpensive. **Tear everything down** with `azd down --purge` and
 end the Fabric trial / delete the workspace when finished.
@@ -137,4 +138,4 @@ OneLake data persists while paused. Trial capacity needs no pausing — it's fre
 | Power BI report is blank | Gold tables not populated (run the pipeline) or semantic model not refreshed/bound to the Lakehouse |
 | Cost container empty | Cost Management export not run yet (it's daily); trigger it manually or wait |
 
-More detail lives in each challenge's **coach guide**.
+See each challenge's **coach guide** for more detail.

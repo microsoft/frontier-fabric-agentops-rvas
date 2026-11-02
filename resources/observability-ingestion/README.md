@@ -5,8 +5,6 @@
 > Azure infrastructure and export scripts that land cost, metrics, logs, diagnostics, and resource
 > metadata into ADLS Gen2 so Fabric can shortcut to it in later challenges.
 
-Azure infrastructure and scripts that ingest observability data from the Azure Control Plane, Azure Monitor, and Cost Management into an ADLS Gen2 landing zone.
-
 ## Architecture Overview
 
 This component provisions the **landing zone** of the AgentOps Control Tower:
@@ -110,8 +108,8 @@ az deployment group create \
 
 ## Seed and Validate the Landing Zone
 
-The scripts are a one-time workshop bootstrap. They make data available immediately without adding
-a production scheduler before the Fabric data path is built. Challenge 6 can move the same exporter
+Use these scripts to seed and validate workshop data once, before building the Fabric data path.
+Challenge 6 can move the same exporter
 to unattended cloud execution without changing its ADLS data contract.
 
 Authenticate with Azure, then create an isolated Python environment:
@@ -140,7 +138,7 @@ python -m pip install -r requirements.txt
 
 ### Resource Graph Export
 
-Queries Azure Resource Graph for resource metadata and exports to ADLS Gen2:
+Export resource metadata from Azure Resource Graph to ADLS Gen2:
 
 ```bash
 python resource_graph_export.py \
@@ -154,7 +152,7 @@ required.
 
 ### Validate Exports
 
-Discovers `costs`, `metadata`, `am-*`, and `insights-*` containers and reports on ingested data:
+Inspect `costs`, `metadata`, `am-*`, and `insights-*` containers and report on ingested data:
 
 ```bash
 python validate_exports.py \
@@ -224,14 +222,14 @@ Exported by `resource_graph_export.py`:
 
 ## Integration with the Fabric Control Tower
 
-This landing zone is the data source for the **[Fabric Control Tower](../fabric-control-tower/README.md)** you connect in **[Challenge 3](../../challenges/challenge-03-onelake-foundation.md)**. The ADLS Gen2 storage account serves as a OneLake shortcut target:
+Connect this landing zone to the **[Fabric Control Tower](../fabric-control-tower/README.md)** in **[Challenge 3](../../challenges/challenge-03-onelake-foundation.md)**. The ADLS Gen2 storage account is the OneLake shortcut target:
 
 1. **Fabric Lakehouse** creates shortcuts to each container in this storage account
 2. **Spark notebooks** read Parquet cost data and resource metadata
 3. **Power BI** datasets are built on top of the lakehouse tables
 4. **Cost dashboards** combine FOCUS cost data with resource tags for showback/chargeback
 
-The storage account uses hierarchical namespace (ADLS Gen2) and date-partitioned directories for optimal Spark performance.
+The storage account uses hierarchical namespace (ADLS Gen2) and date-partitioned directories to support Spark processing.
 
 ## Infrastructure Resources
 

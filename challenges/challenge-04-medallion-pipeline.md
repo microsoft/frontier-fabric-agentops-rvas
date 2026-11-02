@@ -4,16 +4,9 @@
 
 ---
 
-> **Mission log.**
-> The Control Tower can see the enterprise now: cost exports, telemetry files, resource metadata, and
-> mirrored agent conversations are all inside Fabric's reach. But raw signal is still noisy signal.
-> Leadership does not need another data swamp — they need trusted products that correlate **cost,
-> reliability, and agent activity**.
-
-In this challenge you build the data-engineering heart of the Control Tower: a **Bronze → Silver →
-Gold** medallion pipeline over the OneLake shortcuts and mirrored Cosmos data from Challenge 3. The
-win is not just populated tables. The win is correlation — proving that Fabric can connect the cost of
-running agents to the services, telemetry, resources, and conversations that created that spend.
+Build a **Bronze → Silver → Gold** medallion pipeline over the shortcuts and mirrored Cosmos data
+from Challenge 3. Demonstrate how the Gold tables connect agent cost with services, telemetry,
+resources, or conversations.
 
 > ⚠️ **Before you run the pipeline.** The **Load E2E Pipeline** ends with a `Send Failure Notification`
 > web activity that POSTs to the `WebhookUrl` pipeline parameter. Nothing in this repo provisions that
@@ -60,7 +53,7 @@ Gold — correlated data products for the Control Tower
 Challenge 5 — Direct Lake semantic model and dashboards
 ```
 
-Keep the purpose of each layer crisp:
+Each layer has a distinct purpose:
 
 | Layer | What it protects | What it enables |
 |---|---|---|
@@ -83,7 +76,7 @@ Use the Bronze ingestion path to turn the Challenge 3 inputs into raw Delta tabl
   - `01_bronze_ingestion.ipynb` — shortcut-backed telemetry and metadata files.
   - `04_cosmos_mirroring_transform.ipynb` — mirrored conversation records and late-arriving data.
 
-### 2. Standardize and trust it in Silver
+### 2. Standardize data in Silver
 
 Use the Silver transformation path to make the raw signal joinable.
 
@@ -98,7 +91,7 @@ The reference path for this layer is `02_silver_transformation.ipynb`.
 
 ### 3. Build the Gold data products
 
-Gold is where the Control Tower starts answering business questions. Build the analytics-ready tables
+Build the analytics-ready tables
 listed in the reference architecture:
 
 | Gold table | Why it matters |
@@ -115,25 +108,24 @@ Use `03_gold_aggregation.ipynb` for the Gold aggregation path, with
 
 ### 4. Orchestrate the load
 
-Run the **Load E2E Pipeline** instead of treating this as four disconnected notebooks.
+Use the **Load E2E Pipeline** to run the notebooks in dependency order.
 
 - Confirm the pipeline orders the work as Bronze → Silver → Gold, with the mirrored-agent transform
   included and the semantic-model dimensions built last.
 - Use the pipeline parameters to process the intended date/month window.
 - Watch dependency ordering, retries, and failure notifications.
 - Confirm the final semantic-model refresh activity is ready for Challenge 5.
-- Note the **Daily Refresh Pipeline** as the incremental path after the initial load is green.
+- Use the **Daily Refresh Pipeline** for incremental processing after the initial load succeeds.
 
 ### 5. Prove the signal is correlated
 
-This is the checkpoint that matters most. Show one result that joins multiple domains, for example:
+Show one result that joins multiple domains, for example:
 
 - Cost attributed to an agent namespace such as `<organization>.<domain>.<agent-name>.<version>`.
 - Error rate or P95 latency compared with monthly cost for the same service.
 - Token volume and response time beside the resource tags or service that owns the workload.
 
-If the result only shows one source at a time, it is still a dashboard ingredient — not a Control Tower
-insight yet.
+A result from one source alone does not demonstrate correlation.
 
 ## Success criteria
 
@@ -211,9 +203,9 @@ upstream path, schema, or date-window issues — not aggregation math.
 <details>
 <summary>Why the Daily Refresh Pipeline matters</summary>
 
-The Load E2E Pipeline is the first full build. The Daily Refresh Pipeline is the operating model: it
+The Load E2E Pipeline performs the initial load. The Daily Refresh Pipeline
 runs the E2E load on a rolling window so new cost, metrics, logs, metadata, and mirrored conversations
-continue to land without a manual notebook click.
+are processed without running notebooks manually.
 </details>
 
 ## Resources

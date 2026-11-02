@@ -1,7 +1,7 @@
 # Resources — Reference Implementation Toolbox
 
-This directory is your **toolbox** for the RVAS. It contains a complete, working reference
-implementation of the AgentOps Control Tower — infrastructure-as-code, application code, Fabric setup
+This directory contains the AgentOps Control Tower reference implementation for the RVAS:
+infrastructure-as-code, application code, Fabric setup
 automation, PySpark notebooks, pipelines, and a semantic model.
 
 > 🧰 **How to use it:** Teams are encouraged to deploy the Azure foundation (agent workload + landing

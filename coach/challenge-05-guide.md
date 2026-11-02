@@ -13,8 +13,7 @@
 
 ## Coaching objectives
 
-This is the customer-facing payoff. Keep teams focused on the business questions, not dashboard
-ornamentation:
+Keep teams focused on the business questions:
 
 1. **Reliability** — Which agents are healthy? Where are errors and latency spikes coming from?
 2. **Cost** — What is each service or Azure resource costing?

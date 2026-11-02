@@ -4,14 +4,8 @@
 
 ---
 
-> **Mission log.**
-> The lake is full, the Gold tables are polished, and leadership is done waiting for screenshots from
-> five different portals. This is the payoff: turn the medallion data products into a live **AgentOps
-> Control Tower** that answers the three questions in one place — reliability, cost, and performance.
-
-In this challenge your team builds the semantic model and Power BI report that the customer will use
-in the showcase. The goal is not a beautiful wallpaper dashboard; it is a single pane of glass that can
-answer operational questions **live** from the Gold Delta tables.
+Build a **Direct Lake semantic model** and Power BI report over the Gold Delta tables.
+Use the report in the customer showcase to answer questions about reliability, cost, and performance.
 
 ## Objectives
 
@@ -32,7 +26,7 @@ By the end of this challenge you will have:
   [`resources/fabric-control-tower/`](../resources/fabric-control-tower/).
 - The semantic model reference at
   [`resources/fabric-control-tower/src/setup/semantic_model.json`](../resources/fabric-control-tower/src/setup/semantic_model.json).
-- The architecture north star in [`docs/architecture.md`](../docs/architecture.md), especially the
+- The reference architecture in [`docs/architecture.md`](../docs/architecture.md), especially the
   Gold data products and Core KPIs.
 
 ## The dashboard contract
@@ -44,9 +38,6 @@ Your report must answer the same questions the customer asked on day one:
 | **Reliability** | Which agents are healthy? Where are errors, latency spikes, and pipeline issues coming from? |
 | **Cost** | What is each service and Azure resource costing? Which drivers are changing fastest? |
 | **Performance** | Are we meeting SLAs? How much traffic, token usage, and response time are we seeing? |
-
-The Gold layer gives you the data products. The semantic model makes them trustworthy. The report makes
-them usable under pressure.
 
 ## Your mission
 
@@ -109,7 +100,7 @@ Create the core measures called out in the Fabric Control Tower README:
 Add time intelligence so the report can show **YTD**, **MTD**, prior period, and rolling 30-day views.
 Mark `Calendar` as the date table using the `Date` column — `CostYTD` and `CostMoMChange` rely on
 `TOTALYTD` and `DATEADD`, which need a marked date table to resolve correctly.
-The measures do not need to be fancy, but they must be correct and reusable across pages.
+Keep measures correct and reusable across pages.
 
 ### 3. Build the Reliability page
 
@@ -122,8 +113,8 @@ Include visuals that cover:
 - Availability scorecards.
 - Pipeline health or latest Gold refresh status if your team captured it.
 
-A coach should be able to point at one unhealthy agent or service and ask, "What changed?" Your page
-should make the answer obvious.
+A coach should be able to point at one unhealthy agent or service and ask, "What changed?"
+Use the page to show the relevant trends and outliers.
 
 ### 4. Build the Cost page
 
@@ -151,12 +142,11 @@ Include visuals that cover:
 - Conversation, interaction, and session volume.
 - Response-time trends by model and topic.
 
-Connect performance to reliability and cost. High traffic is good only if latency, errors, and spend
-stay under control.
+Compare traffic with latency, errors, and cost to assess performance.
 
 ### 6. Confirm Direct Lake mode
 
-Before you claim victory, prove the model is actually Direct Lake:
+Verify that the model uses Direct Lake:
 
 - Storage mode is **Direct Lake** for all five model tables, including `Calendar` and
   `ResourceInventory`, which bind to the physical dimensions.

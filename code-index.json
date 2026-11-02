@@ -4,7 +4,7 @@
     {
       "id": "agent-workload",
       "label": "Agent Workload",
-      "desc": "Full-stack Foundry agent app — frontend, backend API, and agent orchestration you light up in Challenge 1.",
+      "desc": "The Foundry agent app for Challenge 1: frontend, backend API, and agent orchestration.",
       "tags": [
         "Container Apps",
         "APIM",

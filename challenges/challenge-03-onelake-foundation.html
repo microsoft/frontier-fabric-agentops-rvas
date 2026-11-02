@@ -69,16 +69,9 @@
         <article class="article prose">
 <h1 id="challenge-3-—-connect-fabric-to-the-enterprise">Challenge 3 — Connect Fabric to the Enterprise</h1>
 <hr>
-<blockquote>
-<p><strong>Mission log.</strong>
-The Control Tower has signals now — agent conversations in Cosmos DB, telemetry and cost files in
-ADLS Gen2 — but the customer&#39;s enterprise data is still sitting outside the tower walls. Your job is
-to connect it to Microsoft Fabric without copying piles of data around. This is where OneLake becomes
-the customer&#39;s unifying data estate.</p>
-</blockquote>
-<p>In this challenge you build the <strong>Fabric foundation</strong> for the rest of the RVAS: a Lakehouse that
-sees the Challenge 2 landing-zone files through <strong>OneLake shortcuts</strong>, and a mirrored Cosmos DB source
-that brings Challenge 1 agent conversations into OneLake Delta tables for near-real-time analytics.</p>
+<p>Connect the Challenge 2 landing-zone files to a Fabric Lakehouse through <strong>OneLake shortcuts</strong>.
+Use <strong>Cosmos DB Mirroring</strong> to replicate the Challenge 1 agent conversations into OneLake Delta
+tables for near-real-time analytics.</p>
 <p>The important distinction: shortcuts are <strong>zero-copy pointers</strong> to existing files; Mirroring is
 <strong>managed replication</strong> into Fabric. You need both.</p>
 <h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
@@ -90,7 +83,7 @@ that brings Challenge 1 agent conversations into OneLake Delta tables for near-r
 <code>costs</code>, <code>metadata</code>, three application telemetry sources, and two platform diagnostic sources.</li>
 <li>Cosmos DB <strong>Mirroring</strong> configured for the agent conversation data from Challenge 1.</li>
 <li>Proof that Fabric can query both a shortcut-backed file and a mirrored Cosmos table.</li>
-<li>A crisp explanation of <strong>zero-copy shortcuts</strong> vs <strong>Mirroring replication</strong>.</li>
+<li>An explanation of <strong>zero-copy shortcuts</strong> vs <strong>Mirroring replication</strong>.</li>
 </ul>
 <h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
 <ul>
@@ -107,7 +100,7 @@ that brings Challenge 1 agent conversations into OneLake Delta tables for near-r
 <a href="../resources/fabric-control-tower/README.html"><code>resources/fabric-control-tower/</code></a>.</li>
 </ul>
 <h2 id="the-foundation">The foundation<a class="anchor" href="#the-foundation" aria-hidden="true">#</a></h2>
-<p>Your architecture now gets its Fabric entry point:</p>
+<p>The two data paths feed Challenge 4:</p>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-text">Challenge 2 ADLS Gen2 landing zone       Challenge 1 Cosmos DB
 costs · metadata · am-* · insights-*     conversations · interactions
           │                                         │
@@ -236,7 +229,7 @@ so the Challenge 4 notebooks can read them:</p>
 <p>This step is <strong>not</strong> automated by the setup scripts — create the two shortcuts yourself after
 Mirroring reports a running status, otherwise the source tables will not exist yet.</p>
 <h3 id="5-prove-both-paths-work">5. Prove both paths work<a class="anchor" href="#5-prove-both-paths-work" aria-hidden="true">#</a></h3>
-<p>Show your team and coach that Fabric can read from both enterprise connection patterns:</p>
+<p>Show your team and coach that Fabric can read from both paths:</p>
 <ul>
 <li><strong>Shortcut path:</strong> browse all seven paths in the shortcut contract and open or query at least one
 Parquet file and one JSON file.</li>
@@ -269,7 +262,7 @@ from each path. Then explain which path copies data and which path does not.</p>
 
 <p>A OneLake shortcut is a pointer. The files stay in the ADLS Gen2 storage account from Challenge 2, but
 Fabric presents them inside the Lakehouse <code>Files/</code> tree. You avoid duplicate storage, export jobs, and
-extra egress. If the source file changes, Fabric reads the source location.</p>
+an extra copy step. If the source file changes, Fabric reads the source location.</p>
 </details>
 
 <details>
@@ -309,7 +302,7 @@ Mirroring status and sync timestamp.</p>
 
 <p>For a shortcut file, use a Fabric notebook to read a Parquet file or folder from <code>Files/costs</code> or
 <code>Files/metadata</code>. For a mirrored table, run a simple <code>SELECT TOP 10</code> in the mirrored database SQL
-endpoint or inspect it from Spark. Keep it simple — Challenge 4 will do the heavy transformation.</p>
+endpoint or inspect it from Spark. Challenge 4 covers transformation.</p>
 </details>
 
 <h2 id="resources">Resources<a class="anchor" href="#resources" aria-hidden="true">#</a></h2>
@@ -342,7 +335,7 @@ endpoint or inspect it from Spark. Keep it simple — Challenge 4 will do the he
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

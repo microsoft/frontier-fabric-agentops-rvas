@@ -84,8 +84,7 @@
 </tr>
 </tbody></table></div>
 <h2 id="coaching-objectives">Coaching objectives<a class="anchor" href="#coaching-objectives" aria-hidden="true">#</a></h2>
-<p>This is the <strong>Fabric foundation aha moment</strong>: enterprise data does not need another copy job before it
-can become useful. Teams should leave understanding two distinct patterns:</p>
+<p>Teams connect enterprise data to Fabric through two distinct patterns:</p>
 <ul>
 <li><strong>OneLake shortcuts</strong> expose ADLS Gen2 files in Fabric with zero duplication.</li>
 <li><strong>Cosmos DB Mirroring</strong> continuously replicates operational data into OneLake Delta tables without a
@@ -221,16 +220,14 @@ movement patterns without prompting.</p>
 </tbody></table></div>
 <h2 id="talking-points-mini-briefing">Talking points (mini-briefing)<a class="anchor" href="#talking-points-mini-briefing" aria-hidden="true">#</a></h2>
 <ul>
-<li><strong>OneLake is the unifier.</strong> The customer sees one Fabric data estate even when source data still
+<li><strong>OneLake provides one Fabric data estate</strong> even when source data still
 lives in Azure storage or operational databases.</li>
-<li><strong>Shortcuts eliminate waste.</strong> No duplicate storage bill, no egress-heavy copy, no stale export job.
-Fabric reads the ADLS Gen2 files already landed in Challenge 2.</li>
-<li><strong>Mirroring is near-real-time without connector glue.</strong> Cosmos DB conversations flow into OneLake
+<li><strong>Shortcuts avoid a separate copy job.</strong> Fabric reads the ADLS Gen2 files already landed in Challenge 2.</li>
+<li><strong>Mirroring replicates data in near-real-time.</strong> Cosmos DB conversations flow into OneLake
 Delta tables so data engineers can query them like lake data.</li>
 <li><strong>This is the Bronze feed.</strong> Challenge 4 will refine shortcut files and mirrored tables into Bronze,
 Silver, and Gold products for reliability, cost, and performance.</li>
-<li><strong>Identity is the enterprise control plane.</strong> If RBAC is right, the pattern scales; if identity is
-wrong, every shortcut and mirror becomes a support ticket.</li>
+<li><strong>Identity controls access.</strong> Verify RBAC for shortcuts and Mirroring to avoid access failures.</li>
 </ul>
 <h2 id="if-they-finish-early">If they finish early<a class="anchor" href="#if-they-finish-early" aria-hidden="true">#</a></h2>
 <ul>
@@ -269,7 +266,7 @@ wrong, every shortcut and mirror becomes a support ticket.</li>
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

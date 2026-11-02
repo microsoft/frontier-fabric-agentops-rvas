@@ -8,9 +8,9 @@
 
 ## Overview
 
-This component implements the Microsoft Fabric analytics layer of the AgentOps Control Tower. It processes data from Azure Monitor, Cost Management, and Cosmos DB through a **medallion architecture** (Bronze → Silver → Gold) in Microsoft Fabric, producing Power BI reports for operational insights.
+This component builds the AgentOps Control Tower's analytics layer in Microsoft Fabric. It processes Azure Monitor, Cost Management, and Cosmos DB data through a **medallion architecture** (Bronze → Silver → Gold) for operational Power BI reports.
 
-Raw telemetry — cost exports, platform metrics, diagnostic logs, and AI-agent conversations — flows into a Fabric Lakehouse via ADLS Gen2 shortcuts and Cosmos DB Mirroring. PySpark notebooks transform the data through progressively refined layers, and a Direct Lake semantic model powers interactive Power BI dashboards without any data duplication.
+Cost exports, platform metrics, diagnostic logs, and AI-agent conversations enter a Fabric Lakehouse through ADLS Gen2 shortcuts and Cosmos DB Mirroring. PySpark notebooks transform the data into Bronze, Silver, and Gold tables. A Direct Lake semantic model lets Power BI read the Delta tables without an imported copy.
 
 ## Architecture
 
@@ -110,7 +110,7 @@ python src/setup/setup_fabric_workspace.py \
   --capacity-id "<fabric-capacity-id>"
 ```
 
-The script performs the following:
+The script:
 
 1. Creates (or reuses) a Fabric workspace assigned to the specified capacity.
 2. Creates an **Observability** lakehouse inside the workspace.
@@ -263,7 +263,7 @@ Both pipelines include:
 
 ## Semantic Model
 
-The Direct Lake semantic model connects Power BI directly to Delta tables in OneLake — no import or DirectQuery overhead.
+The Direct Lake semantic model connects Power BI directly to Delta tables in OneLake without importing a copy.
 
 ### Tables and Relationships
 

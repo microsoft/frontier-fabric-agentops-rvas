@@ -73,7 +73,6 @@
 Azure infrastructure and export scripts that land cost, metrics, logs, diagnostics, and resource
 metadata into ADLS Gen2 so Fabric can shortcut to it in later challenges.</p>
 </blockquote>
-<p>Azure infrastructure and scripts that ingest observability data from the Azure Control Plane, Azure Monitor, and Cost Management into an ADLS Gen2 landing zone.</p>
 <h2 id="architecture-overview">Architecture Overview<a class="anchor" href="#architecture-overview" aria-hidden="true">#</a></h2>
 <p>This component provisions the <strong>landing zone</strong> of the AgentOps Control Tower:</p>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>┌──────────────────────────────────────────────────────────────────────┐
@@ -179,8 +178,8 @@ azd provision</code></pre>
   --parameters infra/main.parameters.json \
   --parameters environmentName=demo location=eastus2</code></pre>
 <h2 id="seed-and-validate-the-landing-zone">Seed and Validate the Landing Zone<a class="anchor" href="#seed-and-validate-the-landing-zone" aria-hidden="true">#</a></h2>
-<p>The scripts are a one-time workshop bootstrap. They make data available immediately without adding
-a production scheduler before the Fabric data path is built. Challenge 6 can move the same exporter
+<p>Use these scripts to seed and validate workshop data once, before building the Fabric data path.
+Challenge 6 can move the same exporter
 to unattended cloud execution without changing its ADLS data contract.</p>
 <p>Authenticate with Azure, then create an isolated Python environment:</p>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">az login
@@ -195,7 +194,7 @@ python -m pip install -r requirements.txt</code></pre>
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt</code></pre>
 <h3 id="resource-graph-export">Resource Graph Export<a class="anchor" href="#resource-graph-export" aria-hidden="true">#</a></h3>
-<p>Queries Azure Resource Graph for resource metadata and exports to ADLS Gen2:</p>
+<p>Export resource metadata from Azure Resource Graph to ADLS Gen2:</p>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">python resource_graph_export.py \
   --subscription-id &lt;SUBSCRIPTION_ID&gt; \
   --storage-account &lt;STORAGE_ACCOUNT_NAME&gt; \
@@ -203,7 +202,7 @@ python -m pip install -r requirements.txt</code></pre>
 <p>Diagnostic settings for the reused Log Analytics workspace are deployed by Bicep. No setup script is
 required.</p>
 <h3 id="validate-exports">Validate Exports<a class="anchor" href="#validate-exports" aria-hidden="true">#</a></h3>
-<p>Discovers <code>costs</code>, <code>metadata</code>, <code>am-*</code>, and <code>insights-*</code> containers and reports on ingested data:</p>
+<p>Inspect <code>costs</code>, <code>metadata</code>, <code>am-*</code>, and <code>insights-*</code> containers and report on ingested data:</p>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">python validate_exports.py \
   --storage-account &lt;STORAGE_ACCOUNT_NAME&gt;</code></pre>
 <h2 id="data-format-reference">Data Format Reference<a class="anchor" href="#data-format-reference" aria-hidden="true">#</a></h2>
@@ -322,14 +321,14 @@ required.</p>
 └── insights-metrics-pt1m/
   └── resourceId=*/...          # Diagnostic settings metric output</code></pre>
 <h2 id="integration-with-the-fabric-control-tower">Integration with the Fabric Control Tower<a class="anchor" href="#integration-with-the-fabric-control-tower" aria-hidden="true">#</a></h2>
-<p>This landing zone is the data source for the <strong><a href="../fabric-control-tower/README.html">Fabric Control Tower</a></strong> you connect in <strong><a href="../../challenges/challenge-03-onelake-foundation.html">Challenge 3</a></strong>. The ADLS Gen2 storage account serves as a OneLake shortcut target:</p>
+<p>Connect this landing zone to the <strong><a href="../fabric-control-tower/README.html">Fabric Control Tower</a></strong> in <strong><a href="../../challenges/challenge-03-onelake-foundation.html">Challenge 3</a></strong>. The ADLS Gen2 storage account is the OneLake shortcut target:</p>
 <ol>
 <li><strong>Fabric Lakehouse</strong> creates shortcuts to each container in this storage account</li>
 <li><strong>Spark notebooks</strong> read Parquet cost data and resource metadata</li>
 <li><strong>Power BI</strong> datasets are built on top of the lakehouse tables</li>
 <li><strong>Cost dashboards</strong> combine FOCUS cost data with resource tags for showback/chargeback</li>
 </ol>
-<p>The storage account uses hierarchical namespace (ADLS Gen2) and date-partitioned directories for optimal Spark performance.</p>
+<p>The storage account uses hierarchical namespace (ADLS Gen2) and date-partitioned directories to support Spark processing.</p>
 <h2 id="infrastructure-resources">Infrastructure Resources<a class="anchor" href="#infrastructure-resources" aria-hidden="true">#</a></h2>
 <div class="table-wrap"><table><thead><tr>
 <th>Resource</th>
@@ -367,7 +366,7 @@ required.</p>
         </article>
         
         <div class="filetree">
-          <div class="filetree-head">📁 observability-ingestion — 13 files · click any file to view it here (syntax-highlighted)</div>
+          <div class="filetree-head">observability-ingestion · 13 files · select a file to read its source</div>
           <ul>
             <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2F.github%2Fworkflows%2Fdeploy.yml"><span class="ic">›</span>observability-ingestion/.github/workflows/deploy.yml</a></li>
             <li><a href="../../code.html?path=resources%2Fobservability-ingestion%2F.github%2Fworkflows%2Fscheduled-export.yml"><span class="ic">›</span>observability-ingestion/.github/workflows/scheduled-export.yml</a></li>
@@ -398,7 +397,7 @@ required.</p>
       <a class="brand" href="../../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../../index.html">Home</a>
         <a href="../../builder.html">Builder</a>

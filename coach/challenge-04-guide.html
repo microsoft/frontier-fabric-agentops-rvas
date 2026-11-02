@@ -88,9 +88,9 @@
 </tr>
 </tbody></table></div>
 <h2 id="coaching-objectives">Coaching objectives<a class="anchor" href="#coaching-objectives" aria-hidden="true">#</a></h2>
-<p>This is the data-engineering core of the RVAS. Keep teams focused on <strong>correlation</strong>, not just
-&quot;notebooks ran.&quot; The Control Tower becomes valuable when cost, telemetry, resource metadata, and agent
-activity can be joined into one operational story.</p>
+<p>This is the data-engineering core of the RVAS. Verify <strong>correlation</strong>, not just
+&quot;notebooks ran.&quot; Focus on how cost, telemetry, resource metadata, and agent activity
+can be joined to answer operational questions.</p>
 <p>Make sure they can explain the medallion rationale:</p>
 <ul>
 <li><strong>Bronze = fidelity and reprocessability</strong> — raw inputs plus lineage.</li>
@@ -222,7 +222,7 @@ are visible in the run details.</li>
 operational telemetry.</li>
 <li><strong>Rationale proof</strong> — one team member explains Bronze/Silver/Gold without reading the doc.</li>
 </ol>
-<p>✅ Pass when Gold is populated, the pipeline is green, and the correlation proof is real.</p>
+<p>✅ Pass when Gold is populated, the pipeline succeeds, and the team demonstrates correlation.</p>
 <h2 id="common-pitfalls-fixes">Common pitfalls &amp; fixes<a class="anchor" href="#common-pitfalls-fixes" aria-hidden="true">#</a></h2>
 <div class="table-wrap"><table><thead><tr>
 <th>Pitfall</th>
@@ -267,16 +267,15 @@ operational telemetry.</li>
 </tbody></table></div>
 <h2 id="talking-points-mini-briefing">Talking points (mini-briefing)<a class="anchor" href="#talking-points-mini-briefing" aria-hidden="true">#</a></h2>
 <ul>
-<li><strong>Bronze protects optionality.</strong> When a schema or business rule changes, you can replay from raw
+<li><strong>Bronze preserves raw data.</strong> When a schema or business rule changes, you can replay from raw
 Delta rather than rebuild the landing zone.</li>
-<li><strong>Silver is where trust is earned.</strong> Standardized FOCUS costs and conformed telemetry make cross-source
-joins defensible.</li>
-<li><strong>Gold is a product, not a dump.</strong> It should be fast, named for business questions, and shaped for
+<li><strong>Silver standardizes data.</strong> Standardized FOCUS costs and conformed telemetry support cross-source joins.</li>
+<li><strong>Gold supports business questions.</strong> It should be fast, named for those questions, and shaped for
 Direct Lake consumption.</li>
-<li><strong>Correlation is the Control Tower moment.</strong> A dashboard that shows cost, traces, and agents in
-separate panels is still fragmented; joined insight is what leadership asked for.</li>
-<li><strong>Automation matters.</strong> Pipelines, retries, alerts, and refresh windows are what turn notebooks into
-an operating platform.</li>
+<li><strong>Correlation answers leadership&#39;s questions.</strong> Join cost, traces, and agent data rather than
+only showing them in separate panels.</li>
+<li><strong>Automation supports ongoing operation.</strong> Use pipelines, retries, alerts, and refresh windows
+to run the notebooks.</li>
 </ul>
 <h2 id="if-they-finish-early">If they finish early<a class="anchor" href="#if-they-finish-early" aria-hidden="true">#</a></h2>
 <ul>
@@ -318,7 +317,7 @@ an operating platform.</li>
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

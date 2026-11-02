@@ -86,8 +86,8 @@ tower</strong> itself — the Fabric workspace you stand up across
 <strong><a href="../../challenges/challenge-05-control-tower-dashboards.html">Challenge 5</a></strong> (Direct Lake dashboards).</p>
 </blockquote>
 <h2 id="overview">Overview<a class="anchor" href="#overview" aria-hidden="true">#</a></h2>
-<p>This component implements the Microsoft Fabric analytics layer of the AgentOps Control Tower. It processes data from Azure Monitor, Cost Management, and Cosmos DB through a <strong>medallion architecture</strong> (Bronze → Silver → Gold) in Microsoft Fabric, producing Power BI reports for operational insights.</p>
-<p>Raw telemetry — cost exports, platform metrics, diagnostic logs, and AI-agent conversations — flows into a Fabric Lakehouse via ADLS Gen2 shortcuts and Cosmos DB Mirroring. PySpark notebooks transform the data through progressively refined layers, and a Direct Lake semantic model powers interactive Power BI dashboards without any data duplication.</p>
+<p>This component builds the AgentOps Control Tower&#39;s analytics layer in Microsoft Fabric. It processes Azure Monitor, Cost Management, and Cosmos DB data through a <strong>medallion architecture</strong> (Bronze → Silver → Gold) for operational Power BI reports.</p>
+<p>Cost exports, platform metrics, diagnostic logs, and AI-agent conversations enter a Fabric Lakehouse through ADLS Gen2 shortcuts and Cosmos DB Mirroring. PySpark notebooks transform the data into Bronze, Silver, and Gold tables. A Direct Lake semantic model lets Power BI read the Delta tables without an imported copy.</p>
 <h2 id="architecture">Architecture<a class="anchor" href="#architecture" aria-hidden="true">#</a></h2>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>┌─────────────────────────────────────────────────────────────────────────────┐
 │                           Data Sources                                      │
@@ -190,7 +190,7 @@ python src/setup/setup_fabric_workspace.py \
   --storage-account-url &quot;https://&lt;account&gt;.dfs.core.windows.net&quot; \
   --connection-id &quot;&lt;fabric-connection-id&gt;&quot; \
   --capacity-id &quot;&lt;fabric-capacity-id&gt;&quot;</code></pre>
-<p>The script performs the following:</p>
+<p>The script:</p>
 <ol>
 <li>Creates (or reuses) a Fabric workspace assigned to the specified capacity.</li>
 <li>Creates an <strong>Observability</strong> lakehouse inside the workspace.</li>
@@ -412,7 +412,7 @@ to share them, or per environment to vary them.</p>
 <li>Failure notifications via Fabric alerts (email and Teams webhook).</li>
 </ul>
 <h2 id="semantic-model">Semantic Model<a class="anchor" href="#semantic-model" aria-hidden="true">#</a></h2>
-<p>The Direct Lake semantic model connects Power BI directly to Delta tables in OneLake — no import or DirectQuery overhead.</p>
+<p>The Direct Lake semantic model connects Power BI directly to Delta tables in OneLake without importing a copy.</p>
 <h3 id="tables-and-relationships">Tables and Relationships<a class="anchor" href="#tables-and-relationships" aria-hidden="true">#</a></h3>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>Calendar (dim_date) ──1:*──▶ CostSummary
                     ├─1:*──▶ OperationalMetrics
@@ -541,7 +541,7 @@ ResourceInventory (dim_resource) ──1:*──▶ CostSummary</code></pre>
         </article>
         
         <div class="filetree">
-          <div class="filetree-head">📁 fabric-control-tower — 16 files · click any file to view it here (syntax-highlighted)</div>
+          <div class="filetree-head">fabric-control-tower · 16 files · select a file to read its source</div>
           <ul>
             <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2F.github%2Fworkflows%2Fdeploy.yml"><span class="ic">›</span>fabric-control-tower/.github/workflows/deploy.yml</a></li>
             <li><a href="../../code.html?path=resources%2Ffabric-control-tower%2F.gitignore"><span class="ic">›</span>fabric-control-tower/.gitignore</a></li>
@@ -575,7 +575,7 @@ ResourceInventory (dim_resource) ──1:*──▶ CostSummary</code></pre>
       <a class="brand" href="../../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../../index.html">Home</a>
         <a href="../../builder.html">Builder</a>

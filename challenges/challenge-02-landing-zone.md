@@ -4,15 +4,8 @@
 
 ---
 
-> **Mission log.**
-> The agents are talking. Now the Control Tower needs a place for every signal to land — cost,
-> metrics, logs, resource inventory, and platform diagnostics. Scattered telemetry is noise; a
-> governed lake landing zone is the first step toward intelligence.
-
-In this challenge your team builds the **Ingest** stage of the platform: a secure ADLS Gen2 landing
-zone that Microsoft Fabric will read in Challenge 3 with OneLake shortcuts. You are not building the
-dashboards yet. You are preparing the runway so the Control Tower can correlate reliability, cost, and
-performance later.
+Build an **ADLS Gen2 landing zone** for cost, application telemetry, resource metadata, and
+platform diagnostics. Challenge 3 connects these files to Fabric through OneLake shortcuts.
 
 ## Objectives
 
@@ -25,8 +18,8 @@ By the end of this challenge you will have:
 - Enabled **Log Analytics data export** so application telemetry flows continuously to storage.
 - Configured **Cost Management FOCUS** export for FinOps-ready Parquet cost data.
 - Exported **Azure Resource Graph** metadata and tags to Parquet.
-- Wired **diagnostic settings** so Azure platform logs and metrics land in the lake.
-- Recorded the storage account coordinates Fabric will need next.
+- Configured **diagnostic settings** so Azure platform logs and metrics land in the lake.
+- Recorded the storage account details Fabric will need next.
 
 ## Prerequisites
 
@@ -50,8 +43,8 @@ The provided ingestion layer lands four Azure signal families into one ADLS Gen2
 | Azure Resource Graph | `metadata` | Parquet (Snappy) | On demand / scheduled |
 | Diagnostic settings | `insights-*` containers such as `insights-logs-audit` and `insights-metrics-pt1m` | JSON | Continuous |
 
-That storage account becomes the **OneLake shortcut target** in Challenge 3. Treat its name, resource
-ID, and DFS endpoint as mission-critical coordinates.
+That storage account becomes the **OneLake shortcut target** in Challenge 3. Record its name, resource
+ID, and DFS endpoint for the next challenge.
 
 ```
 Azure Monitor + Cost + Resource Graph + Diagnostics
@@ -126,7 +119,7 @@ account. The identity will be used by Fabric connections and notebooks in the fo
   - Other `am-*` containers — exported tables that have produced records after export was enabled
   - `insights-*` containers — diagnostic settings output
 
-### 6. Record the coordinates for Fabric
+### 6. Record storage and export details
 
 Before moving on, write down:
 
@@ -154,7 +147,7 @@ Challenge 3 depends on these values to create OneLake shortcuts without copying 
 
 > 🧭 **Checkpoint:** show your coach the `costs` and `metadata` containers, the Azure-created
 > `am-*` and `insights-*` containers, one FOCUS Parquet file, one Resource Graph Parquet file, the
-> active Log Analytics export rule, and your recorded Fabric shortcut coordinates.
+> active Log Analytics export rule, and your recorded storage details.
 
 ## Hints
 

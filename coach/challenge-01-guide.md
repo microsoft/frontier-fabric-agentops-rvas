@@ -13,10 +13,9 @@
 
 ## Coaching objectives
 
-The point is **not** "deploy an app" — it's understanding **what telemetry the Control Tower will
-later consume and why**. Make sure teams can trace a single user message from the backend through
-the agent and can name the custom token and latency metrics. That mental model pays off in later
-challenges.
+Teams need to understand **what telemetry the Control Tower will consume and why**, beyond
+"deploy an app". Make sure they can trace a single user message from the backend through
+the agent and name the custom token and latency metrics used in later challenges.
 
 **What good looks like:** the team shows a correlated transaction (backend → agent → model, with
 Cosmos operations), points at token and latency metrics, and finds their conversations in Cosmos DB.
@@ -136,8 +135,8 @@ resource coordinates.
   remain future hardening opportunities.
 - **Managed identity everywhere** — no secrets; auth is Entra + RBAC. This is also how Fabric will
   reach the data later.
-- **Tokens = money.** The custom token metric is the seed of cost-per-request and FinOps chargeback
-  in Challenges 4–6. Connect today's metric to that future payoff.
+- **Token usage informs cost.** Connect the custom token metric to cost-per-request and FinOps
+  chargeback in Challenges 4–6.
 - **Serverless Cosmos DB** is the conversation system-of-record — and the Mirroring source in
   Challenge 3.
 

@@ -4,15 +4,8 @@
 
 ---
 
-> **Mission log, Day 1.**
-> The customer's AI agents are multiplying faster than anyone can track. Before you can build the
-> Control Tower, you need a launchpad: access to the customer's cloud, the right tools on your
-> machines, and a Microsoft Fabric capacity to build on. A control tower is only as good as the
-> ground it's built on — so let's pour the foundation.
-
-In this challenge your team gets fully provisioned and confirms every member can reach Azure **and**
-Fabric. Don't skip the verification steps — a missing role or quota gap discovered now saves hours
-later.
+Confirm that every team member can access **Azure and Fabric**, has the required tools, and can
+use the chosen model quota. Resolve missing roles or quota before deploying the workloads.
 
 ## Objectives
 
@@ -22,7 +15,7 @@ By the end of this challenge you will have:
 - Verified Azure AI Foundry model quota in a region that also supports Fabric.
 - A working **Microsoft Fabric capacity** (trial or paid) and a **team workspace** on it.
 - Local tooling installed and verified for every team member.
-- Cloned this repository and oriented yourselves in the `resources/` toolbox.
+- Cloned this repository and located the reference assets in `resources/`.
 
 ## Prerequisites
 
@@ -33,7 +26,7 @@ By the end of this challenge you will have:
 
 ## Your mission
 
-### 1. Establish the beachhead (Azure)
+### 1. Confirm Azure access
 
 - Every team member signs in: `az login`, and selects the target subscription.
 - As a team, **confirm your roles** on the subscription/resource group: you need **Contributor**
@@ -42,31 +35,31 @@ By the end of this challenge you will have:
 - Confirm someone has **Cost Management Reader** at the billing scope (needed in Challenge 2).
 - Register the resource providers you'll need so first deployments don't stall.
 
-### 2. Confirm your firepower (Foundry model quota)
+### 2. Confirm Foundry model quota
 
 - Confirm access to **Azure AI Foundry / Azure OpenAI** and locate **quota** for `gpt-5-mini`, the
   model used by the reference workload.
 - Pick a **region** that offers both the model and Microsoft Fabric, and agree on it as a team —
   you'll deploy everything there.
 
-### 3. Raise the tower's platform (Fabric)
+### 3. Set up Fabric capacity and workspace
 
-- Stand up a **Fabric capacity**: start the **60-day free trial** (recommended) or use a paid **F2+**
+- Set up a **Fabric capacity**: start the **60-day free trial** (recommended) or use a paid **F2+**
   capacity. Note the **capacity name/ID**.
 - Create a **Fabric workspace** for your team and **assign it to the capacity**.
 - Make sure each team member can open the workspace at
   [app.fabric.microsoft.com](https://app.fabric.microsoft.com).
 
-### 4. Arm the team (tooling) & get the code
+### 4. Install tools and get the code
 
 - Install and verify the local tools (`az`, `azd`, `python`, `node`, `docker`, `git`). Start Docker
   Desktop (or another compatible container runtime) and confirm its engine is running.
-- Clone this repo and take a 5-minute tour of `resources/` — note where the agent workload, landing
-  zone, and Fabric assets live. You'll come back to each.
+- Clone this repo and spend 5 minutes locating the agent workload, landing zone, and Fabric assets
+  in `resources/`.
 
-### 5. Record your coordinates
+### 5. Record environment details
 
-Capture these somewhere your team can see them all event — you'll reuse them constantly:
+Keep these details where your team can find them throughout the event:
 
 - Subscription ID(s), chosen **region**, resource group name convention
 - Foundry model + deployment name
@@ -83,10 +76,10 @@ You're ready to advance when:
 - [ ] A team **Fabric workspace** exists, assigned to the capacity, reachable by all members
 - [ ] Local tooling installed and verified (`az version`, `azd version`, `python --version`, `docker info`)
 - [ ] Repo cloned; team has located the four `resources/` components
-- [ ] Your "coordinates" (subscription, region, capacity, workspace) are written down
+- [ ] Subscription, region, capacity, and workspace details are recorded
 
 > 🧭 **Checkpoint:** show your coach that everyone can reach both the Azure portal **and** the Fabric
-> workspace, and read back your coordinates.
+> workspace, and confirm your recorded environment details.
 
 ## Hints
 
@@ -134,7 +127,7 @@ in the team's chosen region.
 ## Resources
 
 - [`docs/prerequisites.md`](../docs/prerequisites.md) — the detailed companion checklist
-- [`docs/architecture.md`](../docs/architecture.md) — the picture you're about to build
+- [`docs/architecture.md`](../docs/architecture.md) — reference architecture
 - [`resources/README.md`](../resources/README.md) — tour of the provided assets
 
 ---

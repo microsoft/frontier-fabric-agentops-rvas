@@ -102,7 +102,7 @@
       <a class="brand" href="index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Reference implementation · viewed in-place, syntax-highlighted.</p>
+      <p>Browse the reference implementation source.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="index.html">Home</a>
         <a href="builder.html">Builder</a>
@@ -222,9 +222,8 @@
       const intro = document.createElement('div'); intro.className = 'idx-intro';
       intro.innerHTML =
         '<h1>Reference implementation source</h1>' +
-        '<p>Read every source file from the reference implementation &mdash; syntax-highlighted, in place, ' +
-        'no downloads. <b>' + total + ' files</b> across ' + groups.length + ' components. ' +
-        'Click any file to open it in the viewer.</p>' +
+        '<p>Browse <b>' + total + ' reference files</b> across ' + groups.length + ' components. ' +
+        'Select a file to read its source here, with syntax highlighting.</p>' +
         '<input type="search" id="idxFilter" class="idx-filter" placeholder="Filter files by name or path…" autocomplete="off" aria-label="Filter files">';
       view.appendChild(intro);
 

@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contributing to the Frontier Fabric AgentOps RVAS · Frontier Fabric AgentOps RVAS</title>
-  <meta name="description" content="Thanks for your interest in improving this RVAS! This repo is an open teaching asset — the more
-real-world the challenges, hints, and coach guides are, the better the experience fo">
+  <meta name="description" content="Contribute fixes, clearer instructions, reference code, or new challenges to this open teaching
+asset. Keep the content useful for customer teams building an AgentOps Control Tower">
   <link rel="icon" type="image/png" href="assets/logos/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +46,7 @@ real-world the challenges, hints, and coach guides are, the better the experienc
         <div class="toc-title">On this page</div>
         <ul>
           <li><a class="h2" href="#ways-to-contribute">Ways to contribute</a></li>
-          <li><a class="h2" href="#golden-rule-challenges-and-coach-guides-travel-together">Golden rule: challenges and coach guides travel together</a></li>
+          <li><a class="h2" href="#keep-challenges-and-coach-guides-in-sync">Keep challenges and coach guides in sync</a></li>
           <li><a class="h2" href="#house-style">House style</a></li>
           <li><a class="h2" href="#making-changes">Making changes</a></li>
           <li><a class="h2" href="#the-website-github-pages">The website (GitHub Pages)</a></li>
@@ -60,10 +60,8 @@ real-world the challenges, hints, and coach guides are, the better the experienc
         <div class="breadcrumb"><a href="index.html">Home</a> <span class="sep">/</span> <span>Contributing to the Frontier Fabric AgentOps RVAS</span></div>
         <article class="article prose">
 <h1 id="contributing-to-the-frontier-fabric-agentops-rvas">Contributing to the Frontier Fabric AgentOps RVAS</h1>
-<p>Thanks for your interest in improving this RVAS! This repo is an open teaching asset — the more
-real-world the challenges, hints, and coach guides are, the better the experience for the next
-customer team that runs it. Contributions of all sizes are welcome, from fixing a typo to authoring a
-brand-new challenge.</p>
+<p>Contribute fixes, clearer instructions, reference code, or new challenges to this open teaching
+asset. Keep the content useful for customer teams building an AgentOps Control Tower.</p>
 <h2 id="ways-to-contribute">Ways to contribute<a class="anchor" href="#ways-to-contribute" aria-hidden="true">#</a></h2>
 <div class="table-wrap"><table><thead><tr>
 <th>Contribution</th>
@@ -94,9 +92,9 @@ brand-new challenge.</p>
 <td>GitHub Issues</td>
 </tr>
 </tbody></table></div>
-<h2 id="golden-rule-challenges-and-coach-guides-travel-together">Golden rule: challenges and coach guides travel together<a class="anchor" href="#golden-rule-challenges-and-coach-guides-travel-together" aria-hidden="true">#</a></h2>
+<h2 id="keep-challenges-and-coach-guides-in-sync">Keep challenges and coach guides in sync<a class="anchor" href="#keep-challenges-and-coach-guides-in-sync" aria-hidden="true">#</a></h2>
 <p>Every attendee-facing challenge in <code>challenges/</code> has a matching instructor guide in <code>coach/</code>. If you
-change one, update the other in the same pull request so they never drift:</p>
+change one, update the other in the same pull request:</p>
 <ul>
 <li>A new task in a challenge needs a matching checkpoint + reference path in the guide.</li>
 <li>A renamed file needs its prev/next nav links and the coach cross-link updated.</li>
@@ -104,7 +102,7 @@ change one, update the other in the same pull request so they never drift:</p>
 <h2 id="house-style">House style<a class="anchor" href="#house-style" aria-hidden="true">#</a></h2>
 <p><strong>Attendee challenges</strong> (<code>challenges/</code>) describe <strong>what</strong> to accomplish, not <strong>how</strong>:</p>
 <ol>
-<li>A short &quot;mission log&quot; blockquote story hook at the top.</li>
+<li>A short paragraph explaining the scenario and what the team will build.</li>
 <li><code>## Objectives</code> and <code>## Prerequisites</code>.</li>
 <li><code>## Your mission</code> — numbered task groups describing the goal, not click-by-click steps.</li>
 <li><code>## Success criteria</code> — a verifiable checklist.</li>
@@ -118,21 +116,20 @@ change one, update the other in the same pull request so they never drift:</p>
 <li>Coaching objectives and a concrete reference path (exact commands/paths).</li>
 <li>Checkpoint verification, a common-pitfalls table, talking points, and an &quot;if they finish early&quot; note.</li>
 </ol>
-<p>Keep the three business questions — <strong>reliability, cost, performance</strong> — threaded through new content.</p>
+<p>Connect new content to the three business questions: <strong>reliability, cost, and performance</strong>.</p>
 <h2 id="making-changes">Making changes<a class="anchor" href="#making-changes" aria-hidden="true">#</a></h2>
 <ol>
 <li>Fork the repo and create a topic branch: <code>git checkout -b improve-challenge-04</code>.</li>
 <li>Make your changes. Keep relative Markdown links valid (challenge nav, coach cross-links, <code>resources/</code> and <code>docs/</code> references).</li>
 <li>Open a pull request with a clear description of the change and which challenge(s)/guide(s) it affects.</li>
-<li>For substantive changes, please open an Issue first so we can align on direction.</li>
+<li>Before making substantive changes, open an Issue to agree on the direction.</li>
 </ol>
 <h2 id="the-website-github-pages">The website (GitHub Pages)<a class="anchor" href="#the-website-github-pages" aria-hidden="true">#</a></h2>
-<p>The repo doubles as its own website at
-<a href="https://microsoft.github.io/frontier-fabric-agentops-rvas/" target="_blank" rel="noopener">https://microsoft.github.io/frontier-fabric-agentops-rvas/</a>. So visitors never have to leave the
-site, <strong>every Markdown file is pre-rendered into a branded HTML page</strong> that sits next to its source
+<p>The website at <a href="https://microsoft.github.io/frontier-fabric-agentops-rvas/" target="_blank" rel="noopener">https://microsoft.github.io/frontier-fabric-agentops-rvas/</a> serves
+<strong>Markdown content as generated HTML pages</strong> next to their sources
 (<code>challenges/challenge-01-agent-telemetry.md</code> → <code>challenges/challenge-01-agent-telemetry.html</code>), and
-reference-implementation code is viewable in-place through <code>code.html</code>. The landing page
-(<code>index.html</code>) and the delivery composer (<code>builder.html</code>) tie it all together.</p>
+reference code is viewable through <code>code.html</code>. The landing page is <code>index.html</code>;
+the delivery composer is <code>builder.html</code>.</p>
 <p>GitHub Pages serves this repo in <strong>legacy mode</strong> (the branch root, as-is) — there is no CI build — so
 the generated HTML is committed to the repo. <strong>If you edit any Markdown, regenerate the site</strong> so the
 pages match:</p>
@@ -140,7 +137,8 @@ pages match:</p>
 npm run build      # regenerates all *.html pages + builder-data.json</code></pre>
 <p>What the build does:</p>
 <ul>
-<li>Renders every <code>.md</code> (outside <code>.git</code>, <code>.agents</code>, <code>node_modules</code>, <code>tools</code>) to a branded <code>.html</code> page.</li>
+<li>Renders content <code>.md</code> files (outside <code>.git</code>, <code>.agents</code>, <code>node_modules</code>, <code>tools</code>) to branded <code>.html</code>
+pages. <code>TONE-OF-VOICE.md</code> stores writing guidance and is not published.</li>
 <li>Rewrites links so navigation stays on the site: <code>*.md</code> → <code>*.html</code>, directories → their <code>README.html</code>
 (or the parent component page), and code files → the in-site <code>code.html</code> viewer.</li>
 <li>Regenerates <code>builder-data.json</code> (challenge metadata + dependencies) that powers <code>builder.html</code>.</li>
@@ -150,7 +148,7 @@ Do not hand-edit generated <code>.html</code> files or <code>builder-data.json</
 the next build. Styling lives in <code>assets/css/site.css</code>; the generator lives in <code>tools/build.js</code>.</p>
 <h2 id="reporting-issues">Reporting issues<a class="anchor" href="#reporting-issues" aria-hidden="true">#</a></h2>
 <p>Use GitHub Issues for bug reports, unclear instructions, broken links, or environment/setup problems
-encountered during a run. Please include the challenge number, your environment (Azure region, Fabric
+encountered during a run. Include the challenge number, your environment (Azure region, Fabric
 capacity SKU), and what you expected vs. what happened.</p>
 <h2 id="contributor-license-agreement">Contributor License Agreement<a class="anchor" href="#contributor-license-agreement" aria-hidden="true">#</a></h2>
 <p>This project welcomes contributions and suggestions. Most contributions require you to agree to a
@@ -187,7 +185,7 @@ third-party&#39;s policies.</p>
       <a class="brand" href="index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="index.html">Home</a>
         <a href="builder.html">Builder</a>

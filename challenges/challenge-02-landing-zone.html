@@ -53,7 +53,7 @@
           <li><a class="h3" href="#3-verify-platform-diagnostics">3. Verify platform diagnostics</a></li>
           <li><a class="h3" href="#4-land-cost-and-resource-metadata">4. Land cost and resource metadata</a></li>
           <li><a class="h3" href="#5-validate-the-data-lake">5. Validate the data lake</a></li>
-          <li><a class="h3" href="#6-record-the-coordinates-for-fabric">6. Record the coordinates for Fabric</a></li>
+          <li><a class="h3" href="#6-record-storage-and-export-details">6. Record storage and export details</a></li>
           <li><a class="h2" href="#success-criteria">Success criteria</a></li>
           <li><a class="h2" href="#hints">Hints</a></li>
           <li><a class="h2" href="#resources">Resources</a></li>
@@ -70,16 +70,8 @@
         <article class="article prose">
 <h1 id="challenge-2-—-build-the-telemetry-landing-zone">Challenge 2 — Build the Telemetry Landing Zone</h1>
 <hr>
-<blockquote>
-<p><strong>Mission log.</strong>
-The agents are talking. Now the Control Tower needs a place for every signal to land — cost,
-metrics, logs, resource inventory, and platform diagnostics. Scattered telemetry is noise; a
-governed lake landing zone is the first step toward intelligence.</p>
-</blockquote>
-<p>In this challenge your team builds the <strong>Ingest</strong> stage of the platform: a secure ADLS Gen2 landing
-zone that Microsoft Fabric will read in Challenge 3 with OneLake shortcuts. You are not building the
-dashboards yet. You are preparing the runway so the Control Tower can correlate reliability, cost, and
-performance later.</p>
+<p>Build an <strong>ADLS Gen2 landing zone</strong> for cost, application telemetry, resource metadata, and
+platform diagnostics. Challenge 3 connects these files to Fabric through OneLake shortcuts.</p>
 <h2 id="objectives">Objectives<a class="anchor" href="#objectives" aria-hidden="true">#</a></h2>
 <p>By the end of this challenge you will have:</p>
 <ul>
@@ -90,8 +82,8 @@ containers for diagnostic settings.</li>
 <li>Enabled <strong>Log Analytics data export</strong> so application telemetry flows continuously to storage.</li>
 <li>Configured <strong>Cost Management FOCUS</strong> export for FinOps-ready Parquet cost data.</li>
 <li>Exported <strong>Azure Resource Graph</strong> metadata and tags to Parquet.</li>
-<li>Wired <strong>diagnostic settings</strong> so Azure platform logs and metrics land in the lake.</li>
-<li>Recorded the storage account coordinates Fabric will need next.</li>
+<li>Configured <strong>diagnostic settings</strong> so Azure platform logs and metrics land in the lake.</li>
+<li>Recorded the storage account details Fabric will need next.</li>
 </ul>
 <h2 id="prerequisites">Prerequisites<a class="anchor" href="#prerequisites" aria-hidden="true">#</a></h2>
 <ul>
@@ -137,8 +129,8 @@ gives you real agent workload telemetry to land.</li>
 <td>Continuous</td>
 </tr>
 </tbody></table></div>
-<p>That storage account becomes the <strong>OneLake shortcut target</strong> in Challenge 3. Treat its name, resource
-ID, and DFS endpoint as mission-critical coordinates.</p>
+<p>That storage account becomes the <strong>OneLake shortcut target</strong> in Challenge 3. Record its name, resource
+ID, and DFS endpoint for the next challenge.</p>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code>Azure Monitor + Cost + Resource Graph + Diagnostics
                          │
                          ▼
@@ -207,7 +199,7 @@ from Log Analytics</li>
 </ul>
 </li>
 </ul>
-<h3 id="6-record-the-coordinates-for-fabric">6. Record the coordinates for Fabric<a class="anchor" href="#6-record-the-coordinates-for-fabric" aria-hidden="true">#</a></h3>
+<h3 id="6-record-storage-and-export-details">6. Record storage and export details<a class="anchor" href="#6-record-storage-and-export-details" aria-hidden="true">#</a></h3>
 <p>Before moving on, write down:</p>
 <ul>
 <li>Storage account name</li>
@@ -234,7 +226,7 @@ appearing in <code>insights-*</code> containers after platform telemetry is emit
 <blockquote>
 <p>🧭 <strong>Checkpoint:</strong> show your coach the <code>costs</code> and <code>metadata</code> containers, the Azure-created
 <code>am-*</code> and <code>insights-*</code> containers, one FOCUS Parquet file, one Resource Graph Parquet file, the
-active Log Analytics export rule, and your recorded Fabric shortcut coordinates.</p>
+active Log Analytics export rule, and your recorded storage details.</p>
 </blockquote>
 <h2 id="hints">Hints<a class="anchor" href="#hints" aria-hidden="true">#</a></h2>
 <details>
@@ -321,7 +313,7 @@ join spend to resource metadata and Challenge 5 can show cost by service, team, 
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

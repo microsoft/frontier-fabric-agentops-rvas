@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prerequisites &amp; Environment Setup · Frontier Fabric AgentOps RVAS</title>
-  <meta name="description" content="Prerequisites &amp; Environment Setup">
+  <meta name="description" content="Confirm access, quota, and tooling with your coach before Day 1. The RVAS runs in the
+customer&#39;s environment: Azure subscription(s) and a Microsoft Fabric capacity.">
   <link rel="icon" type="image/png" href="../assets/logos/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,16 +56,15 @@
           <li><a class="h2" href="#6-local-tooling">6. Local tooling</a></li>
           <li><a class="h2" href="#7-cost-expectations-hygiene">7. Cost expectations &amp; hygiene</a></li>
           <li><a class="h2" href="#8-get-the-code">8. Get the code</a></li>
-          <li><a class="h2" href="#✅-pre-flight-checklist">✅ Pre-flight checklist</a></li>
+          <li><a class="h2" href="#pre-flight-checklist">Pre-flight checklist</a></li>
         </ul>
       </aside>
       <main class="doc-main">
         <div class="breadcrumb"><a href="../index.html">Home</a> <span class="sep">/</span> <span>Docs</span> <span class="sep">/</span> <span>Prerequisites &amp; Environment Setup</span></div><div class="meta-row"><span class="chip cat-docs">Docs</span></div>
         <article class="article prose">
 <h1 id="prerequisites-environment-setup">Prerequisites &amp; Environment Setup</h1>
-<p>Work through this checklist <strong>with your coach before Day 1</strong>. The RVAS runs on the <strong>customer&#39;s
-own environment</strong> — your Azure subscription(s) plus a Microsoft Fabric capacity. Getting access and
-quota sorted up front is the single biggest factor in a smooth event.</p>
+<p>Confirm access, quota, and tooling <strong>with your coach before Day 1</strong>. The RVAS runs in the
+<strong>customer&#39;s environment</strong>: Azure subscription(s) and a Microsoft Fabric capacity.</p>
 <blockquote>
 <p>⏱️ <strong>Lead time:</strong> Azure AI Foundry model quota and Fabric tenant enablement can take from minutes
 to a few business days depending on your tenant&#39;s governance. <strong>Start at least 3–5 business days
@@ -100,7 +100,7 @@ early.</strong></p>
 </tr>
 </tbody></table></div>
 <blockquote>
-<p>🏢 <strong>Multiple subscriptions?</strong> That&#39;s fine and realistic. A common pattern: the <strong>agent workload</strong>
+<p><strong>Multiple subscriptions?</strong> A common pattern is that the <strong>agent workload</strong>
 and <strong>landing zone</strong> live in one subscription, while <strong>cost exports</strong> are scoped at the billing
 account / management group. Note your subscription IDs in Challenge 0.</p>
 </blockquote>
@@ -130,13 +130,13 @@ manager → Start trial</strong>. See <a href="https://learn.microsoft.com/fabri
 </ul>
 <h3 id="option-b-—-paid-fabric-capacity">Option B — Paid Fabric capacity<a class="anchor" href="#option-b-—-paid-fabric-capacity" aria-hidden="true">#</a></h3>
 <ul>
-<li>Any <strong>F2 or higher</strong> capacity works. F2 handles the RVAS data volumes comfortably; the
+<li>Any <strong>F2 or higher</strong> capacity works for the RVAS data volumes; the
 reference Q&amp;A notes F64+ for production scale.</li>
 <li>Create it in the Azure portal (<code>Microsoft.Fabric/capacities</code>) and <strong>pause it</strong> outside working
 hours to control cost.</li>
 </ul>
 <h3 id="tenant-settings-admin-one-time">Tenant settings (admin, one-time)<a class="anchor" href="#tenant-settings-admin-one-time" aria-hidden="true">#</a></h3>
-<p>A <strong>Fabric / Power BI tenant administrator</strong> must ensure:</p>
+<p>A <strong>Fabric / Power BI tenant administrator</strong> must confirm:</p>
 <ul>
 <li><strong>Microsoft Fabric is enabled</strong> for the tenant (or for the relevant security group). See
 <a href="https://learn.microsoft.com/fabric/admin/fabric-switch" target="_blank" rel="noopener">Enable Microsoft Fabric</a>.</li>
@@ -215,7 +215,7 @@ node --version
 docker info
 git --version</code></pre>
 <h2 id="7-cost-expectations-hygiene">7. Cost expectations &amp; hygiene<a class="anchor" href="#7-cost-expectations-hygiene" aria-hidden="true">#</a></h2>
-<p>This RVAS is intentionally low-cost, but <strong>clean up when you&#39;re done</strong>.</p>
+<p>Plan for these costs and <strong>clean up when you&#39;re done</strong>:</p>
 <ul>
 <li><strong>Fabric</strong> — free on trial; pause paid capacity outside hours. OneLake storage is a few cents/GB.</li>
 <li><strong>Agent workload</strong> — serverless Cosmos DB, Container Apps autoscaling, and <code>gpt-5-mini</code> keep
@@ -228,8 +228,8 @@ cleanup notes), and delete the Fabric workspace / end the trial.</li>
 <pre><button class="code-copy" type="button" aria-label="Copy code">Copy</button><code class="language-bash">git clone https://github.com/microsoft/frontier-fabric-agentops-rvas.git
 cd frontier-fabric-agentops-rvas</code></pre>
 <hr>
-<h2 id="✅-pre-flight-checklist">✅ Pre-flight checklist<a class="anchor" href="#✅-pre-flight-checklist" aria-hidden="true">#</a></h2>
-<p>Bring this to the kickoff. You&#39;re ready when every box is ticked:</p>
+<h2 id="pre-flight-checklist">Pre-flight checklist<a class="anchor" href="#pre-flight-checklist" aria-hidden="true">#</a></h2>
+<p>Confirm each item before kickoff:</p>
 <ul>
 <li><input disabled="" type="checkbox"> Each member can <code>az login</code> to the target subscription</li>
 <li><input disabled="" type="checkbox"> Roles confirmed: Contributor (+ User Access Administrator), Cost Management Reader</li>
@@ -242,8 +242,8 @@ cd frontier-fabric-agentops-rvas</code></pre>
 <li><input disabled="" type="checkbox"> Local tooling installed and verified (<code>az</code>, <code>azd</code>, <code>python</code>, <code>docker</code>, <code>git</code>)</li>
 <li><input disabled="" type="checkbox"> Repo cloned</li>
 </ul>
-<p>Stuck on any item? That&#39;s exactly what <strong><a href="../challenges/challenge-00-mission-setup.html">Challenge 0</a></strong>
-and your coach are for.</p>
+<p>Resolve access and setup issues with your coach in
+<a href="../challenges/challenge-00-mission-setup.html">Challenge 0</a>.</p>
 
         </article>
         
@@ -261,7 +261,7 @@ and your coach are for.</p>
       <a class="brand" href="../index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="../assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="../index.html">Home</a>
         <a href="../builder.html">Builder</a>

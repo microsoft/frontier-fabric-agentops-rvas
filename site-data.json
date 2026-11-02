@@ -8,7 +8,7 @@
       ],
       "group": "Foundation & Sources",
       "url": "challenges/challenge-00-mission-setup.html",
-      "description": "Get the tenant agent-ready: Azure subscriptions, Fabric trial capacity, tooling, and the whole team onboarded.",
+      "description": "Confirm team access to Azure and Fabric, set up capacity, and verify local tools.",
       "tags": [
         "Setup",
         "Fabric admin"
@@ -22,7 +22,7 @@
       ],
       "group": "Foundation & Sources",
       "url": "challenges/challenge-01-agent-telemetry.html",
-      "description": "Deploy the Foundry agent workload on Container Apps + Cosmos DB and confirm telemetry is flowing to App Insights.",
+      "description": "Deploy the Foundry agent workload on Container Apps with Cosmos DB, then verify its App Insights telemetry.",
       "tags": [
         "Azure",
         "Container Apps",
@@ -37,7 +37,7 @@
       ],
       "group": "Foundation & Sources",
       "url": "challenges/challenge-02-landing-zone.html",
-      "description": "Land cost, metrics, logs, metadata & diagnostics in ADLS Gen2 as one analytics-ready landing zone.",
+      "description": "Collect cost, metrics, logs, resource metadata, and diagnostics in an ADLS Gen2 landing zone.",
       "tags": [
         "Azure Monitor",
         "FinOps",
@@ -52,7 +52,7 @@
       ],
       "group": "Fabric & Medallion",
       "url": "challenges/challenge-03-onelake-foundation.html",
-      "description": "Bring enterprise data into Fabric with zero copy — a Lakehouse, OneLake shortcuts, and Cosmos DB Mirroring.",
+      "description": "Connect ADLS Gen2 files through zero-copy OneLake shortcuts and replicate Cosmos DB records through Mirroring.",
       "tags": [
         "Fabric",
         "OneLake",
@@ -67,7 +67,7 @@
       ],
       "group": "Fabric & Medallion",
       "url": "challenges/challenge-04-medallion-pipeline.html",
-      "description": "Engineer a Bronze → Silver → Gold medallion pipeline that correlates reliability, cost, and performance signals.",
+      "description": "Build a Bronze → Silver → Gold pipeline that correlates reliability, cost, and performance data.",
       "tags": [
         "PySpark",
         "Data Engineering"
@@ -81,7 +81,7 @@
       ],
       "group": "Control Tower & Evolve",
       "url": "challenges/challenge-05-control-tower-dashboards.html",
-      "description": "Build a Direct Lake semantic model and the Reliability / Cost / Performance dashboards — the single pane of glass.",
+      "description": "Build a Direct Lake semantic model and Power BI dashboards for reliability, cost, and performance.",
       "tags": [
         "Power BI",
         "DAX",
@@ -111,7 +111,7 @@
       ],
       "group": "Reference Implementation",
       "url": "resources/agent-workload/README.html",
-      "description": "Full-stack Foundry agent app — frontend, backend API, and agent orchestration you light up in Challenge 1.",
+      "description": "The Foundry agent app for Challenge 1: frontend, backend API, and agent orchestration.",
       "tags": [
         "Container Apps",
         "APIM",
@@ -172,7 +172,7 @@
       ],
       "group": "Documentation",
       "url": "docs/architecture.html",
-      "description": "The end-to-end architecture and the four data stages — Emit, Ingest, Process, Serve — you build challenge by challenge.",
+      "description": "The Control Tower architecture: emit telemetry, ingest it, process it, and serve dashboards and alerts.",
       "tags": [
         "Architecture",
         "Data Flow"
@@ -213,7 +213,7 @@
       ],
       "group": "Instructor Toolkit",
       "url": "coach/README.html",
-      "description": "Logistics, timing, sample agenda, facilitation philosophy, and the reference-reveal policy for instructors.",
+      "description": "Event logistics, timing, a sample agenda, and guidance on coaching and sharing reference solutions.",
       "tags": [
         "Facilitation",
         "Agenda"

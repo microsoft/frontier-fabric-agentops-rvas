@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════════
    Frontier Fabric AgentOps RVAS — static site builder
-   Renders every Markdown file in the repo into a branded, self-contained HTML
+   Renders content Markdown files in the repo into branded, self-contained HTML
    page (next to its source) so visitors never leave GitHub Pages. Also emits
    builder-data.json for the delivery composer (builder.html) and code-index.json
    for the in-site code viewer's landing page (code.html).
@@ -47,7 +47,7 @@ function walkMarkdown(dir, acc = []) {
     if (EXCLUDE_DIRS.has(entry.name)) continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) walkMarkdown(full, acc);
-    else if (entry.isFile() && entry.name.toLowerCase().endsWith('.md')) acc.push(full);
+    else if (entry.isFile() && entry.name.toLowerCase().endsWith('.md') && entry.name !== 'TONE-OF-VOICE.md') acc.push(full);
   }
   return acc;
 }
@@ -335,7 +335,7 @@ ${o.body}
       <a class="brand" href="${rp}index.html" aria-label="RVAS — Frontier Fabric AgentOps">
         <img src="${rp}assets/img/logo-full.png" alt="RVAP" class="rvap-nav-logo" height="28">
       </a>
-      <p>Build an AgentOps Control Tower on Microsoft Fabric. Build. Innovate. Scale real value.</p>
+      <p>Build an AgentOps Control Tower on Microsoft Fabric.</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="${rp}index.html">Home</a>
         <a href="${rp}builder.html">Builder</a>
@@ -490,7 +490,7 @@ function build() {
         }).join('\n            ');
         filetree = `
         <div class="filetree">
-          <div class="filetree-head">📁 ${escapeHtml(rm[1])} — ${list.length} files · click any file to view it here (syntax-highlighted)</div>
+          <div class="filetree-head">${escapeHtml(rm[1])} · ${list.length} files · select a file to read its source</div>
           <ul>
             ${items}
           </ul>
